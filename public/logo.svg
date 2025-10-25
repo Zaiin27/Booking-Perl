@@ -1,0 +1,17 @@
+<svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" style="stop-color:#9945FF;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#14F195;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Background circle -->
+  <circle cx="24" cy="24" r="22" fill="url(#gradient)" stroke="white" stroke-width="2"/>
+  
+  <!-- Meal Logo - Simplified M -->
+  <path d="M14 16 L14 32 M14 16 L20 24 L26 16 M26 16 L26 32" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+  
+  <!-- Small accent -->
+  <circle cx="24" cy="36" r="3" fill="white" opacity="0.8"/>
+</svg>

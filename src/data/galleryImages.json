@@ -1,0 +1,129 @@
+{
+  "galleryImages": [
+    {
+      "id": 1,
+      "src": "Delicious_Food_Collection",
+      "alt": "Delicious Food Collection"
+    },
+    {
+      "id": 2,
+      "src": "Fresh_Ingredients",
+      "alt": "Fresh Ingredients"
+    },
+    {
+      "id": 3,
+      "src": "Gourmet_Experience",
+      "alt": "Gourmet Experience"
+    },
+    {
+      "id": 4,
+      "src": "Culinary_Art",
+      "alt": "Culinary Art"
+    },
+    {
+      "id": 5,
+      "src": "Tasty_Delights",
+      "alt": "Tasty Delights"
+    },
+    {
+      "id": 6,
+      "src": "Food_Presentation",
+      "alt": "Food Presentation"
+    },
+    {
+      "id": 7,
+      "src": "Restaurant_Quality",
+      "alt": "Restaurant Quality"
+    },
+    {
+      "id": 8,
+      "src": "Behind_The_Scenes",
+      "alt": "Behind The Scenes"
+    },
+    {
+      "id": 9,
+      "src": "Kitchen_Magic",
+      "alt": "Kitchen Magic"
+    },
+    {
+      "id": 10,
+      "src": "Food_Preparation",
+      "alt": "Food Preparation"
+    },
+    {
+      "id": 11,
+      "src": "Quality_Meals",
+      "alt": "Quality Meals"
+    },
+    {
+      "id": 12,
+      "src": "Fresh_and_Tasty",
+      "alt": "Fresh & Tasty"
+    },
+    {
+      "id": 13,
+      "src": "food",
+      "alt": "Food"
+    },
+    {
+      "id": 14,
+      "src": "pasta",
+      "alt": "Pasta"
+    },
+    {
+      "id": 15,
+      "src": "burger1",
+      "alt": "Burger"
+    },
+    {
+      "id": 16,
+      "src": "cock",
+      "alt": "Cock"
+    },
+    {
+      "id": 17,
+      "src": "pizza",
+      "alt": "Pizza"
+    },
+    {
+      "id": 18,
+      "src": "wrap",
+      "alt": "Wrap"
+    },
+    {
+      "id": 19,
+      "src": "tasty",
+      "alt": "Tasty"
+    },
+    {
+      "id": 20,
+      "src": "boxs",
+      "alt": "Boxs"
+    },
+    {
+      "id": 21,
+      "src": "cam",
+      "alt": "Cam"
+    },
+    {
+      "id": 22,
+      "src": "lint",
+      "alt": "Lint"
+    },
+    {
+      "id": 23,
+      "src": "candy",
+      "alt": "Candy"
+    },
+    {
+      "id": 24,
+      "src": "apart",
+      "alt": "Apart"
+    },
+    {
+      "id": 25,
+      "src": "FG2",
+      "alt": "FG2"
+    }
+  ]
+}

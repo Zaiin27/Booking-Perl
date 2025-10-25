@@ -1,0 +1,6 @@
+export { default as main_logo } from './main_logo.svg'
+export { default as slide_logo } from './slide_logo.svg'
+export { default as stat1 } from './stat1.svg'
+export { default as stat2 } from './stat2.svg'
+export { default as stat3 } from './stat3.svg'
+export { default as stat4} from './stat4.svg'
