@@ -27,6 +27,7 @@ import OrderNowPage from "./pages/orderNowPage";
 import PropertiesListPage from "./pages/propertiesListPage";
 import BookingFormPage from "./pages/bookingFormPage";
 import BookingSuccessPage from "./pages/BookingSuccessPage";
+import PaymentVerificationPage from "./pages/PaymentVerificationPage";
 import AdminOrders from "./pages/mealAdminPages/orders";
 import PropertiesPage from "./pages/mealAdminPages/properties";
 import PropertyForm from "./pages/mealAdminPages/propertyForm";
@@ -65,6 +66,7 @@ const AppRouter = () => {
           <Route path="properties" element={<PropertiesListPage />} />
           <Route path="booking/:propertyId" element={<BookingFormPage />} />
           <Route path="booking-success" element={<BookingSuccessPage />} />
+          <Route path="payment-verification" element={<PaymentVerificationPage />} />
         {/* Placeholder route for meals page */}
         <Route
           path="meals"
