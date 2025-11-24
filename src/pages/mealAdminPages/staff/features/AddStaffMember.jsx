@@ -8,10 +8,13 @@ const AddStaffMember = ({ isOpen, onClose, onAddStaff, isLoading = false }) => {
     email: "",
     role: "",
     password: "",
+    paymentType: "both",
   });
 
   const [isRoleDropdownOpen, setIsRoleDropdownOpen] = useState(false);
+  const [isPaymentTypeDropdownOpen, setIsPaymentTypeDropdownOpen] = useState(false);
   const dropdownRef = useRef(null);
+  const paymentTypeDropdownRef = useRef(null);
 
   const availableRoles = [
     { value: "admin", label: "Admin" },
@@ -21,10 +24,19 @@ const AddStaffMember = ({ isOpen, onClose, onAddStaff, isLoading = false }) => {
 
   const roleOptions = availableRoles.sort((a, b) => a.label.localeCompare(b.label));
 
+  const paymentTypeOptions = [
+    { value: "online", label: "Online Payment" },
+    { value: "cash", label: "Cash Payment" },
+    { value: "both", label: "Both (Online & Cash)" },
+  ];
+
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
         setIsRoleDropdownOpen(false);
+      }
+      if (paymentTypeDropdownRef.current && !paymentTypeDropdownRef.current.contains(event.target)) {
+        setIsPaymentTypeDropdownOpen(false);
       }
     };
 
@@ -36,7 +48,7 @@ const AddStaffMember = ({ isOpen, onClose, onAddStaff, isLoading = false }) => {
 
   useEffect(() => {
     if (!isOpen) {
-      setFormData({ name: "", email: "", role: "", password: "" });
+      setFormData({ name: "", email: "", role: "", password: "", paymentType: "both" });
     }
   }, [isOpen]);
 
@@ -57,13 +69,13 @@ const AddStaffMember = ({ isOpen, onClose, onAddStaff, isLoading = false }) => {
       return;
     }
     
-    if (formData.name && formData.email && formData.role && formData.password && !isLoading) {
+    if (formData.name && formData.email && formData.role && formData.password && formData.paymentType && !isLoading) {
       onAddStaff(formData);
     }
   };
 
   const handleClose = () => {
-    setFormData({ name: "", email: "", role: "", password: "" });
+    setFormData({ name: "", email: "", role: "", password: "", paymentType: "both" });
     onClose();
   };
 
@@ -167,6 +179,45 @@ const AddStaffMember = ({ isOpen, onClose, onAddStaff, isLoading = false }) => {
                 placeholder="Enter password"
                 required
               />
+            </div>
+
+            {/* Payment Type Field */}
+            <div>
+              <label className="block text-xs font-inter text-[#FFFFFF]/70 mb-2">
+                Payment Type
+              </label>
+              <div className="relative" ref={paymentTypeDropdownRef}>
+                <button
+                  type="button"
+                  className="w-full bg-[#121B36] border-none rounded-lg px-3 py-3 text-white text-sm font-inter flex items-center justify-between focus:outline-none focus:border-[#14F195] transition-colors"
+                  onClick={() => setIsPaymentTypeDropdownOpen(!isPaymentTypeDropdownOpen)}
+                >
+                  {paymentTypeOptions.find(opt => opt.value === formData.paymentType)?.label || "Select Payment Type"}
+                  <ChevronDown className="w-4 h-4 text-[#AEB9E1]" />
+                </button>
+
+                {isPaymentTypeDropdownOpen && (
+                  <div className="absolute top-full left-0 mt-1 bg-[#171D41] border border-[#3A3A4E] rounded-lg shadow-xl z-20 w-full min-w-[180px]">
+                    {paymentTypeOptions.map((option) => (
+                      <button
+                        key={option.value}
+                        type="button"
+                        onClick={() => {
+                          handleInputChange("paymentType", option.value);
+                          setIsPaymentTypeDropdownOpen(false);
+                        }}
+                        className={`w-full text-left px-3 py-2 text-[10px] font-medium hover:bg-[#3A3A4E] transition-colors first:rounded-t-lg last:rounded-b-lg ${
+                          formData.paymentType === option.value
+                            ? "text-[#14F195] bg-[#14F19533]"
+                            : "text-white"
+                        }`}
+                      >
+                        {option.label}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         </form>

@@ -209,8 +209,8 @@ const SignUp = () => {
           <span className="text-white text-4xl md:text-[50px] !font-bold font-inter">
             Sign Up to{" "}
           </span>
-          <span className="bg-gradient-to-r from-[#9945FF] to-[#14F195] bg-clip-text text-transparent text-4xl md:text-[50px] !font-bold font-inter">
-            MealCheap
+          <span className="text-white text-4xl md:text-[50px] !font-bold font-inter">
+            Booking Pearl
           </span>
         </div>
       </div>
@@ -390,7 +390,7 @@ const SignUp = () => {
                     <input
                       type="text"
                       placeholder="Name"
-                      className="w-full pl-10 pr-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-purple-500 transition-all duration-200"
+                      className="w-full pl-10 pr-4 py-3 border-2 border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary transition-all duration-200"
                       {...register("name", {
                         required: "Name is required",
                         minLength: {
@@ -441,7 +441,7 @@ const SignUp = () => {
                     <input
                       type="email"
                       placeholder="Email"
-                      className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-colors"
+                      className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-transparent transition-colors"
                       {...register("email", {
                         required: "Email is required",
                         pattern: {
@@ -604,8 +604,8 @@ const SignUp = () => {
                       type="button"
                       className={`relative w-6 h-6 flex-shrink-0 flex items-center justify-center rounded-md transition-colors mt-0.5 ${
                         watch("marketingEmails")
-                          ? "bg-gradient-to-r from-[#9945FF] to-[#14F195] border-0"
-                          : "bg-white border border-gray-300 hover:border-purple-500"
+                          ? "bg-primary border-0"
+                          : "bg-white border border-gray-300 hover:border-primary"
                       }`}
                       onClick={() => {
                         const currentValue = watch("marketingEmails");
@@ -664,7 +664,7 @@ const SignUp = () => {
                 <button
                   disabled={auth.loading || isSubmitted}
                   type="submit"
-                  className="w-full bg-gradient-to-r from-[#9945FF] to-[#14F195] text-white py-4 font-medium rounded-full text-xl hover:from-[#9945FF] hover:to-[#14F195] transition-all duration-200 transform hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="w-full bg-primary hover:bg-primary-600 text-white py-4 font-medium rounded-md text-xl transition-all duration-200 transform hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed shadow-md hover:shadow-lg"
                 >
                   {auth.loading
                     ? "Creating Account..."

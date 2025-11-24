@@ -7,14 +7,14 @@ const Button = React.forwardRef(({ className, shimmer = false, children ,variant
   const Comp = asChild ? Slot : "button";
 
   const variants = {
-    default: "bg-primary text-primary-foreground hover:bg-primary/90",
-    primary: "bg-primary-600 hover:bg-primary-700 text-white",
-    destructive: "bg-destructive text-destructive-foreground hover:bg-destructive/90",
-    outline: "border border-input hover:bg-accent hover:text-accent-foreground",
-    secondary: "bg-secondary text-secondary-foreground hover:bg-secondary/80",
-    ghost: "hover:bg-accent hover:text-accent-foreground",
+    default: "bg-primary text-white hover:bg-primary-600",
+    primary: "bg-primary hover:bg-primary-600 text-white",
+    destructive: "bg-red-600 text-white hover:bg-red-700",
+    outline: "border-2 border-primary text-primary hover:bg-primary hover:text-white",
+    secondary: "bg-white border-2 border-gray-300 text-gray-800 hover:bg-gray-50 hover:border-gray-400",
+    ghost: "hover:bg-gray-100 text-gray-700",
     link: "underline-offset-4 hover:underline text-primary",
-    yellow: "bg-yellow-300 hover:bg-[rgb(220,192,4)]",
+    white: "bg-white text-primary hover:bg-gray-100 border-2 border-white",
   };
 
   // const variantClasses = {

@@ -9,7 +9,7 @@ export default defineConfig({
     allowedHosts: ["meb.senew-tech.com", "localhost"], 
     proxy: {
       "/api": {
-        target: "http://localhost:8001",
+        target: "https://bookingpearl-6cqp2f6x.b4a.run",
         changeOrigin: true,
         secure: false,
         timeout: 10000,

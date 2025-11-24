@@ -7,16 +7,29 @@ import { FaArrowLeft, FaCheckCircle, FaMobile, FaWallet, FaSpinner } from "react
 const PaymentVerificationPage = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { booking, paymentMethod, transactionId } = location.state || {};
+  const { 
+    booking, 
+    subscriptionId, 
+    amount, 
+    currency, 
+    planName,
+    paymentMethod, 
+    transactionId 
+  } = location.state || {};
+  
+  // Determine if this is a subscription or booking payment
+  const isSubscription = !!subscriptionId;
+  const paymentAmount = isSubscription ? amount : (booking?.totalAmount || 0);
+  const paymentCurrency = isSubscription ? (currency || 'PKR') : 'PKR';
   
   const [verificationStatus, setVerificationStatus] = useState('pending');
   const [loading, setLoading] = useState(true);
   const [timeLeft, setTimeLeft] = useState(300); // 5 minutes
 
   useEffect(() => {
-    if (!booking || !paymentMethod || !transactionId) {
+    if ((!booking && !subscriptionId) || !paymentMethod || !transactionId) {
       toast.error("Invalid payment verification session");
-      navigate("/properties");
+      navigate(isSubscription ? "/pricing" : "/properties");
       return;
     }
 
@@ -45,13 +58,25 @@ const PaymentVerificationPage = () => {
             
             // Redirect to success page after 3 seconds
             setTimeout(() => {
-              navigate("/booking-success", { 
-                state: { 
-                  booking: booking,
-                  paymentMethod: paymentMethod,
-                  transactionId: transactionId
-                } 
-              });
+              if (isSubscription) {
+                // Redirect to pricing or dashboard for subscription
+                toast.success("Subscription activated successfully!");
+                navigate("/pricing", { 
+                  state: { 
+                    subscriptionActivated: true,
+                    planName: planName
+                  } 
+                });
+              } else {
+                // Redirect to booking success for booking
+                navigate("/booking-success", { 
+                  state: { 
+                    booking: booking,
+                    paymentMethod: paymentMethod,
+                    transactionId: transactionId
+                  } 
+                });
+              }
             }, 3000);
           } else if (status === 'failed' || status === 'cancelled') {
             setVerificationStatus('failed');
@@ -74,7 +99,7 @@ const PaymentVerificationPage = () => {
       clearInterval(timer);
       clearInterval(pollInterval);
     };
-  }, [booking, paymentMethod, transactionId, navigate]);
+  }, [booking, subscriptionId, paymentMethod, transactionId, navigate, isSubscription, planName]);
 
   const formatTime = (seconds) => {
     const mins = Math.floor(seconds / 60);
@@ -83,6 +108,8 @@ const PaymentVerificationPage = () => {
   };
 
   const getPaymentMethodInfo = () => {
+    const amountText = `${paymentCurrency} ${paymentAmount.toLocaleString()}`;
+    
     switch (paymentMethod) {
       case 'jazzcash':
         return {
@@ -91,7 +118,7 @@ const PaymentVerificationPage = () => {
           instructions: [
             "1. Open JazzCash app on your mobile",
             "2. Go to 'Send Money' or 'Pay Bills'",
-            "3. Enter the amount: PKR " + booking.totalAmount,
+            `3. Enter the amount: ${amountText}`,
             "4. Use transaction ID: " + transactionId,
             "5. Complete the payment"
           ],
@@ -104,7 +131,7 @@ const PaymentVerificationPage = () => {
           instructions: [
             "1. Open EasyPaisa app on your mobile",
             "2. Go to 'Send Money' or 'Pay Bills'",
-            "3. Enter the amount: PKR " + booking.totalAmount,
+            `3. Enter the amount: ${amountText}`,
             "4. Use transaction ID: " + transactionId,
             "5. Complete the payment"
           ],
@@ -126,7 +153,7 @@ const PaymentVerificationPage = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-[#0F0F23] via-[#1A1A2E] to-[#16213E]">
+    <div className="min-h-screen bg-gradient-to-b from-[#0F0F23] via-[#1A1A2E] to-[#16213E] pt-20">
       <div className="container mx-auto px-4 py-8">
         {/* Header */}
         <div className="flex items-center gap-4 mb-8">
@@ -146,7 +173,11 @@ const PaymentVerificationPage = () => {
               {paymentInfo.icon}
               <div>
                 <h2 className="text-2xl font-semibold text-white">{paymentInfo.name} Payment</h2>
-                <p className="text-[#AEB9E1]">Complete your payment to confirm booking</p>
+                <p className="text-[#AEB9E1]">
+                  {isSubscription 
+                    ? `Complete your payment to activate ${planName || 'subscription'}`
+                    : "Complete your payment to confirm booking"}
+                </p>
               </div>
             </div>
 
@@ -159,12 +190,19 @@ const PaymentVerificationPage = () => {
                 </div>
                 <div>
                   <span className="text-[#AEB9E1] text-sm">Amount:</span>
-                  <p className="text-white font-semibold">PKR {booking.totalAmount}</p>
+                  <p className="text-white font-semibold">{paymentCurrency} {paymentAmount.toLocaleString()}</p>
                 </div>
-                <div>
-                  <span className="text-[#AEB9E1] text-sm">Booking Reference:</span>
-                  <p className="text-white font-mono text-sm">{booking.bookingReference}</p>
-                </div>
+                {isSubscription ? (
+                  <div>
+                    <span className="text-[#AEB9E1] text-sm">Plan:</span>
+                    <p className="text-white font-mono text-sm capitalize">{planName || 'N/A'}</p>
+                  </div>
+                ) : (
+                  <div>
+                    <span className="text-[#AEB9E1] text-sm">Booking Reference:</span>
+                    <p className="text-white font-mono text-sm">{booking?.bookingReference || 'N/A'}</p>
+                  </div>
+                )}
                 <div>
                   <span className="text-[#AEB9E1] text-sm">Time Remaining:</span>
                   <p className={`font-semibold ${timeLeft < 60 ? 'text-red-400' : 'text-white'}`}>
@@ -227,7 +265,7 @@ const PaymentVerificationPage = () => {
             {/* Action Buttons */}
             <div className="flex gap-4 mt-6">
               <button
-                onClick={() => navigate("/properties")}
+                onClick={() => navigate(isSubscription ? "/pricing" : "/properties")}
                 className="flex-1 px-4 py-3 bg-gray-600 hover:bg-gray-700 text-white rounded-lg transition"
               >
                 Cancel Payment

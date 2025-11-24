@@ -7,7 +7,7 @@ import { PiInstagramLogoFill } from "react-icons/pi";
 
 const Footer = () => {
   return (
-    <footer className="bg-[#060B27] border-t-[11px] border-[#343853] text-white relative overflow-hidden">
+    <footer className="bg-primary border-t border-primary-600 text-white relative overflow-hidden">
       <div className="relative z-10">
         {/* Top Section */}
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
@@ -17,10 +17,10 @@ const Footer = () => {
               <div className="flex items-center mb-6">
                 <h2 className="text-3xl font-bold text-white">
                   <span className="text-white">Booking</span>{" "}
-                  <span className="text-yellow-400">Pearl</span>
+                  <span className="text-white">Pearl</span>
                 </h2>
               </div>
-              <p className="text-white font-inter text-sm max-w-lg leading-relaxed">
+              <p className="text-white/90 font-inter text-sm max-w-lg leading-relaxed">
                 Experience luxury hospitality with premium accommodations and exceptional service at Booking Pearl.
               </p>
 
@@ -28,25 +28,25 @@ const Footer = () => {
               <div className="flex items-center space-x-6 mt-8">
                 <Link
                   to="#"
-                  className="text-white hover:text-white/80 transition-colors"
+                  className="text-white/80 hover:text-white transition-colors"
                 >
                   <RiSendPlaneFill className="w-6 h-6" />
                 </Link>
                 <Link
                   to="#"
-                  className="text-white hover:text-white/80 transition-colors"
+                  className="text-white/80 hover:text-white transition-colors"
                 >
                   <PiInstagramLogoFill className="w-6 h-6" />
                 </Link>
                 <Link
                   to="#"
-                  className="text-white hover:text-white/80 transition-colors"
+                  className="text-white/80 hover:text-white transition-colors"
                 >
                   <FaDiscord className="w-6 h-6" />
                 </Link>
                 <Link
                   to="#"
-                  className="text-white hover:text-white/80 transition-colors"
+                  className="text-white/80 hover:text-white transition-colors"
                 >
                   <FaTwitter className="w-6 h-6" />
                 </Link>
@@ -57,7 +57,7 @@ const Footer = () => {
             <div className="flex-shrink-0 flex md:self-end md:justify-end justify-center">
               <Link
                 to="/properties"
-                className="bg-gradient-primary text-white px-12 py-4 font-inter rounded-full font-bold text-md hover:shadow-xl transition-all duration-300 inline-block transform hover:scale-105"
+                className="bg-white text-primary px-12 py-4 font-inter rounded-md font-bold text-md hover:shadow-xl transition-all duration-300 inline-block transform hover:scale-105"
               >
                 START BOOKING
               </Link>
@@ -69,8 +69,8 @@ const Footer = () => {
         <div>
           <div className="max-w-7xl mx-auto px-4 border-t border-white/20 sm:px-6 lg:px-8 py-6">
             <div className="flex flex-col md:flex-row items-center justify-between gap-4">
-              {/* Copyright */}
-              <div className="text-white font-inter font-medium text-sm">
+          
+              <div className="text-white/80 font-inter font-medium text-sm">
                 © 2025 Booking Pearl. All rights reserved.
               </div>
 

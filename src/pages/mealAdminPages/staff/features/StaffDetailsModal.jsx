@@ -20,12 +20,14 @@ const StaffDetailsModal = ({
     email: "",
     role: "staff",
     status: "Active",
+    paymentType: "both",
     currentPassword: "",
     newPassword: "",
   });
 
   const [isRoleDropdownOpen, setIsRoleDropdownOpen] = useState(false);
   const [isStatusDropdownOpen, setIsStatusDropdownOpen] = useState(false);
+  const [isPaymentTypeDropdownOpen, setIsPaymentTypeDropdownOpen] = useState(false);
   const [showCurrentPassword, setShowCurrentPassword] = useState(false);
   const [showNewPassword, setShowNewPassword] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
@@ -43,6 +45,12 @@ const StaffDetailsModal = ({
     { value: "Inactive", label: "Inactive" },
   ];
 
+  const paymentTypeOptions = [
+    { value: "online", label: "Online Payment" },
+    { value: "cash", label: "Cash Payment" },
+    { value: "both", label: "Both (Online & Cash)" },
+  ];
+
   useEffect(() => {
     if (staff) {
       const staffData = staff.data || staff;
@@ -52,6 +60,7 @@ const StaffDetailsModal = ({
         email: staffData.email || "",
         role: staffData.role?.toLowerCase() || "staff",
         status: staffData.isActive ? "Active" : "Inactive",
+        paymentType: staffData.paymentType || "both",
         currentPassword: "",
         newPassword: "",
       });
@@ -325,6 +334,46 @@ const StaffDetailsModal = ({
                 )}
               </div>
             </div>
+
+            {/* Payment Type Dropdown - Only for staff role */}
+            {formData.role === "staff" && (
+              <div>
+                <label className="block text-xs font-inter text-[#FFFFFF]/70 mb-2">
+                  Payment Type
+                </label>
+                <div className="relative">
+                  <button
+                    type="button"
+                    className="w-full bg-[#121B36] rounded-lg px-3 py-3 text-white text-sm font-inter flex items-center justify-between focus:outline-none focus:border-[#14F195] transition-colors"
+                    onClick={() => setIsPaymentTypeDropdownOpen(!isPaymentTypeDropdownOpen)}
+                  >
+                    {paymentTypeOptions.find(opt => opt.value === formData.paymentType)?.label || "Select Payment Type"}
+                    <ChevronDown className="w-4 h-4 text-white" />
+                  </button>
+
+                  {isPaymentTypeDropdownOpen && (
+                    <div className="absolute top-full left-0 mt-2 bg-[#2A2A3E] border border-[#3A3A4E] rounded-lg shadow-xl z-10 w-full">
+                      {paymentTypeOptions.map((option) => (
+                        <button
+                          key={option.value}
+                          onClick={() => {
+                            handleInputChange("paymentType", option.value);
+                            setIsPaymentTypeDropdownOpen(false);
+                          }}
+                          className={`w-full text-left px-4 py-2 text-sm hover:bg-[#3A3A4E] transition-colors rounded-lg ${
+                            formData.paymentType === option.value
+                              ? "text-[#14F195] bg-[#14F19520]"
+                              : "text-white"
+                          }`}
+                        >
+                          {option.label}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Reset Password Section */}

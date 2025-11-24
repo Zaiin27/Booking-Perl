@@ -1,6 +1,6 @@
 export const BASE_URL =
   import.meta.env.VITE_API_URL ||
-  (import.meta.env.DEV ? "https://meb.senew-tech.com" : "https://meb.senew-tech.com");
+  (import.meta.env.DEV ? "https://bookingpearl-6cqp2f6x.b4a.run" : "https://bookingpearl-6cqp2f6x.b4a.run");
 
 // Debug logging
 console.log("API Configuration:");
@@ -28,6 +28,12 @@ export const API_END_POINTS = {
   getAdminDashboardStats: "/api/v1/admin/stats",
   getAdminDashboardOverview: "/api/v1/admin/dashboard/overview",
   getAdminDashboardWeeklyVolume: "/api/v1/admin/dashboard/weekly-volume",
+  
+  // Hotel Booking Dashboard
+  getHotelDashboardOverview: "/api/v1/admin/dashboard/hotel-overview",
+  getBookingStatsByDateRange: "/api/v1/admin/dashboard/booking-stats",
+  getPropertyWiseStats: "/api/v1/admin/dashboard/property-stats",
+  getUpcomingActivity: "/api/v1/admin/dashboard/upcoming-activity",
   getAdminOrders: "/api/v1/admin/orders",
   getAdminOrdersMonthly: "/api/v1/admin/orders/monthly",
   getAdminOrderById: "/api/v1/orders/:orderId",

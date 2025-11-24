@@ -21,7 +21,7 @@ import {
   ChatIcon,
   XIcon,
 } from "../../assets/icons";
-import { FaBuilding, FaCalendarCheck } from "react-icons/fa";
+import { FaBuilding, FaCalendarCheck, FaImage } from "react-icons/fa";
 import { IoMdArrowDropdown } from "react-icons/io";
 
 function Sidebar({ isMobileSidebarOpen, toggleSidebar, setActivePage }) {
@@ -65,6 +65,7 @@ function Sidebar({ isMobileSidebarOpen, toggleSidebar, setActivePage }) {
           { path: "/admin/dashboard", name: "Dashboard", icon: DashboardIcon },
           { path: "/admin/properties", name: "Properties", icon: FaBuilding },
           { path: "/admin/bookings", name: "Bookings", icon: FaCalendarCheck },
+          { path: "/admin/banner-ads", name: "Banner Ads", icon: FaImage },
           { path: "/admin/staff", name: "Staff", icon: StaffIcon },
         ],
         bottom: [
@@ -114,6 +115,11 @@ function Sidebar({ isMobileSidebarOpen, toggleSidebar, setActivePage }) {
             path: "/user/orders",
             name: "My Orders",
             icon: OrdersIcon,
+          },
+          {
+            path: "/booking-history",
+            name: "My Bookings",
+            icon: FaCalendarCheck,
           },
           {
             path: "/user/tickets",

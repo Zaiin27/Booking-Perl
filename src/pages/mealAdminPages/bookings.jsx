@@ -96,47 +96,64 @@ const BookingsPage = () => {
     {
       key: "bookingReference",
       label: "Booking Ref",
+      className: "min-w-[160px]",
     },
     {
       key: "guestName",
       label: "Guest Info",
+      className: "min-w-[200px]",
     },
     {
       key: "property_id",
       label: "Property",
+      className: "min-w-[220px]",
     },
     {
       key: "checkInDate",
       label: "Check-in / Check-out",
+      className: "min-w-[180px]",
     },
     {
       key: "numberOfGuests",
       label: "Guests / Rooms",
+      className: "min-w-[140px]",
     },
     {
       key: "bookedRooms",
       label: "Room Types",
+      className: "min-w-[140px]",
     },
     {
       key: "totalAmount",
       label: "Amount",
+      className: "min-w-[120px]",
     },
     {
       key: "bookingStatus",
       label: "Booking Status",
+      className: "min-w-[140px]",
     },
     {
       key: "paymentStatus",
       label: "Payment Status",
+      className: "min-w-[140px]",
+    },
+    {
+      key: "paymentType",
+      label: "Payment Type",
+      className: "min-w-[120px]",
     },
     {
       key: "createdAt",
       label: "Booked On",
+      className: "min-w-[140px]",
     },
-    {
+    // Only show actions column for admin
+    ...(user?.role === 'admin' ? [{
       key: "actions",
       label: "Actions",
-    },
+      className: "min-w-[100px]",
+    }] : []),
   ];
 
   // Filter options for ReusableFilter
@@ -203,14 +220,14 @@ const BookingsPage = () => {
         </div>
 
         {/* Table */}
-        <div className="bg-[#171D41] rounded-lg shadow-lg border border-[#3A3A4E] overflow-hidden">
+        <div className="bg-[#171D41] rounded-lg shadow-lg border border-[#3A3A4E] overflow-x-auto overflow-y-visible">
           <div className="p-2 sm:p-4">
             <ReusableTable
               columns={columns}
               data={bookings}
               isLoading={loading}
               tableType="bookings"
-              onView={(row) => navigate(`/admin/bookings/${row._id}`)}
+              onView={user?.role === 'admin' ? (row) => navigate(`/admin/bookings/${row._id}`) : null}
             />
           </div>
 

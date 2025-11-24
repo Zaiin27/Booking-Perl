@@ -17,18 +17,19 @@ export default {
         padding: '5%'
       },
       colors: {
+        // Booking.com color scheme
         primary: {
-          DEFAULT: '#ffffff',
-          '50': 'rgba(255, 255, 255, 0.05)',
-          '100': 'rgba(255, 255, 255, 0.1)',
-          '200': 'rgba(255, 255, 255, 0.2)',
-          '300': 'rgba(255, 255, 255, 0.3)',
-          '400': 'rgba(255, 255, 255, 0.4)',
-          '500': 'rgba(255, 255, 255, 0.5)',
-          '600': 'rgba(255, 255, 255, 0.6)',
-          '700': 'rgba(255, 255, 255, 0.7)',
-          '800': 'rgba(255, 255, 255, 0.8)',
-          '900': 'rgba(255, 255, 255, 0.9)',
+          DEFAULT: '#003580', // Booking.com blue
+          '50': '#E6F0FF',
+          '100': '#CCE1FF',
+          '200': '#99C3FF',
+          '300': '#66A5FF',
+          '400': '#3387FF',
+          '500': '#003580',
+          '600': '#002A66',
+          '700': '#001F4D',
+          '800': '#001533',
+          '900': '#000A1A',
         },
         secondary: {
           DEFAULT: '#000000',
@@ -43,9 +44,19 @@ export default {
           '800': 'rgba(0, 0, 0, 0.8)',
           '900': 'rgba(0, 0, 0, 0.9)',
         },
+        booking: {
+          blue: '#003580',
+          'blue-light': '#006CE4',
+          'blue-dark': '#002A66',
+          white: '#FFFFFF',
+          black: '#000000',
+          'gray-light': '#F5F5F5',
+          'gray-medium': '#E5E5E5',
+          'gray-dark': '#666666',
+        },
         gradient: {
-          start: '#9945FF',
-          end: '#14F195',
+          start: '#003580',
+          end: '#006CE4',
         },
         gray: {
           DEFAULT: '#555555',
@@ -110,7 +121,7 @@ export default {
         outfit: ["Outfit", "sans-serif"],
       },
       backgroundImage: {
-        'gradient-primary': 'linear-gradient(90deg, #9945FF 0%, #14F195 100%)',
+        'gradient-primary': 'linear-gradient(90deg, #003580 0%, #006CE4 100%)',
       },
     },
   },

@@ -236,6 +236,8 @@ const StaffPage = () => {
         email: newStaff.email,
         role: newStaff.role.toLowerCase(),
         password: newStaff.password,
+        paymentType: newStaff.paymentType || "both",
+        confirmPassword: newStaff.password, // API expects confirmPassword
       };
 
       // Create staff via API
@@ -395,6 +397,7 @@ const StaffPage = () => {
       const apiData = {
         name: updatedStaff.name,
         email: updatedStaff.email,
+        paymentType: updatedStaff.paymentType,
         role: updatedStaff.role.toLowerCase(), 
         isActive: updatedStaff.status === "Active"
       };

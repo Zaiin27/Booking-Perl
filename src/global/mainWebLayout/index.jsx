@@ -9,7 +9,7 @@ const MainWebLayout = () => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   }, [pathname]);
   return (
-    <div className="min-h-screen bg-[#060B27] flex flex-col">
+    <div className="min-h-screen bg-[#003b95] flex flex-col">
       {/* Fixed Header */}
       <Header />
 

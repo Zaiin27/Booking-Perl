@@ -12,6 +12,7 @@ import { useCheckAuthQuery } from "../services/Api";
 import { setUser } from "../store/slices/authSlice";
 import loginBg from "../assets/images/loginbg.png";
 import PageLoading from "../components/PageLoading";
+import SubscriptionStatus from "../components/SubscriptionStatus";
 
 const ProfilePage = () => {
   const dispatch = useDispatch();
@@ -77,6 +78,11 @@ const ProfilePage = () => {
           <div className="container mx-auto px-4">
             <ProfileHero />
 
+            {/* Subscription Status */}
+            <div className="mb-6 max-w-4xl mx-auto">
+              <SubscriptionStatus showUpgrade={true} />
+            </div>
+
             <UserProfileCard />
 
             <SummaryCards />
@@ -127,6 +133,11 @@ const ProfilePage = () => {
     >
       <div className="container mx-auto px-4">
         <ProfileHero />
+
+        {/* Subscription Status */}
+        <div className="mb-6 max-w-4xl mx-auto">
+          <SubscriptionStatus showUpgrade={true} />
+        </div>
 
         <UserProfileCard />
 

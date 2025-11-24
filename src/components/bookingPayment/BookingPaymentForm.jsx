@@ -21,6 +21,40 @@ const BookingPaymentForm = () => {
   const [paymentMethod, setPaymentMethod] = useState('stripe');
   const [mobileNumber, setMobileNumber] = useState('');
 
+  // Format currency based on booking currency
+  const formatCurrency = (amount) => {
+    if (!amount && amount !== 0) return "N/A";
+    
+    const currency = booking?.currency || "USD";
+    
+    // Support for PKR/Rs (Pakistani Rupees)
+    if (currency === "PKR" || currency === "Rs" || currency === "RS" || currency === "pkr") {
+      // Format PKR with comma separators and "Rs" prefix
+      const formattedAmount = new Intl.NumberFormat("en-PK", {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      }).format(amount);
+      return `Rs ${formattedAmount}`;
+    }
+    
+    // Default to USD format
+    return new Intl.NumberFormat("en-US", {
+      style: "currency",
+      currency: "USD",
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2,
+    }).format(amount);
+  };
+
+  // Get currency for payment API calls
+  const getPaymentCurrency = () => {
+    const currency = booking?.currency || "USD";
+    if (currency === "PKR" || currency === "Rs" || currency === "RS" || currency === "pkr") {
+      return "PKR";
+    }
+    return "usd"; // Stripe uses lowercase "usd"
+  };
+
   // Fetch booking details
   useEffect(() => {
     const fetchBooking = async () => {
@@ -89,7 +123,7 @@ const BookingPaymentForm = () => {
     // Create payment intent for booking
     const response = await axios.post("/api/v1/payments/create-booking-payment-intent", {
       amount: booking.totalAmount,
-      currency: "usd",
+      currency: getPaymentCurrency(),
       booking_reference: booking.bookingReference,
       booking_id: booking.booking_id,
       description: `Payment for booking ${booking.bookingReference}`,
@@ -274,7 +308,7 @@ const BookingPaymentForm = () => {
               <div className="border-t border-[#3A3A4E] pt-4">
                 <div className="flex justify-between text-xl font-bold text-white">
                   <span>Total Amount:</span>
-                  <span>${booking.totalAmount}</span>
+                  <span>{formatCurrency(booking.totalAmount)}</span>
                 </div>
               </div>
             </div>
@@ -416,7 +450,7 @@ const BookingPaymentForm = () => {
                     {paymentMethod === 'stripe' && <FaCreditCard />}
                     {paymentMethod === 'jazzcash' && <FaMobile />}
                     {paymentMethod === 'easypaisa' && <FaWallet />}
-                    Pay ${booking.totalAmount}
+                    Pay {formatCurrency(booking.totalAmount)}
                   </>
                 )}
               </button>

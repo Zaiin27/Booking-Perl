@@ -24,8 +24,9 @@ const ReusableTable = ({
 
   useEffect(() => {
     const handleClickOutside = (event) => {
-      // Close menu if click is outside any actions menu
+      // Close menu if click is outside the actions container
       if (activeMenu && !event.target.closest("[data-actions-container]")) {
+        console.log("Closing menu due to outside click");
         setActiveMenu(null);
       }
       // Close status dropdown if click is outside any status dropdown
@@ -43,8 +44,17 @@ const ReusableTable = ({
     };
   }, [activeMenu, activeStatusDropdown]);
 
+  useEffect(() => {
+    console.log("activeMenu changed to:", activeMenu);
+  }, [activeMenu]);
+
   const handleMenuClick = (e, rowId, index) => {
     e.stopPropagation();
+    e.preventDefault();
+    
+    // Convert rowId to string for consistent comparison
+    const rowIdStr = String(rowId);
+    console.log("Menu clicked:", { rowId, rowIdStr, index, currentActiveMenu: activeMenu, tableType });
 
     // Determine menu position based on row position
     const isFirstRow = index === 0;
@@ -59,7 +69,10 @@ const ReusableTable = ({
       setMenuPosition("bottom");
     }
 
-    setActiveMenu(activeMenu === rowId ? null : rowId);
+    const currentActiveMenuStr = activeMenu ? String(activeMenu) : null;
+    const newActiveMenu = currentActiveMenuStr === rowIdStr ? null : rowIdStr;
+    console.log("Setting activeMenu from", activeMenu, "to", newActiveMenu);
+    setActiveMenu(newActiveMenu);
   };
 
   const handleView = (row) => {
@@ -478,7 +491,7 @@ const ReusableTable = ({
         );
       case "address":
         return (
-          <div className="text-[#AEB9E1] text-xs max-w-[200px] truncate" title={value}>
+          <div className="text-[#AEB9E1] text-xs break-words" title={value}>
             {value}
           </div>
         );
@@ -531,7 +544,7 @@ const ReusableTable = ({
               {staffId || "N/A"}
             </span>
             {staffName && (
-              <div className="text-xs text-[#AEB9E1] mt-1 truncate max-w-[100px]" title={staffName}>
+              <div className="text-xs text-[#AEB9E1] mt-1 break-words" title={staffName}>
                 {staffName}
               </div>
             )}
@@ -546,44 +559,46 @@ const ReusableTable = ({
         );
       case "guestName":
         return (
-          <div>
-            <div className="font-medium text-white">{value}</div>
-            <div className="text-xs text-[#AEB9E1]">{row.guestEmail}</div>
-            <div className="text-xs text-[#AEB9E1]">{row.guestPhone}</div>
+          <div className="space-y-1">
+            <div className="font-semibold text-white text-sm break-words">{value}</div>
+            <div className="text-xs text-[#AEB9E1] break-words" title={row.guestEmail}>{row.guestEmail}</div>
+            <div className="text-xs text-[#AEB9E1] break-words">{row.guestPhone}</div>
           </div>
         );
       case "property_id":
         return (
-          <div>
-            <div className="font-medium text-white">{value?.name}</div>
-            <div className="text-xs text-[#AEB9E1] max-w-[200px] truncate" title={value?.address}>
+          <div className="space-y-1">
+            <div className="font-semibold text-white text-sm break-words">{value?.name}</div>
+            <div className="text-xs text-[#AEB9E1] break-words" title={value?.address}>
               {value?.address}
             </div>
           </div>
         );
       case "checkInDate":
         return (
-          <div className="text-sm">
-            <div className="flex items-center gap-1 text-green-400">
-              <span>→</span>
-              <span>{new Date(value).toLocaleDateString()}</span>
+          <div className="space-y-1">
+            <div className="flex items-center gap-2 text-green-400 text-sm">
+              <span className="text-xs">📅</span>
+              <span className="font-medium">{new Date(value).toLocaleDateString()}</span>
             </div>
-            <div className="flex items-center gap-1 text-red-400">
-              <span>←</span>
-              <span>{new Date(row.checkOutDate).toLocaleDateString()}</span>
+            <div className="flex items-center gap-2 text-red-400 text-sm">
+              <span className="text-xs">📅</span>
+              <span className="font-medium">{new Date(row.checkOutDate).toLocaleDateString()}</span>
             </div>
-            <div className="text-xs text-[#AEB9E1] mt-1">
+            <div className="text-xs text-[#AEB9E1] bg-blue-500/20 px-2 py-1 rounded-full text-center">
               {Math.ceil((new Date(row.checkOutDate) - new Date(value)) / (1000 * 60 * 60 * 24))} nights
             </div>
           </div>
         );
       case "numberOfGuests":
         return (
-          <div className="text-center">
-            <div className="text-sm">
-              <span className="font-medium text-white">{value}</span> guests
+          <div className="text-center space-y-1">
+            <div className="flex items-center justify-center gap-1 text-sm">
+              <span className="text-xs">👥</span>
+              <span className="font-semibold text-white">{value}</span>
+              <span className="text-[#AEB9E1]">guests</span>
             </div>
-            <div className="text-xs text-[#AEB9E1]">
+            <div className="text-xs text-[#AEB9E1] bg-purple-500/20 px-2 py-1 rounded-full">
               {row.totalRooms} room{row.totalRooms > 1 ? "s" : ""}
             </div>
           </div>
@@ -593,7 +608,7 @@ const ReusableTable = ({
           return (
             <div className="flex flex-col gap-1">
               {value.map((room, index) => (
-                <span key={index} className="bg-purple-500/20 text-purple-300 px-2 py-1 rounded text-xs">
+                <span key={index} className="bg-gradient-to-r from-purple-500/20 to-pink-500/20 text-purple-300 px-3 py-1.5 rounded-lg text-xs font-semibold border border-purple-500/30 text-center">
                   {room.quantity}x {room.roomType}
                 </span>
               ))}
@@ -603,11 +618,13 @@ const ReusableTable = ({
         return value;
       case "totalAmount":
         return (
-          <div className="text-right">
+          <div className="text-center space-y-1">
             <div className="font-bold text-lg text-green-400">
               ${Number(value).toFixed(2)}
             </div>
-            <div className="text-xs text-[#AEB9E1]">{row.currency || "USD"}</div>
+            <div className="text-xs text-[#AEB9E1] bg-green-500/20 px-2 py-1 rounded-full">
+              {row.currency || "USD"}
+            </div>
           </div>
         );
       case "bookingStatus":
@@ -637,35 +654,155 @@ const ReusableTable = ({
             {paymentConfig.label}
           </div>
         );
+      case "paymentType":
+        const paymentTypeConfig = {
+          online: { bg: "bg-blue-500/20", text: "text-blue-400", label: "Online", border: "border-blue-500/30", icon: "💳" },
+          on_arrival: { bg: "bg-orange-500/20", text: "text-orange-400", label: "On Arrival", border: "border-orange-500/30", icon: "🏨" },
+        };
+        const typeConfig = paymentTypeConfig[value] || paymentTypeConfig.online;
+        return (
+          <div className={`inline-flex items-center justify-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap ${typeConfig.bg} ${typeConfig.text} ${typeConfig.border}`}>
+            <span className="text-xs">{typeConfig.icon}</span>
+            <span className="text-xs">{typeConfig.label}</span>
+          </div>
+        );
       case "createdAt":
         return (
-          <div className="text-sm text-[#AEB9E1]">
-            {new Date(value).toLocaleDateString()}
+          <div className="text-center space-y-1">
+            <div className="text-sm font-medium text-white">
+              {new Date(value).toLocaleDateString()}
+            </div>
+            <div className="text-xs text-[#AEB9E1] bg-gray-500/20 px-2 py-1 rounded-full">
+              {new Date(value).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
+            </div>
+          </div>
+        );
+      // Banner Ad specific cases
+      case "image":
+        return (
+          <div className="w-20 h-20 rounded-lg overflow-hidden">
+            {value ? (
+              <img
+                src={value}
+                alt={row.title || "Banner"}
+                className="w-full h-full object-cover"
+              />
+            ) : (
+              <div className="w-full h-full bg-gray-700 flex items-center justify-center">
+                <span className="text-gray-400 text-2xl">📷</span>
+              </div>
+            )}
+          </div>
+        );
+      case "title":
+        return (
+          <div>
+            <div className="font-semibold text-white">{value}</div>
+            {row.description && (
+              <div className="text-sm text-gray-400 line-clamp-1">{row.description}</div>
+            )}
+          </div>
+        );
+      case "priority":
+        return (
+          <span className="px-2 py-1 bg-blue-500/20 text-blue-400 rounded text-sm font-semibold">
+            {value}
+          </span>
+        );
+      case "clickCount":
+        const clickLimit = row.clickLimit;
+        const isLimitReached = clickLimit !== null && clickLimit !== undefined && value >= clickLimit;
+        return (
+          <div className="space-y-1">
+            <div className="flex items-center gap-2">
+              <span className={`px-2 py-1 rounded text-sm font-semibold ${
+                isLimitReached
+                  ? "bg-red-500/20 text-red-400"
+                  : "bg-green-500/20 text-green-400"
+              }`}>
+                {value || 0} clicks
+              </span>
+            </div>
+            {clickLimit !== null && clickLimit !== undefined && (
+              <div className="text-xs text-[#AEB9E1]">
+                Limit: {clickLimit} {isLimitReached && "✓ Reached"}
+              </div>
+            )}
+            {(!clickLimit || clickLimit === null) && (
+              <div className="text-xs text-[#AEB9E1]">Unlimited</div>
+            )}
+          </div>
+        );
+      case "isActive":
+        const isExpired = row.endDate && new Date(row.endDate) < new Date();
+        return (
+          <div className="flex flex-col gap-1">
+            <span
+              className={`px-2 py-1 rounded text-xs font-semibold ${
+                value && !isExpired
+                  ? "bg-green-500/20 text-green-400"
+                  : "bg-red-500/20 text-red-400"
+              }`}
+            >
+              {value && !isExpired ? "Active" : "Inactive"}
+            </span>
+            {isExpired && (
+              <span className="text-xs text-red-400">Expired</span>
+            )}
+          </div>
+        );
+      case "startDate":
+        return (
+          <div className="text-sm text-gray-400">
+            <div className="flex items-center gap-1">
+              <span className="text-xs">📅</span>
+              <span>Start: {new Date(value).toLocaleDateString()}</span>
+            </div>
+            {row.endDate && (
+              <div className="flex items-center gap-1 mt-1">
+                <span className="text-xs">📅</span>
+                <span>End: {new Date(row.endDate).toLocaleDateString()}</span>
+              </div>
+            )}
           </div>
         );
       case "actions":
+        const rowId = row._id || row.id;
+        const rowIdStr = String(rowId);
+        const activeMenuStr = activeMenu ? String(activeMenu) : null;
+        const isMenuOpen = activeMenuStr === rowIdStr;
         return (
-          <div className="relative" data-actions-container>
+          <div className="relative z-[100]" data-actions-container style={{ position: 'relative' }}>
             <button
-              onClick={(e) => handleMenuClick(e, row._id || row.id, data.indexOf(row))}
+              onClick={(e) => {
+                e.stopPropagation();
+                e.preventDefault();
+                console.log("Actions button clicked for row:", { rowId, rowIdStr, activeMenu, activeMenuStr, isMenuOpen });
+                handleMenuClick(e, rowId, data.indexOf(row));
+              }}
               className="p-2 hover:bg-[#2A2A3E] rounded-lg transition-colors"
             >
               <MoreHorizontal className="w-4 h-4 text-[#AEB9E1]" />
             </button>
 
-            <ActionsMenu
-              isOpen={activeMenu === (row._id || row.id)}
-              onClose={() => setActiveMenu(null)}
-              onView={handleView}
-              onEdit={handleEdit}
-              onDelete={handleDelete}
-              onResendViaEmail={handleResendViaEmail}
-              onOpenInChat={handleOpenInChat}
-              onAddProperty={onAddProperty}
-              position={menuPosition}
-              rowData={row}
-              tableType={tableType}
-            />
+            {isMenuOpen && (
+              <ActionsMenu
+                isOpen={isMenuOpen}
+                onClose={() => {
+                  console.log("Closing menu for row:", rowIdStr);
+                  setActiveMenu(null);
+                }}
+                onView={handleView}
+                onEdit={handleEdit}
+                onDelete={handleDelete}
+                onResendViaEmail={handleResendViaEmail}
+                onOpenInChat={handleOpenInChat}
+                onAddProperty={onAddProperty}
+                position={menuPosition}
+                rowData={row}
+                tableType={tableType}
+              />
+            )}
           </div>
         );
       default:
@@ -691,7 +828,7 @@ const ReusableTable = ({
   };
 
   return (
-    <div className="overflow-x-auto w-full">
+    <div className="overflow-x-auto overflow-y-visible w-full scrollbar-thin scrollbar-thumb-gray-600 scrollbar-track-gray-800">
       {/* Mobile/Tablet Card View */}
       <div className="block lg:hidden">
         {isLoading ? (
@@ -815,16 +952,21 @@ const ReusableTable = ({
       </div>
 
       {/* Desktop Table View */}
-      <table className="w-full hidden lg:table table-fixed min-w-[1200px] text-left">
+      <table className="w-full hidden lg:table table-auto text-left border-separate border-spacing-0">
         <thead>
           <tr className="border-b border-[#EDEDED33]">
             {columns.map((column) => (
               <th
                 key={column.key}
-                className={`text-left py-3 px-2 text-[10px] font-semibold text-white font-inter w-1/${columns.length} ${
+                className={`text-left py-5 px-6 text-sm font-semibold text-white font-inter ${
                   column.className || ""
                 }`}
-                style={{ width: `${100 / columns.length}%` }}
+                style={{ 
+                  width: `${100 / columns.length}%`,
+                  minWidth: column.className ? column.className.replace('min-w-[', '').replace(']', '') : '140px',
+                  maxWidth: column.key === 'paymentType' ? '150px' : '300px',
+                  overflow: 'visible'
+                }}
               >
                 {column.label}
               </th>
@@ -851,19 +993,27 @@ const ReusableTable = ({
               <tr
                 key={row.id || index}
                 onClick={() => onRowClick && onRowClick(row)}
-                className={`border-b border-[#EDEDED33] hover:bg-[#0A1330] hover:rounded-lg transition-all duration-200 cursor-pointer ${
+                className={`border-b border-[#EDEDED33] hover:bg-[#0A1330] hover:rounded-lg transition-all duration-200 cursor-pointer my-2 ${
                   selectedRow === row.id ? "bg-[#0A1330]" : ""
                 }`}
               >
                 {columns.map((column) => (
                   <td
                     key={column.key}
-                    className={`py-3 px-2 text-[10px] text-[#AEB9E1] font-medium font-inter w-1/${columns.length} text-left ${
+                    className={`py-5 px-6 text-sm text-[#AEB9E1] font-medium font-inter text-left ${
                       column.className || ""
-                    }`}
-                    style={{ width: `${100 / columns.length}%` }}
+                    } ${column.key === 'actions' ? 'overflow-visible' : ''}`}
+                    style={{ 
+                      width: `${100 / columns.length}%`,
+                      minWidth: column.className ? column.className.replace('min-w-[', '').replace(']', '') : '140px',
+                      maxWidth: column.key === 'actions' ? 'none' : (column.key === 'paymentType' ? '150px' : 'none'),
+                      overflow: 'visible',
+                      wordWrap: 'break-word'
+                    }}
                   >
-                    {renderCellValue(column, row[column.key], row)}
+                    <div className="break-words">
+                      {renderCellValue(column, row[column.key], row)}
+                    </div>
                   </td>
                 ))}
               </tr>

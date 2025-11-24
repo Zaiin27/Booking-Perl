@@ -114,8 +114,7 @@ export const login = createAsyncThunk(
       console.log("Login thunk: Starting login with credentials:", credentials);
       console.log(
         "Login thunk: BASE_URL:",
-        import.meta.env.VITE_API_URL ||
-          (import.meta.env.DEV ? "" : "https://meb.senew-tech.com")
+        BASE_URL
       );
       console.log("Login thunk: API endpoint:", "/api/v1/auth/signin");
 

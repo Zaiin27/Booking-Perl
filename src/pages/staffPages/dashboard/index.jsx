@@ -1,211 +1,211 @@
-import React from "react";
-import StatCard from "../../../components/Cards/stat-card";
-import ComplianceChart from "../../../components/charts/compliance-chart";
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import StatCard from "../../mealAdminPages/dashboard/features/dashboard-card";
 import {
-  alertsData,
-  driverExpiringDocuments,
-  expiringDocuments,
-  pendingJobs,
-  recentActivities,
-  upcomingReminders,
-  whatsappMessages,
-} from "../../../utils/fakeData";
-import { PeoplesIcon, TruckDriverIcon } from "../../../utils/icons";
-import { Activity, BusFront, FileText, Headset } from "lucide-react";
-import { AiOutlineAlert } from "react-icons/ai";
-import ExpiringDocuments from "./features/ExpiringDocuments";
-import { HiOutlineWrenchScrewdriver } from "react-icons/hi2";
-import { ReminderItem } from "../../dashboardCommons/ReminderItem";
-import { truckGif } from "../../../assets/icons";
+  Building2,
+  Calendar,
+  DollarSign,
+  Users,
+  Clock,
+  CheckCircle,
+  TrendingUp,
+  Home,
+} from "lucide-react";
 import {
-  useGetDriverDashboardStatsQuery,
-  useGetDriverDashboardStatusQuery,
-  useGetDriverAlertReminderQuery,
-} from "../../../services/user/userApi";
+  useGetHotelDashboardOverviewQuery,
+  useGetBookingStatsByDateRangeQuery,
+  useGetUpcomingActivityQuery,
+} from "../../../services/admin/adminApi";
+import PageLoading from "../../../components/PageLoading";
+import { useSelector } from "react-redux";
+import BookingChart from "../../mealAdminPages/dashboard/features/BookingChart";
+import RecentBookings from "../../mealAdminPages/dashboard/features/RecentBookings";
+import UpcomingCheckIns from "../../mealAdminPages/dashboard/features/UpcomingCheckIns";
+import SubscriptionStatus from "../../../components/SubscriptionStatus";
 
-const DriverDashboard = ({ driver = {} }) => {
-  const { data: statsData, isLoading: statsLoading } =
-    useGetDriverDashboardStatsQuery();
-  const { data: statusData, isLoading: statusLoading } =
-    useGetDriverDashboardStatusQuery();
-  const { data: alertsData, isLoading: alertsLoading } =
-    useGetDriverAlertReminderQuery();
+const StaffDashboard = () => {
+  const navigate = useNavigate();
+  const { user } = useSelector((state) => state.auth);
 
-  const [loading, setLoading] = React.useState(true);
+  // Get current date range for last 7 days
+  const getLast7Days = () => {
+    const end = new Date();
+    const start = new Date();
+    start.setDate(start.getDate() - 7);
+    start.setHours(0, 0, 0, 0);
+    return {
+      startDate: start.toISOString().split("T")[0],
+      endDate: end.toISOString().split("T")[0],
+    };
+  };
 
-  React.useEffect(() => {
-    const timer = setTimeout(() => setLoading(false), 500);
-    return () => clearTimeout(timer);
-  }, []);
+  const { startDate, endDate } = getLast7Days();
 
-  if (loading || statsLoading || statusLoading || alertsLoading) {
+  // Fetch dashboard data (staff only sees their own data)
+  const {
+    data: overviewData,
+    isLoading: isLoadingOverview,
+    isError: isErrorOverview,
+    error: overviewError,
+  } = useGetHotelDashboardOverviewQuery();
+
+  const {
+    data: bookingStatsData,
+    isLoading: isLoadingStats,
+    isError: isErrorStats,
+  } = useGetBookingStatsByDateRangeQuery({ startDate, endDate });
+
+  const {
+    data: upcomingActivityData,
+    isLoading: isLoadingActivity,
+    isError: isErrorActivity,
+  } = useGetUpcomingActivityQuery();
+
+  // Show loading state
+  if (isLoadingOverview) {
+    return <PageLoading message="Loading dashboard..." />;
+  }
+
+  // Show error state
+  if (isErrorOverview) {
     return (
-      <div className="flex items-center justify-center min-h-screen w-full fixed top-0 left-0 bg-white  z-[9999]">
-        <img src={truckGif} width={200} alt="" />
+      <div className="p-6">
+        <div className="flex items-center justify-center h-64">
+          <div className="text-red-500">
+            Error loading dashboard: {overviewError?.message || "Unknown error"}
+          </div>
+        </div>
       </div>
     );
   }
 
-  // Format dates for display
-  const formatDate = (dateString) => {
-    if (!dateString) return "N/A";
-    const date = new Date(dateString);
-    return date.toLocaleDateString("en-US", {
-      day: "numeric",
-      month: "short",
-      year: "numeric",
-    });
+  // Extract data from API response
+  const dashboardData = overviewData?.data || {};
+  const {
+    totalProperties = 0,
+    totalBookings = 0,
+    todayBookings = 0,
+    totalRevenue = 0,
+    pendingBookings = 0,
+    confirmedBookings = 0,
+    activeGuests = 0,
+    currency = "USD",
+  } = dashboardData;
+
+  // Format currency
+  const formatCurrency = (amount) => {
+    return new Intl.NumberFormat("en-US", {
+      style: "currency",
+      currency: currency,
+      minimumFractionDigits: 2,
+    }).format(amount);
   };
 
   return (
-    <div className="">
-      {/* Stats Row */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+    <div className="p-4 sm:p-6 bg-[#0A1330] min-h-screen">
+      {/* Header */}
+      <div className="mb-6">
+        <div className="flex items-center gap-3 mb-2">
+          <div className="w-10 h-10 rounded-lg bg-gradient-to-r from-[#9945FF] to-[#14F195] flex items-center justify-center">
+            <Home className="w-5 h-5 text-white" />
+          </div>
+          <h1 className="text-2xl sm:text-3xl font-bold text-white">My Dashboard</h1>
+        </div>
+        <p className="text-[#AEB9E1] text-sm sm:text-base">
+          Welcome back! Here's what's happening with your property today.
+        </p>
+      </div>
+
+      {/* Subscription Status */}
+      <SubscriptionStatus showUpgrade={true} />
+
+      {/* Stat Cards Section */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
         <StatCard
-          title="My Equipment"
-          value={statsData?.data?.equipmentCount || 0}
-          icon={HiOutlineWrenchScrewdriver}
-          type="clients"
+          title="My Property"
+          value={totalProperties.toString()}
+          icon={Building2}
+          gradient="from-blue-500 to-cyan-500"
         />
         <StatCard
-          title="Documents"
-          value={statsData?.data?.documentCount || 0}
-          icon={FileText}
-          type="vehicles"
+          title="Total Revenue"
+          value={formatCurrency(totalRevenue)}
+          icon={DollarSign}
+          gradient="from-green-500 to-emerald-500"
         />
         <StatCard
-          title="Training"
-          value={`${statsData?.data?.driverAttemptedTraining || 0}/${
-            statsData?.data?.totalTraining || 0
-          }`}
-          icon={Headset}
-          type="drivers"
+          title="Today's Bookings"
+          value={todayBookings.toString()}
+          icon={Calendar}
+          gradient="from-purple-500 to-pink-500"
         />
         <StatCard
-          title="Active Alerts"
-          value={statsData?.data?.alertCount || 0}
-          icon={AiOutlineAlert}
-          type="alerts"
+          title="Active Guests"
+          value={activeGuests.toString()}
+          icon={Users}
+          gradient="from-orange-500 to-red-500"
         />
       </div>
 
-      {/* Chart and Expiring Documents Row */}
+      {/* Secondary Stats Row */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+        <StatCard
+          title="Total Bookings"
+          value={totalBookings.toString()}
+          icon={TrendingUp}
+          gradient="from-indigo-500 to-blue-500"
+        />
+        <StatCard
+          title="Pending"
+          value={pendingBookings.toString()}
+          icon={Clock}
+          gradient="from-yellow-500 to-orange-500"
+        />
+        <StatCard
+          title="Confirmed"
+          value={confirmedBookings.toString()}
+          icon={CheckCircle}
+          gradient="from-green-500 to-teal-500"
+        />
+        <StatCard
+          title="Booking Rate"
+          value={
+            totalBookings > 0
+              ? `${((confirmedBookings / totalBookings) * 100).toFixed(1)}%`
+              : "0%"
+          }
+          icon={TrendingUp}
+          gradient="from-violet-500 to-purple-500"
+        />
+      </div>
+
+      {/* Charts and Recent Activity Section */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+        {/* Booking Chart - Takes 2 columns */}
         <div className="lg:col-span-2">
-          <div className="bg-white rounded-lg  shadow-sm h-full">
-            <div className="flex justify-between px-6 py-4 border-[0.0563rem] border-[#191D311A] rounded-t-lg items-center">
-              <h3 className="text-lg font-semibold font-nunito text-primary">
-                Important Alerts ({alertsData?.data?.length || 0})
-              </h3>
-              <Activity className="h-5 w-5 text-primary" />
-            </div>
-            <div className="p-4">
-              <div className="overflow-x-auto">
-                <div className="min-w-full space-y-4">
-                  {/* Alerts */}
-                  {alertsData?.data?.length > 0 ? (
-                    <>
-                      <div className="mb-2 font-semibold text-primary text-base">
-                        Alerts
-                      </div>
-                      {alertsData.data.map((alert) => (
-                        <ReminderItem
-                          key={alert.id}
-                          reminder={{
-                            id: alert.id,
-                            title: alert.type,
-                            description: alert.message,
-                            // Format date as DD-MM-YYYY
-                            date: alert.date
-                              ? new Date(alert.date).toLocaleDateString("en-GB")
-                              : "N/A",
-                            status: alert.severity,
-                            read: alert.read,
-                          }}
-                          cardType="alert"
-                        />
-                      ))}
-                    </>
-                  ) : (
-                    <div className="text-center py-4 text-gray-500">
-                      No important alerts found
-                    </div>
-                  )}
-                </div>
-              </div>
-            </div>
-          </div>
+          <BookingChart
+            bookingStatsData={bookingStatsData}
+            isLoading={isLoadingStats}
+            isError={isErrorStats}
+          />
         </div>
 
-        <div>
-          <div className="bg-white rounded-lg px-4 py-4 mb-5 shadow-sm ">
-            <h3 className="text-lg font-semibold font-nunito text-primary mb-4">
-              Driver Status
-            </h3>
-            {/* Profile Completion Section */}
-            <div className="flex justify-between items-center border border-l-[0.2rem] border-[#E96666] border-t-[#E96666]/30 border-r-[#E96666]/30 border-b-[#E96666]/30 rounded-md px-3 py-2 mb-2">
-              <span className="text-[#E96666] font-nunito font-medium text-sm">
-                Profile Completion{" "}
-                <span className="text-[0.5rem]">
-                  ({statusData?.data?.completedStepsCount || 0}/
-                  {statusData?.data?.totalSteps || 0})
-                </span>
-              </span>
-              <span
-                className={`${
-                  statusData?.data?.profileCompletion === "complete"
-                    ? "bg-green-50 text-green"
-                    : "bg-[#E96666]/10 text-[#E96666]"
-                } text-xs px-3 py-1 rounded-md font-normal`}
-              >
-                {statusData?.data?.profileCompletion === "complete"
-                  ? "Complete"
-                  : "Incomplete"}
-              </span>
-            </div>
-
-            <div className="space-y-1 px-2">
-              <div className="flex justify-between items-center py-2 border-b-[0.0462rem] border-[#5555551A]">
-                <span className="text-primary font-nunito text-sm font-medium">
-                  Status
-                </span>
-                <span
-                  className={`${
-                    statusData?.data?.driverStatus === "active"
-                      ? "bg-green-50 text-green"
-                      : "bg-red-50 text-red"
-                  } px-4 py-1 font-nunito text-xs rounded-md`}
-                >
-                  {statusData?.data?.driverStatus || "N/A"}
-                </span>
-              </div>
-
-              <div className="flex justify-between items-center py-2 border-b-[0.0462rem] border-[#5555551A]">
-                <span className="text-primary font-nunito text-sm font-medium">
-                  License Expiration
-                </span>
-                <span className="text-primary-800 text-xs">
-                  {formatDate(statusData?.data?.licenseExpiration)}
-                </span>
-              </div>
-
-              <div className="flex justify-between items-center py-2 ">
-                <span className="text-primary font-nunito text-sm font-medium">
-                  TWIC Card
-                </span>
-                <span className="text-primary-800 text-xs">
-                  {formatDate(statusData?.data?.twicCardExpiry)}
-                </span>
-              </div>
-            </div>
-          </div>
-          <div>
-            <ExpiringDocuments documents={driverExpiringDocuments} />
-          </div>
+        {/* Upcoming Check-ins - Takes 1 column */}
+        <div className="lg:col-span-1">
+          <UpcomingCheckIns
+            upcomingActivityData={upcomingActivityData}
+            isLoading={isLoadingActivity}
+            isError={isErrorActivity}
+          />
         </div>
+      </div>
+
+      {/* Recent Bookings Section */}
+      <div className="mb-6">
+        <RecentBookings isAdmin={false} />
       </div>
     </div>
   );
 };
 
-export default DriverDashboard;
+export default StaffDashboard;

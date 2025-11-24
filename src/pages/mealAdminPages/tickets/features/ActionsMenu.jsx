@@ -20,9 +20,12 @@ const ActionsMenu = ({
     onEdit,
     onDelete,
     rowData,
+    tableType,
   });
 
-  if (!isOpen) return null;
+  if (!isOpen) {
+    return null;
+  }
 
   const handleViewClick = () => {
     console.log("View clicked, calling onView with:", rowData);
@@ -62,6 +65,8 @@ const ActionsMenu = ({
         return ["view"]; // Only show View for orders
       case "tickets":
         return ["view", "openInChat"]; // Show View and Open in Chat for tickets
+      case "bookings":
+        return ["view"]; // Only show View for bookings
       case "staff":
         return ["edit", "delete", "addProperty"];
       case "properties":
@@ -70,16 +75,24 @@ const ActionsMenu = ({
         if (onEdit) actions.push("edit");
         if (onDelete) actions.push("delete");
         return actions;
+      case "bannerAds":
+        // For banner ads, show view, edit and delete if handlers are available
+        const bannerActions = [];
+        if (onView) bannerActions.push("view");
+        if (onEdit) bannerActions.push("edit");
+        if (onDelete) bannerActions.push("delete");
+        return bannerActions.length > 0 ? bannerActions : ["view", "edit", "delete"];
       default:
         return ["view", "edit", "delete"];
     }
   };
 
   const actionsToShow = getActionsToShow();
+  console.log("Actions to show:", actionsToShow);
 
   return (
     <div
-      className={`absolute z-50 ${
+      className={`absolute z-[99999] ${
         tableType === "tickets" ? "w-40" : "w-32"
       } bg-[#060B27] border border-[#3A3A4E] rounded-lg shadow-xl py-1 ${
         position === "top" ? "bottom-full mb-2" : "top-full mt-2"

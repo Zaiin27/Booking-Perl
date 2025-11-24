@@ -254,7 +254,7 @@ const PropertiesPage = () => {
         </div>
 
         {/* Table */}
-        <div className="bg-[#171D41] rounded-lg shadow-lg border border-[#3A3A4E] overflow-hidden">
+        <div className="bg-[#171D41] rounded-lg shadow-lg border border-[#3A3A4E] overflow-x-auto overflow-y-visible">
           <div className="p-2 sm:p-4">
             <ReusableTable
               columns={columns}

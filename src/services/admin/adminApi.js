@@ -26,6 +26,32 @@ export const adminApi = SplitApiSettings.injectEndpoints({
         params: params && Object.keys(params).length > 0 ? params : undefined,
       }),
     }),
+    // Hotel Booking Dashboard
+    getHotelDashboardOverview: builder.query({
+      query: () => ({
+        url: API_END_POINTS.getHotelDashboardOverview,
+        method: "GET",
+      }),
+    }),
+    getBookingStatsByDateRange: builder.query({
+      query: (params) => ({
+        url: API_END_POINTS.getBookingStatsByDateRange,
+        method: "GET",
+        params: params && Object.keys(params).length > 0 ? params : undefined,
+      }),
+    }),
+    getPropertyWiseStats: builder.query({
+      query: () => ({
+        url: API_END_POINTS.getPropertyWiseStats,
+        method: "GET",
+      }),
+    }),
+    getUpcomingActivity: builder.query({
+      query: () => ({
+        url: API_END_POINTS.getUpcomingActivity,
+        method: "GET",
+      }),
+    }),
     getAdminOrders: builder.query({
       query: (params) => ({
         url: API_END_POINTS.getAdminOrders,
@@ -186,6 +212,10 @@ export const {
   useGetAdminDashboardStatsQuery,
   useGetAdminDashboardOverviewQuery,
   useGetAdminDashboardWeeklyVolumeQuery, 
+  useGetHotelDashboardOverviewQuery,
+  useGetBookingStatsByDateRangeQuery,
+  useGetPropertyWiseStatsQuery,
+  useGetUpcomingActivityQuery,
   useGetAdminOrdersQuery,
   useGetAdminOrdersMonthlyQuery,
   useGetAdminOrderByIdQuery,
