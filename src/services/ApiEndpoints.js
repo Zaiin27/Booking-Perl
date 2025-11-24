@@ -1,6 +1,6 @@
 export const BASE_URL =
   import.meta.env.VITE_API_URL ||
-  (import.meta.env.DEV ? "https://bookingpearl-6cqp2f6x.b4a.run" : "https://bookingpearl-6cqp2f6x.b4a.run");
+  (import.meta.env.DEV ? "https://bookingpearl-ctfiaolf.b4a.run" : "https://bookingpearl-ctfiaolf.b4a.run");
 
 // Debug logging
 console.log("API Configuration:");

@@ -2,7 +2,7 @@ import axios from "axios";
 
 // Create the API instance without store dependencies
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || "https://bookingpearl-6cqp2f6x.b4a.run",
+  baseURL: import.meta.env.VITE_API_URL || "https://bookingpearl-ctfiaolf.b4a.run",
   timeout: 30000,
   headers: {
     "Content-Type": "application/json",
