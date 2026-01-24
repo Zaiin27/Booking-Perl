@@ -6,7 +6,6 @@ import {
   FaArrowLeft,
   FaMapMarkerAlt,
   FaBed,
-  FaDollarSign,
   FaClock,
   FaEnvelope,
   FaPhone,
@@ -136,10 +135,10 @@ const PropertyDetailPage = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-[#0F0F23] via-[#1A1A2E] to-[#16213E]">
+      <div className="min-h-screen flex items-center justify-center bg-white">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-[#9945FF] mx-auto mb-4"></div>
-          <div className="text-xl text-white">Loading property details...</div>
+          <div className="animate-spin rounded-full h-16 w-16 border-b-4 border-primary mx-auto mb-4"></div>
+          <div className="text-xl text-gray-900">Loading property details...</div>
         </div>
       </div>
     );
@@ -147,12 +146,12 @@ const PropertyDetailPage = () => {
 
   if (!property) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-[#0F0F23] via-[#1A1A2E] to-[#16213E]">
+      <div className="min-h-screen flex items-center justify-center bg-white">
         <div className="text-center">
-          <div className="text-white text-2xl mb-4">Property not found</div>
+          <div className="text-gray-900 text-2xl mb-4">Property not found</div>
           <button
             onClick={() => navigate("/properties")}
-            className="bg-gradient-to-r from-[#9945FF] to-[#14F195] text-white px-6 py-3 rounded-lg hover:scale-105 transition-transform"
+            className="bg-primary hover:bg-primary-600 text-white px-6 py-3 rounded-lg hover:scale-105 transition-transform"
           >
             Back to Properties
           </button>
@@ -182,24 +181,24 @@ const PropertyDetailPage = () => {
   }, 0) || 0;
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-[#0F0F23] via-[#1A1A2E] to-[#16213E]">
+    <div className="min-h-screen bg-white">
       {/* Header Navigation */}
-      <div className="sticky top-0 z-40 bg-[#0F0F23]/95 backdrop-blur-md border-b border-white/10">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
-          <div className="flex items-center gap-4">
+      <div className="sticky top-0 z-40 bg-white shadow-md border-b border-gray-200">
+        <div className="max-w-7xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8 py-3 sm:py-4">
+          <div className="flex items-center gap-3 sm:gap-4">
             <button
               onClick={() => navigate("/properties")}
-              className="p-3 bg-white/10 hover:bg-white/20 rounded-full transition-all duration-300 hover:scale-110"
+              className="p-2 sm:p-3 bg-gray-100 hover:bg-gray-200 rounded-full transition-all duration-300 hover:scale-110"
             >
-              <FaArrowLeft className="text-white text-lg" />
+              <FaArrowLeft className="text-gray-700 text-base sm:text-lg" />
             </button>
-            <div className="flex-1">
-              <div className="flex items-center gap-2 text-sm text-white/80">
-                <Link to="/" className="hover:text-white transition-colors">Home</Link>
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center gap-1.5 sm:gap-2 text-xs sm:text-sm text-gray-600 flex-wrap">
+                <Link to="/" className="hover:text-primary transition-colors">Home</Link>
                 <span>/</span>
-                <Link to="/properties" className="hover:text-white transition-colors">Properties</Link>
+                <Link to="/properties" className="hover:text-primary transition-colors">Properties</Link>
                 <span>/</span>
-                <span className="text-white">{property.name}</span>
+                <span className="text-gray-900 truncate">{property.name}</span>
               </div>
             </div>
           </div>
@@ -208,12 +207,12 @@ const PropertyDetailPage = () => {
 
       {/* Image Gallery Section */}
       <div className="relative">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="max-w-7xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8 py-4 sm:py-6 md:py-8">
           {photos.length > 0 ? (
             <div className="relative group">
               {/* Main Image */}
               <div 
-                className="relative h-[400px] md:h-[500px] lg:h-[600px] rounded-2xl overflow-hidden shadow-2xl cursor-pointer"
+                className="relative h-[250px] sm:h-[300px] md:h-[400px] lg:h-[500px] xl:h-[600px] rounded-xl sm:rounded-2xl overflow-hidden shadow-lg cursor-pointer"
                 onClick={() => openImageModal(currentImageIndex)}
               >
                 <img
@@ -223,57 +222,57 @@ const PropertyDetailPage = () => {
                 />
                 
                 {/* Gradient Overlay */}
-                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
+                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent"></div>
 
                 {/* Navigation Arrows */}
                 {hasMultipleImages && (
                   <>
                     <button
-                      onClick={handlePreviousImage}
-                      className="absolute left-4 top-1/2 -translate-y-1/2 p-3 bg-white/20 hover:bg-white/30 backdrop-blur-md rounded-full transition-all duration-300 opacity-0 group-hover:opacity-100 hover:scale-110"
+                      onClick={(e) => { e.stopPropagation(); handlePreviousImage(); }}
+                      className="absolute left-2 sm:left-4 top-1/2 -translate-y-1/2 p-2 sm:p-3 bg-white/90 hover:bg-white backdrop-blur-md rounded-full transition-all duration-300 hover:scale-110"
                       aria-label="Previous image"
                     >
-                      <FaChevronLeft className="text-white text-xl" />
+                      <FaChevronLeft className="text-gray-900 text-base sm:text-xl" />
                     </button>
                     <button
-                      onClick={handleNextImage}
-                      className="absolute right-4 top-1/2 -translate-y-1/2 p-3 bg-white/20 hover:bg-white/30 backdrop-blur-md rounded-full transition-all duration-300 opacity-0 group-hover:opacity-100 hover:scale-110"
+                      onClick={(e) => { e.stopPropagation(); handleNextImage(); }}
+                      className="absolute right-2 sm:right-4 top-1/2 -translate-y-1/2 p-2 sm:p-3 bg-white/90 hover:bg-white backdrop-blur-md rounded-full transition-all duration-300 hover:scale-110"
                       aria-label="Next image"
                     >
-                      <FaChevronRight className="text-white text-xl" />
+                      <FaChevronRight className="text-gray-900 text-base sm:text-xl" />
                     </button>
                   </>
                 )}
 
                 {/* Image Counter */}
                 {hasMultipleImages && (
-                  <div className="absolute bottom-4 left-1/2 -translate-x-1/2 px-4 py-2 bg-black/50 backdrop-blur-md rounded-full text-white text-sm">
+                  <div className="absolute bottom-3 sm:bottom-4 left-1/2 -translate-x-1/2 px-3 sm:px-4 py-1.5 sm:py-2 bg-black/70 backdrop-blur-md rounded-full text-white text-xs sm:text-sm">
                     {currentImageIndex + 1} / {photos.length}
                   </div>
                 )}
 
                 {/* Property Title Overlay */}
-                <div className="absolute bottom-0 left-0 right-0 p-8">
-                  <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-2 drop-shadow-2xl">
+                <div className="absolute bottom-0 left-0 right-0 p-4 sm:p-6 md:p-8">
+                  <h1 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl xl:text-5xl font-bold text-white mb-2 drop-shadow-2xl">
                     {property.name}
                   </h1>
-                  <div className="flex items-center gap-2 text-white/90">
-                    <FaMapMarkerAlt className="text-[#14F195]" />
-                    <span className="text-lg">{property.address}</span>
+                  <div className="flex items-center gap-2 text-white text-sm sm:text-base md:text-lg">
+                    <FaMapMarkerAlt className="text-green-400 flex-shrink-0" />
+                    <span className="truncate">{property.address}</span>
                   </div>
                 </div>
               </div>
 
               {/* Thumbnail Gallery */}
               {hasMultipleImages && photos.length > 1 && (
-                <div className="grid grid-cols-4 md:grid-cols-6 gap-3 mt-4">
+                <div className="grid grid-cols-4 sm:grid-cols-5 md:grid-cols-6 gap-2 sm:gap-3 mt-3 sm:mt-4">
                   {photos.slice(0, 6).map((photo, index) => (
                     <button
                       key={index}
                       onClick={() => setCurrentImageIndex(index)}
-                      className={`relative h-24 md:h-32 rounded-lg overflow-hidden transition-all duration-300 ${
+                      className={`relative h-16 sm:h-20 md:h-24 lg:h-32 rounded-lg overflow-hidden transition-all duration-300 ${
                         currentImageIndex === index
-                          ? "ring-4 ring-[#9945FF] scale-105"
+                          ? "ring-2 sm:ring-4 ring-primary scale-105"
                           : "opacity-70 hover:opacity-100 hover:scale-105"
                       }`}
                     >
@@ -283,7 +282,7 @@ const PropertyDetailPage = () => {
                         className="w-full h-full object-cover"
                       />
                       {currentImageIndex === index && (
-                        <div className="absolute inset-0 bg-[#9945FF]/30"></div>
+                        <div className="absolute inset-0 bg-primary/30"></div>
                       )}
                     </button>
                   ))}
@@ -291,15 +290,15 @@ const PropertyDetailPage = () => {
               )}
             </div>
           ) : (
-            <div className="relative h-[400px] md:h-[500px] lg:h-[600px] rounded-2xl overflow-hidden shadow-2xl bg-gradient-to-r from-[#9945FF] to-[#14F195] flex items-center justify-center">
-              <div className="text-white text-8xl">🏨</div>
-              <div className="absolute bottom-0 left-0 right-0 p-8">
-                <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-white mb-2">
+            <div className="relative h-[250px] sm:h-[300px] md:h-[400px] lg:h-[500px] xl:h-[600px] rounded-xl sm:rounded-2xl overflow-hidden shadow-lg bg-gradient-to-r from-primary to-primary-600 flex items-center justify-center">
+              <div className="text-white text-6xl sm:text-8xl">🏨</div>
+              <div className="absolute bottom-0 left-0 right-0 p-4 sm:p-6 md:p-8">
+                <h1 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl xl:text-5xl font-bold text-white mb-2">
                   {property.name}
                 </h1>
-                <div className="flex items-center gap-2 text-white/90">
-                  <FaMapMarkerAlt className="text-white" />
-                  <span className="text-lg">{property.address}</span>
+                <div className="flex items-center gap-2 text-white text-sm sm:text-base md:text-lg">
+                  <FaMapMarkerAlt className="text-white flex-shrink-0" />
+                  <span className="truncate">{property.address}</span>
                 </div>
               </div>
             </div>
@@ -308,26 +307,26 @@ const PropertyDetailPage = () => {
       </div>
 
       {/* Main Content */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+      <div className="max-w-7xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8 py-6 sm:py-8 md:py-12">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6 md:gap-8">
           {/* Left Column - Main Content */}
-          <div className="lg:col-span-2 space-y-8">
+          <div className="lg:col-span-2 space-y-4 sm:space-y-6 md:space-y-8">
             {/* Description */}
             {property.description && (
-              <div className="bg-white/5 backdrop-blur-md rounded-2xl p-6 border border-white/10">
-                <h2 className="text-2xl font-bold text-white mb-4">About This Property</h2>
-                <p className="text-white/80 leading-relaxed text-lg">{property.description}</p>
+              <div className="bg-gray-50 rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-gray-200">
+                <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-3 sm:mb-4">About This Property</h2>
+                <p className="text-gray-700 leading-relaxed text-sm sm:text-base md:text-lg">{property.description}</p>
               </div>
             )}
 
             {/* Room Types */}
-            <div className="bg-white/5 backdrop-blur-md rounded-2xl p-6 border border-white/10">
-              <h2 className="text-2xl font-bold text-white mb-6 flex items-center gap-2">
-                <FaBed className="text-[#9945FF]" />
+            <div className="bg-gray-50 rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-gray-200">
+              <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-4 sm:mb-6 flex items-center gap-2">
+                <FaBed className="text-primary" />
                 Room Types & Availability
               </h2>
               
-              <div className="space-y-4">
+              <div className="space-y-3 sm:space-y-4">
                 {property.roomTypes?.map((room, index) => {
                   const availability = getRoomAvailability(room);
                   const isAvailable = availability.available > 0;
@@ -335,39 +334,39 @@ const PropertyDetailPage = () => {
                   return (
                     <div
                       key={index}
-                      className={`p-5 rounded-xl border transition-all duration-300 ${
+                      className={`p-4 sm:p-5 rounded-lg sm:rounded-xl border transition-all duration-300 ${
                         isAvailable
-                          ? "bg-gradient-to-r from-green-500/10 to-emerald-500/10 border-green-500/30 hover:border-green-500/50"
-                          : "bg-gradient-to-r from-red-500/10 to-pink-500/10 border-red-500/30 opacity-75"
+                          ? "bg-green-50 border-green-200 hover:border-green-300"
+                          : "bg-red-50 border-red-200 opacity-75"
                       }`}
                     >
-                      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                      <div className="flex flex-col gap-3 sm:gap-4">
                         <div className="flex-1">
-                          <div className="flex items-center gap-3 mb-2">
-                            <FaBed className={`text-2xl ${isAvailable ? "text-green-400" : "text-red-400"}`} />
-                            <h3 className="text-xl font-bold text-white capitalize">{room.type} Room</h3>
+                          <div className="flex flex-wrap items-center gap-2 sm:gap-3 mb-2 sm:mb-3">
+                            <FaBed className={`text-xl sm:text-2xl ${isAvailable ? "text-green-600" : "text-red-600"}`} />
+                            <h3 className="text-lg sm:text-xl font-bold text-gray-900 capitalize">{room.type} Room</h3>
                             {isAvailable && (
-                              <span className="px-3 py-1 bg-green-500/20 text-green-400 rounded-full text-xs font-semibold flex items-center gap-1">
-                                <FaCheckCircle /> Available
+                              <span className="px-2 sm:px-3 py-1 bg-green-100 text-green-700 rounded-full text-xs font-semibold flex items-center gap-1">
+                                <FaCheckCircle className="text-xs" /> Available
                               </span>
                             )}
                           </div>
                           
-                          <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mt-3">
+                          <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-4 mt-2 sm:mt-3">
                             <div>
-                              <p className="text-white/60 text-sm">Total Rooms</p>
-                              <p className="text-white font-semibold">{availability.total}</p>
+                              <p className="text-gray-600 text-xs sm:text-sm">Total Rooms</p>
+                              <p className="text-gray-900 font-semibold text-sm sm:text-base">{availability.total}</p>
                             </div>
                             <div>
-                              <p className="text-white/60 text-sm">Available</p>
-                              <p className={`font-semibold ${isAvailable ? "text-green-400" : "text-red-400"}`}>
+                              <p className="text-gray-600 text-xs sm:text-sm">Available</p>
+                              <p className={`font-semibold text-sm sm:text-base ${isAvailable ? "text-green-600" : "text-red-600"}`}>
                                 {availability.available}
                               </p>
                             </div>
-                            <div>
-                              <p className="text-white/60 text-sm">Price/Night</p>
-                              <p className="text-white font-semibold flex items-center gap-1">
-                                <FaDollarSign className="text-[#14F195]" />
+                            <div className="col-span-2 sm:col-span-1">
+                              <p className="text-gray-600 text-xs sm:text-sm">Price/Night</p>
+                              <p className="text-gray-900 font-semibold text-sm sm:text-base flex items-center gap-1">
+                                <span className="text-primary">Rs</span>
                                 {formatCurrency(room.price)}
                               </p>
                             </div>
@@ -375,9 +374,9 @@ const PropertyDetailPage = () => {
                         </div>
                         
                         {availability.booked > 0 && (
-                          <div className="text-center md:text-right">
-                            <p className="text-white/60 text-sm">Currently Booked</p>
-                            <p className="text-white font-semibold">{availability.booked}</p>
+                          <div className="text-left sm:text-center md:text-right pt-2 sm:pt-0 border-t sm:border-t-0 border-gray-200 sm:border-0">
+                            <p className="text-gray-600 text-xs sm:text-sm">Currently Booked</p>
+                            <p className="text-gray-900 font-semibold text-sm sm:text-base">{availability.booked}</p>
                           </div>
                         )}
                       </div>
@@ -389,16 +388,16 @@ const PropertyDetailPage = () => {
 
             {/* Amenities */}
             {property.amenities && property.amenities.length > 0 && (
-              <div className="bg-white/5 backdrop-blur-md rounded-2xl p-6 border border-white/10">
-                <h2 className="text-2xl font-bold text-white mb-4">Amenities</h2>
-                <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+              <div className="bg-gray-50 rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-gray-200">
+                <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-3 sm:mb-4">Amenities</h2>
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 sm:gap-3">
                   {property.amenities.map((amenity, index) => (
                     <div
                       key={index}
-                      className="flex items-center gap-2 p-3 bg-white/5 rounded-lg border border-white/10 hover:border-[#9945FF]/50 transition-all duration-300"
+                      className="flex items-center gap-2 p-2 sm:p-3 bg-white rounded-lg border border-gray-200 hover:border-primary transition-all duration-300"
                     >
-                      <FaCheckCircle className="text-[#14F195]" />
-                      <span className="text-white/90">{amenity}</span>
+                      <FaCheckCircle className="text-green-600 text-sm sm:text-base flex-shrink-0" />
+                      <span className="text-gray-700 text-xs sm:text-sm">{amenity}</span>
                     </div>
                   ))}
                 </div>
@@ -406,36 +405,38 @@ const PropertyDetailPage = () => {
             )}
 
             {/* Contact Information */}
-            <div className="bg-white/5 backdrop-blur-md rounded-2xl p-6 border border-white/10">
-              <h2 className="text-2xl font-bold text-white mb-4">Contact Information</h2>
-              <div className="space-y-3">
+            <div className="bg-gray-50 rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-gray-200">
+              <h2 className="text-xl sm:text-2xl font-bold text-gray-900 mb-3 sm:mb-4">Contact Information</h2>
+              <div className="space-y-2 sm:space-y-3">
                 {property.contactEmail && (
-                  <div className="flex items-center gap-3 p-3 bg-white/5 rounded-lg">
-                    <FaEnvelope className="text-[#9945FF] text-xl" />
+                  <div className="flex items-center gap-2 sm:gap-3 p-2 sm:p-3 bg-white rounded-lg">
+                    <FaEnvelope className="text-primary text-base sm:text-xl flex-shrink-0" />
                     <a
                       href={`mailto:${property.contactEmail}`}
-                      className="text-white/90 hover:text-white transition-colors"
+                      className="text-gray-700 hover:text-primary transition-colors text-sm sm:text-base break-all"
                     >
                       {property.contactEmail}
                     </a>
                   </div>
                 )}
                 {property.contactPhone && (
-                  <div className="flex items-center gap-3 p-3 bg-white/5 rounded-lg">
-                    <FaPhone className="text-[#9945FF] text-xl" />
+                  <div className="flex items-center gap-2 sm:gap-3 p-2 sm:p-3 bg-white rounded-lg">
+                    <FaPhone className="text-primary text-base sm:text-xl flex-shrink-0" />
                     <a
                       href={`tel:${property.contactPhone}`}
-                      className="text-white/90 hover:text-white transition-colors"
+                      className="text-gray-700 hover:text-primary transition-colors text-sm sm:text-base"
                     >
                       {property.contactPhone}
                     </a>
                   </div>
                 )}
                 {property.checkInTime && property.checkOutTime && (
-                  <div className="flex items-center gap-3 p-3 bg-white/5 rounded-lg">
-                    <FaClock className="text-[#9945FF] text-xl" />
-                    <span className="text-white/90">
-                      Check-in: {property.checkInTime} | Check-out: {property.checkOutTime}
+                  <div className="flex items-start sm:items-center gap-2 sm:gap-3 p-2 sm:p-3 bg-white rounded-lg">
+                    <FaClock className="text-primary text-base sm:text-xl flex-shrink-0 mt-0.5 sm:mt-0" />
+                    <span className="text-gray-700 text-xs sm:text-sm">
+                      <span className="block sm:inline">Check-in: {property.checkInTime}</span>
+                      <span className="hidden sm:inline"> | </span>
+                      <span className="block sm:inline">Check-out: {property.checkOutTime}</span>
                     </span>
                   </div>
                 )}
@@ -445,30 +446,30 @@ const PropertyDetailPage = () => {
 
           {/* Right Column - Booking Card */}
           <div className="lg:col-span-1">
-            <div className="sticky top-24 bg-white/5 backdrop-blur-md rounded-2xl p-6 border border-white/10 shadow-2xl">
-              <div className="mb-6">
-                <div className="flex items-center gap-2 mb-4">
-                  <FaStar className="text-yellow-400" />
-                  <span className="text-white font-semibold">Quick Booking</span>
+            <div className="sticky top-20 lg:top-24 bg-white rounded-xl sm:rounded-2xl p-4 sm:p-6 border border-gray-200 shadow-lg">
+              <div className="mb-4 sm:mb-6">
+                <div className="flex items-center gap-2 mb-3 sm:mb-4">
+                  <FaStar className="text-yellow-500" />
+                  <span className="text-gray-900 font-semibold text-base sm:text-lg">Quick Booking</span>
                 </div>
                 
-                <div className="space-y-4 mb-6">
-                  <div className="flex justify-between items-center p-3 bg-white/5 rounded-lg">
-                    <span className="text-white/70">Total Rooms</span>
-                    <span className="text-white font-semibold">
+                <div className="space-y-3 sm:space-y-4 mb-4 sm:mb-6">
+                  <div className="flex justify-between items-center p-2 sm:p-3 bg-gray-50 rounded-lg">
+                    <span className="text-gray-600 text-sm sm:text-base">Total Rooms</span>
+                    <span className="text-gray-900 font-semibold text-sm sm:text-base">
                       {property.roomTypes?.reduce((sum, room) => sum + room.count, 0) || 0}
                     </span>
                   </div>
-                  <div className="flex justify-between items-center p-3 bg-white/5 rounded-lg">
-                    <span className="text-white/70">Available Now</span>
-                    <span className="text-green-400 font-semibold">{totalAvailable}</span>
+                  <div className="flex justify-between items-center p-2 sm:p-3 bg-gray-50 rounded-lg">
+                    <span className="text-gray-600 text-sm sm:text-base">Available Now</span>
+                    <span className="text-green-600 font-semibold text-sm sm:text-base">{totalAvailable}</span>
                   </div>
-                  <div className="border-t border-white/10 pt-4">
-                    <p className="text-white/60 text-sm mb-2">Starting from</p>
+                  <div className="border-t border-gray-200 pt-3 sm:pt-4">
+                    <p className="text-gray-600 text-xs sm:text-sm mb-2">Starting from</p>
                     {property.roomTypes?.length > 0 && (
-                      <p className="text-3xl font-bold bg-gradient-to-r from-[#9945FF] to-[#14F195] bg-clip-text text-transparent">
+                      <p className="text-2xl sm:text-3xl font-bold text-primary">
                         {formatCurrency(Math.min(...property.roomTypes.map(r => r.price)))}
-                        <span className="text-white/60 text-lg font-normal">/night</span>
+                        <span className="text-gray-600 text-base sm:text-lg font-normal">/night</span>
                       </p>
                     )}
                   </div>
@@ -478,17 +479,17 @@ const PropertyDetailPage = () => {
               <button
                 onClick={handleBookNow}
                 disabled={totalAvailable === 0}
-                className={`w-full py-4 rounded-xl font-semibold text-lg transition-all duration-300 ${
+                className={`w-full py-3 sm:py-4 rounded-lg sm:rounded-xl font-semibold text-base sm:text-lg transition-all duration-300 ${
                   totalAvailable === 0
-                    ? "bg-gray-500/50 text-gray-400 cursor-not-allowed"
-                    : "bg-gradient-to-r from-[#9945FF] to-[#14F195] text-white hover:scale-105 hover:shadow-2xl hover:shadow-[#9945FF]/50"
+                    ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+                    : "bg-primary hover:bg-primary-600 text-white hover:scale-105 hover:shadow-lg"
                 }`}
               >
                 {totalAvailable === 0 ? "Fully Booked" : "Book Now"}
               </button>
 
               {totalAvailable === 0 && (
-                <p className="text-center text-white/60 text-sm mt-3">
+                <p className="text-center text-gray-600 text-xs sm:text-sm mt-3">
                   All rooms are currently booked
                 </p>
               )}
@@ -500,14 +501,14 @@ const PropertyDetailPage = () => {
       {/* Image Modal */}
       {isImageModalOpen && photos.length > 0 && (
         <div
-          className="fixed inset-0 z-50 bg-black/95 flex items-center justify-center p-4"
+          className="fixed inset-0 z-50 bg-black/95 flex items-center justify-center p-2 sm:p-4"
           onClick={closeImageModal}
         >
           <button
             onClick={closeImageModal}
-            className="absolute top-4 right-4 p-3 bg-white/10 hover:bg-white/20 rounded-full transition-all z-50"
+            className="absolute top-2 sm:top-4 right-2 sm:right-4 p-2 sm:p-3 bg-white/90 hover:bg-white rounded-full transition-all z-50"
           >
-            <FaTimes className="text-white text-xl" />
+            <FaTimes className="text-gray-900 text-lg sm:text-xl" />
           </button>
           
           <div className="relative max-w-6xl w-full" onClick={(e) => e.stopPropagation()}>
@@ -521,17 +522,17 @@ const PropertyDetailPage = () => {
               <>
                 <button
                   onClick={handlePreviousImage}
-                  className="absolute left-4 top-1/2 -translate-y-1/2 p-4 bg-white/20 hover:bg-white/30 backdrop-blur-md rounded-full transition-all hover:scale-110"
+                  className="absolute left-2 sm:left-4 top-1/2 -translate-y-1/2 p-3 sm:p-4 bg-white/90 hover:bg-white backdrop-blur-md rounded-full transition-all hover:scale-110"
                 >
-                  <FaChevronLeft className="text-white text-2xl" />
+                  <FaChevronLeft className="text-gray-900 text-xl sm:text-2xl" />
                 </button>
                 <button
                   onClick={handleNextImage}
-                  className="absolute right-4 top-1/2 -translate-y-1/2 p-4 bg-white/20 hover:bg-white/30 backdrop-blur-md rounded-full transition-all hover:scale-110"
+                  className="absolute right-2 sm:right-4 top-1/2 -translate-y-1/2 p-3 sm:p-4 bg-white/90 hover:bg-white backdrop-blur-md rounded-full transition-all hover:scale-110"
                 >
-                  <FaChevronRight className="text-white text-2xl" />
+                  <FaChevronRight className="text-gray-900 text-xl sm:text-2xl" />
                 </button>
-                <div className="absolute bottom-4 left-1/2 -translate-x-1/2 px-4 py-2 bg-black/50 backdrop-blur-md rounded-full text-white">
+                <div className="absolute bottom-2 sm:bottom-4 left-1/2 -translate-x-1/2 px-3 sm:px-4 py-1.5 sm:py-2 bg-black/70 backdrop-blur-md rounded-full text-white text-xs sm:text-sm">
                   {currentImageIndex + 1} / {photos.length}
                 </div>
               </>

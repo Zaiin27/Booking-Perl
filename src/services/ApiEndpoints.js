@@ -28,7 +28,7 @@ export const API_END_POINTS = {
   getAdminDashboardStats: "/api/v1/admin/stats",
   getAdminDashboardOverview: "/api/v1/admin/dashboard/overview",
   getAdminDashboardWeeklyVolume: "/api/v1/admin/dashboard/weekly-volume",
-  
+
   // Hotel Booking Dashboard
   getHotelDashboardOverview: "/api/v1/admin/dashboard/hotel-overview",
   getBookingStatsByDateRange: "/api/v1/admin/dashboard/booking-stats",
@@ -61,6 +61,7 @@ export const API_END_POINTS = {
 
   /////////////////////////////<=== SUPPORT ===>//////////////////////////////
   contactSupport: "/api/v1/support/contact",
+  getContactMessages: "/api/v1/support/messages",
 
   /////////////////////////////<=== PAYMENTS ===>//////////////////////////////
   createPaymentIntent: "/api/v1/payments/create-simulate-payment-intent",

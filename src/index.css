@@ -18,23 +18,25 @@
 }
 
 @layer utilities {
+
   /* Ultra thin scrollbar */
   .scrollbar-ultra-thin::-webkit-scrollbar {
     width: 4px;
   }
-  
+
   .scrollbar-ultra-thin::-webkit-scrollbar-track {
     background: transparent;
   }
-  
+
   .scrollbar-ultra-thin::-webkit-scrollbar-thumb {
     background: #9CA3AF;
     border-radius: 2px;
   }
-  
+
   .scrollbar-ultra-thin::-webkit-scrollbar-thumb:hover {
     background: #6B7280;
   }
+
   .line-clamp-2 {
     display: -webkit-box;
     -webkit-line-clamp: 2;
@@ -44,12 +46,15 @@
 
   /* Hide scrollbar but keep functionality */
   .scrollbar-hide {
-    -ms-overflow-style: none;  /* Internet Explorer 10+ */
-    scrollbar-width: none;  /* Firefox */
+    -ms-overflow-style: none;
+    /* Internet Explorer 10+ */
+    scrollbar-width: none;
+    /* Firefox */
   }
-  
+
   .scrollbar-hide::-webkit-scrollbar {
-    display: none;  /* Safari and Chrome */
+    display: none;
+    /* Safari and Chrome */
   }
 }
 
@@ -739,4 +744,53 @@ input[type="text"]:focus {
 
 .admin-table-scrollbar::-webkit-scrollbar-track {
   background: #171D41;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-slide-up {
+  opacity: 0;
+  animation: slideUp 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.delay-100 {
+  animation-delay: 100ms;
+}
+
+.delay-200 {
+  animation-delay: 200ms;
+}
+
+.delay-300 {
+  animation-delay: 300ms;
+}
+
+.delay-400 {
+  animation-delay: 400ms;
+}
+
+.delay-500 {
+  animation-delay: 500ms;
+}
+
+.glass-header {
+  @apply backdrop-blur-xl bg-white/70 border-b border-white/20 transition-all duration-500;
+}
+
+.glass-drawer {
+  @apply backdrop-blur-2xl bg-white/90 border-r border-white/20;
+}
+
+.nav-link-pill {
+  @apply px-4 py-2 rounded-xl transition-all duration-300 hover:bg-slate-100/50 active:scale-95 font-inter font-bold text-sm;
 }

@@ -30,23 +30,23 @@ const DiscoverSection = () => {
   ];
 
   return (
-    <section className="py-20 bg-white">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <section className="py-12 sm:py-16 md:py-20 bg-white w-full">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">
         {/* Section Header */}
-        <div className="text-center mb-16">
-          <h2 className="text-4xl lg:text-5xl font-bold text-gray-900 mb-4">
+        <div className="text-center mb-8 sm:mb-12 md:mb-16 lg:mt-0 md:mt-10 mt-20">
+          <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 mb-2 sm:mb-4 px-2">
             Discover your new favourite stay
           </h2>
         </div>
 
         {/* Categories Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-6">
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 sm:gap-4 md:gap-6">
           {categories.map((category) => (
             <div
               key={category.id}
-              className="group relative bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2"
+              className="group relative bg-white rounded-xl sm:rounded-2xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 sm:hover:-translate-y-2 cursor-pointer"
             >
-               <div className="relative h-64 overflow-hidden">
+               <div className="relative h-32 sm:h-40 md:h-56 lg:h-64 overflow-hidden">
                  <img
                    src={category.image}
                    alt={category.name}
@@ -57,9 +57,9 @@ const DiscoverSection = () => {
                </div>
                
                {/* Category Label */}
-               <div className="absolute bottom-4 left-4 right-4">
-                 <div className="rounded-lg px-4 py-2 text-center ">
-                   <span className="text-white font-semibold text-sm">
+               <div className="absolute bottom-2 sm:bottom-3 md:bottom-4 left-2 sm:left-3 md:left-4 right-2 sm:right-3 md:right-4">
+                 <div className="rounded-lg px-2 sm:px-3 md:px-4 py-1 sm:py-1.5 md:py-2 text-center">
+                   <span className="text-white font-semibold text-xs sm:text-sm md:text-base drop-shadow-lg">
                      {category.name}
                    </span>
                  </div>

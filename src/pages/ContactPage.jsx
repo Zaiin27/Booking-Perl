@@ -2,6 +2,8 @@ import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { useContactSupportMutation } from "../services/Api";
 import { toastUtils } from "../utils/toastUtils";
+import { FiPhone, FiMail, FiMapPin, FiGlobe, FiShield, FiStar } from "react-icons/fi";
+import BackgroundImg from "../assets/images/herobg.png";
 
 const ContactPage = () => {
   const [contactSupport, { isLoading }] = useContactSupportMutation();
@@ -51,6 +53,7 @@ const ContactPage = () => {
       const contactData = {
         name: `${formData.firstName} ${formData.lastName}`,
         email: formData.email,
+        subject: formData.subject,
         message: formData.message,
       };
 
@@ -74,246 +77,241 @@ const ContactPage = () => {
           errorMessage = result.error.data.error;
         }
 
-        toast.error(errorMessage);
+        toastUtils.error(errorMessage);
       }
     } catch (error) {
-      toast.error("Network error. Please try again.");
+      toastUtils.error("Network error. Please try again.");
     }
   };
 
+  const contactOptions = [
+    {
+      title: "Call Us",
+      info: "+92 300 1234567",
+      subInfo: "24/7 dedicated support line",
+      icon: <FiPhone className="text-2xl" />,
+      link: "tel:+923001234567"
+    },
+    {
+      title: "Email Us",
+      info: "support@bookingpearl.com",
+      subInfo: "Response within 2 hours",
+      icon: <FiMail className="text-2xl" />,
+      link: "mailto:support@bookingpearl.com"
+    },
+    {
+      title: "Our Location",
+      info: "Main Boulevard, Gulberg III",
+      subInfo: "Lahore, Pakistan",
+      icon: <FiMapPin className="text-2xl" />,
+      link: "#"
+    },
+    {
+      title: "Global Offices",
+      info: "Visit our Website",
+      subInfo: "Available in 40+ countries",
+      icon: <FiGlobe className="text-2xl" />,
+      link: "https://bookingpearl.com"
+    }
+  ];
+
   return (
-    <div className="py-20 bg-gradient-to-b from-[#0F0F23] via-[#1A1A2E] to-[#16213E]">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Header */}
-        <div className="text-center mb-16 mt-16">
-          <h1 className="text-4xl lg:text-5xl font-inter font-bold text-white mb-4">
-            Contact Us
-          </h1>
-          <p className="text-xl text-white/80 font-poppins max-w-2xl mx-auto">
-            Get in touch with our team. We're here to help with any questions
-            about our services.
-          </p>
+    <div className="bg-white min-h-screen">
+      {/* Premium Hero Section */}
+      <section className="relative overflow-hidden min-h-[45vh] flex items-center pt-20">
+        <div
+          className="absolute inset-0 bg-cover bg-center transition-transform duration-1000 hover:scale-110"
+          style={{ backgroundImage: `url(${BackgroundImg})` }}
+        >
+          <div className="absolute inset-0 bg-gradient-to-r from-booking-blue via-booking-blue/80 to-transparent"></div>
+          <div className="absolute inset-0 bg-black/20"></div>
         </div>
 
-        <div className="grid lg:grid-cols-2 gap-12">
-          {/* Contact Form */}
-          <div className="bg-white/10 backdrop-blur-md rounded-2xl p-8 border border-white/20">
-            <h2 className="text-2xl font-inter font-semibold text-white mb-6">
-              Send us a Message
-            </h2>
-            <form onSubmit={handleSubmit} className="space-y-6">
-              <div className="grid md:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-white font-poppins text-sm mb-2">
-                    First Name
-                  </label>
-                  <input
-                    type="text"
-                    name="firstName"
-                    value={formData.firstName}
-                    onChange={handleInputChange}
-                    className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-white/50 focus:outline-none focus:border-[#9945FF] transition-colors"
-                    placeholder="Enter your first name"
-                    required
-                  />
-                </div>
-                <div>
-                  <label className="block text-white font-poppins text-sm mb-2">
-                    Last Name
-                  </label>
-                  <input
-                    type="text"
-                    name="lastName"
-                    value={formData.lastName}
-                    onChange={handleInputChange}
-                    className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-white/50 focus:outline-none focus:border-[#9945FF] transition-colors"
-                    placeholder="Enter your last name"
-                    required
-                  />
-                </div>
-              </div>
-              <div>
-                <label className="block text-white font-poppins text-sm mb-2">
-                  Email
-                </label>
-                <input
-                  type="email"
-                  name="email"
-                  value={formData.email}
-                  onChange={handleInputChange}
-                  className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-white/50 focus:outline-none focus:border-[#9945FF] transition-colors"
-                  placeholder="Enter your email"
-                  required
-                />
-              </div>
-              <div>
-                <label className="block text-white font-poppins text-sm mb-2">
-                  Subject
-                </label>
-                <input
-                  type="text"
-                  name="subject"
-                  value={formData.subject}
-                  onChange={handleInputChange}
-                  className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-white/50 focus:outline-none focus:border-[#9945FF] transition-colors"
-                  placeholder="What's this about?"
-                />
-              </div>
-              <div>
-                <label className="block text-white font-poppins text-sm mb-2">
-                  Message
-                </label>
-                <textarea
-                  name="message"
-                  value={formData.message}
-                  onChange={handleInputChange}
-                  rows={5}
-                  className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-xl text-white placeholder-white/50 focus:outline-none focus:border-[#9945FF] transition-colors resize-none"
-                  placeholder="Tell us more about your inquiry..."
-                  required
-                ></textarea>
-              </div>
-              <button
-                type="submit"
-                disabled={isLoading}
-                className="w-full bg-gradient-to-r from-[#14F195] to-[#9945FF] text-white px-8 py-4 rounded-xl font-outfit font-semibold text-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
-              >
-                {isLoading ? "Sending..." : "Send Message"}
-              </button>
-            </form>
-          </div>
-
-          {/* Contact Information */}
-          <div className="space-y-8">
-            <div className="bg-white/10 backdrop-blur-md rounded-2xl p-8 border border-white/20">
-              <h3 className="text-2xl font-inter font-semibold text-white mb-6">
-                Get in Touch
-              </h3>
-              <div className="space-y-6">
-                <div className="flex items-start space-x-4">
-                  <div className="w-12 h-12 bg-gradient-to-r from-[#9945FF] to-[#14F195] rounded-xl flex items-center justify-center flex-shrink-0">
-                    <svg
-                      className="w-6 h-6 text-white"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
-                      />
-                    </svg>
-                  </div>
-                  <div>
-                    <h4 className="text-white font-inter font-semibold mb-1">
-                      Email
-                    </h4>
-                    <p className="text-white/80 font-poppins">
-                      support@mealcheap.com
-                    </p>
-                    <p className="text-white/80 font-poppins">
-                      info@mealcheap.com
-                    </p>
-                  </div>
-                </div>
-                <div className="flex items-start space-x-4">
-                  <div className="w-12 h-12 bg-gradient-to-r from-[#9945FF] to-[#14F195] rounded-xl flex items-center justify-center flex-shrink-0">
-                    <svg
-                      className="w-6 h-6 text-white"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"
-                      />
-                    </svg>
-                  </div>
-                  <div>
-                    <h4 className="text-white font-inter font-semibold mb-1">
-                      Phone
-                    </h4>
-                    <p className="text-white/80 font-poppins">
-                      +1 (555) 123-4567
-                    </p>
-                    <p className="text-white/80 font-poppins">
-                      Mon-Fri: 9AM-6PM EST
-                    </p>
-                  </div>
-                </div>
-                <div className="flex items-start space-x-4">
-                  <div className="w-12 h-12 bg-gradient-to-r from-[#9945FF] to-[#14F195] rounded-xl flex items-center justify-center flex-shrink-0">
-                    <svg
-                      className="w-6 h-6 text-white"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
-                      />
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
-                      />
-                    </svg>
-                  </div>
-                  <div>
-                    <h4 className="text-white font-inter font-semibold mb-1">
-                      Address
-                    </h4>
-                    <p className="text-white/80 font-poppins">
-                      123 Food Street
-                    </p>
-                    <p className="text-white/80 font-poppins">
-                      New York, NY 10001
-                    </p>
-                    <p className="text-white/80 font-poppins">United States</p>
-                  </div>
-                </div>
-              </div>
+        <div className="custom-container relative z-10 py-20">
+          <div className="max-w-3xl space-y-6 animate-fade-in-up">
+            <div className="inline-flex items-center space-x-2 bg-white/10 backdrop-blur-md border border-white/20 px-4 py-2 rounded-full">
+              <span className="flex h-2 w-2 rounded-full bg-booking-blue-light animate-pulse"></span>
+              <span className="text-white text-xs font-semibold tracking-wider uppercase">Contact Services</span>
             </div>
 
-            {/* FAQ Quick Links */}
-            <div className="bg-white/10 backdrop-blur-md rounded-2xl p-8 border border-white/20">
-              <h3 className="text-2xl font-inter font-semibold text-white mb-6">
-                Quick Help
-              </h3>
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-inter font-bold text-white leading-tight">
+              Get in touch with <br />
+              <span className="bg-gradient-to-r from-white to-white/70 bg-clip-text text-transparent">
+                World-class Support.
+              </span>
+            </h1>
+            <p className="text-lg text-white/80 font-poppins max-w-xl leading-relaxed">
+              We're here to ensure your premium booking experience is seamless and exceptional from start to finish.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      {/* Main Content Layout */}
+      <section className="py-24 relative overflow-hidden">
+        {/* Subtle background decoration */}
+        <div className="absolute top-0 right-0 w-1/3 h-full bg-booking-blue/[0.01] -skew-x-12 transform origin-top-right"></div>
+
+        <div className="custom-container">
+          <div className="grid lg:grid-cols-2 gap-20 items-start">
+
+            {/* Left Side: Contact Information Cards */}
+            <div className="space-y-12">
               <div className="space-y-4">
-                <Link
-                  to="/faq"
-                  className="block text-white/80 font-poppins hover:text-white transition-colors"
-                >
-                  → Frequently Asked Questions
-                </Link>
-                
-                <Link
-                  to="/terms"
-                  className="block text-white/80 font-poppins hover:text-white transition-colors"
-                >
-                  → Terms & Conditions
-                </Link>
-                <Link
-                  to="/privacy"
-                  className="block text-white/80 font-poppins hover:text-white transition-colors"
-                >
-                  → Privacy Policy
-                </Link>
+                <h2 className="text-3xl font-inter font-bold text-booking-black">Reach out to <span className="text-booking-blue">Booking Pearl</span></h2>
+                <p className="text-booking-gray-dark font-poppins max-w-lg">
+                  Our professional team is available around the clock to assist you with any inquiries, modifications, or specialized requests.
+                </p>
+              </div>
+
+              <div className="grid sm:grid-cols-2 gap-6">
+                {contactOptions.map((option, index) => (
+                  <a
+                    key={index}
+                    href={option.link}
+                    className="group p-8 rounded-[2rem] border border-booking-gray-medium bg-white hover:border-booking-blue hover:shadow-2xl transition-all duration-500"
+                  >
+                    <div className="w-14 h-14 rounded-2xl bg-booking-blue/5 text-booking-blue flex items-center justify-center group-hover:bg-booking-blue group-hover:text-white transition-all duration-300 mb-6">
+                      {option.icon}
+                    </div>
+                    <h3 className="text-lg font-inter font-bold text-booking-black mb-2">{option.title}</h3>
+                    <p className="text-booking-blue font-semibold text-sm mb-1">{option.info}</p>
+                    <p className="text-booking-gray-dark text-xs font-poppins">{option.subInfo}</p>
+                  </a>
+                ))}
+              </div>
+
+              {/* Trust Indicators */}
+              <div className="pt-10 border-t border-booking-gray-light">
+                <p className="text-sm font-bold text-booking-gray-dark uppercase tracking-widest mb-6">Trusted Worldwide</p>
+                <div className="grid grid-cols-3 gap-4">
+                  <div className="flex flex-col items-center text-center space-y-2 p-4 bg-booking-gray-light/50 rounded-2xl">
+                    <div className="w-8 h-8 text-booking-blue"><FiShield className="w-full h-full" /></div>
+                    <span className="text-[10px] font-bold text-booking-black uppercase">Secure Payments</span>
+                  </div>
+                  <div className="flex flex-col items-center text-center space-y-2 p-4 bg-booking-gray-light/50 rounded-2xl">
+                    <div className="w-8 h-8 text-booking-blue"><FiStar className="w-full h-full" /></div>
+                    <span className="text-[10px] font-bold text-booking-black uppercase">Premium Quality</span>
+                  </div>
+                  <div className="flex flex-col items-center text-center space-y-2 p-4 bg-booking-gray-light/50 rounded-2xl">
+                    <div className="w-8 h-8 text-booking-blue"><FiGlobe className="w-full h-full" /></div>
+                    <span className="text-[10px] font-bold text-booking-black uppercase">Global Network</span>
+                  </div>
+                </div>
               </div>
             </div>
+
+            {/* Right Side: Contact Form Card */}
+            <div className="relative group">
+              {/* Floating Decorative Blur */}
+              <div className="absolute -inset-4 bg-booking-blue/5 blur-3xl rounded-[3rem] group-hover:bg-booking-blue/10 transition-all duration-700"></div>
+
+              <div className="relative bg-white border border-booking-gray-medium rounded-[3rem] p-10 md:p-12 shadow-2xl overflow-hidden">
+                <div className="relative z-10 space-y-8">
+                  <div className="space-y-2">
+                    <h3 className="text-2xl font-inter font-bold text-booking-black italic">Send us a Private Message</h3>
+                    <p className="text-booking-gray-dark font-poppins text-sm">We value your privacy and respond to all inquiries personally.</p>
+                  </div>
+
+                  <form onSubmit={handleSubmit} className="space-y-6">
+                    <div className="grid md:grid-cols-2 gap-6">
+                      <div className="space-y-2">
+                        <label className="text-xs font-bold text-booking-black uppercase tracking-wider ml-1">First Name</label>
+                        <input
+                          type="text"
+                          name="firstName"
+                          value={formData.firstName}
+                          onChange={handleInputChange}
+                          placeholder="E.g. John"
+                          className="w-full bg-booking-gray-light/30 border-none px-6 py-4 rounded-2xl focus:ring-2 focus:ring-booking-blue/20 transition-all font-poppins text-sm"
+                          required
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <label className="text-xs font-bold text-booking-black uppercase tracking-wider ml-1">Last Name</label>
+                        <input
+                          type="text"
+                          name="lastName"
+                          value={formData.lastName}
+                          onChange={handleInputChange}
+                          placeholder="E.g. Doe"
+                          className="w-full bg-booking-gray-light/30 border-none px-6 py-4 rounded-2xl focus:ring-2 focus:ring-booking-blue/20 transition-all font-poppins text-sm"
+                          required
+                        />
+                      </div>
+                    </div>
+
+                    <div className="space-y-2">
+                      <label className="text-xs font-bold text-booking-black uppercase tracking-wider ml-1">Email Address</label>
+                      <input
+                        type="email"
+                        name="email"
+                        value={formData.email}
+                        onChange={handleInputChange}
+                        placeholder="john.doe@premium.com"
+                        className="w-full bg-booking-gray-light/30 border-none px-6 py-4 rounded-2xl focus:ring-2 focus:ring-booking-blue/20 transition-all font-poppins text-sm"
+                        required
+                      />
+                    </div>
+
+                    <div className="space-y-2">
+                      <label className="text-xs font-bold text-booking-black uppercase tracking-wider ml-1">Inquiry Subject</label>
+                      <input
+                        type="text"
+                        name="subject"
+                        value={formData.subject}
+                        onChange={handleInputChange}
+                        placeholder="E.g. VIP Reservation Request"
+                        className="w-full bg-booking-gray-light/30 border-none px-6 py-4 rounded-2xl focus:ring-2 focus:ring-booking-blue/20 transition-all font-poppins text-sm"
+                      />
+                    </div>
+
+                    <div className="space-y-2">
+                      <label className="text-xs font-bold text-booking-black uppercase tracking-wider ml-1">Detailed Message</label>
+                      <textarea
+                        name="message"
+                        value={formData.message}
+                        onChange={handleInputChange}
+                        rows="5"
+                        placeholder="How can our professional team assist you today?"
+                        className="w-full bg-booking-gray-light/30 border-none px-6 py-4 rounded-2xl focus:ring-2 focus:ring-booking-blue/20 transition-all resize-none font-poppins text-sm"
+                        required
+                      ></textarea>
+                    </div>
+
+                    <button
+                      type="submit"
+                      disabled={isLoading}
+                      className="w-full bg-booking-blue hover:bg-booking-blue-dark text-white font-bold py-5 rounded-2xl shadow-xl shadow-booking-blue/20 transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50"
+                    >
+                      {isLoading ? "PROCESSING..." : "SEND PREMIUM MESSAGE"}
+                    </button>
+                  </form>
+                </div>
+
+                {/* Corner Accents */}
+                <div className="absolute -top-10 -left-10 w-32 h-32 bg-booking-blue/5 rounded-full blur-2xl"></div>
+                <div className="absolute -bottom-10 -right-10 w-40 h-40 bg-booking-blue/5 rounded-full blur-3xl"></div>
+              </div>
+            </div>
+
           </div>
         </div>
-      </div>
+      </section>
+
+      {/* Map or Newsletter Area Placeholder */}
+      <section className="bg-booking-black py-20">
+        <div className="custom-container text-center space-y-8">
+          <h3 className="text-white text-3xl font-inter font-bold">Experience the Gold Standard of Service</h3>
+          <p className="text-white/60 font-poppins max-w-2xl mx-auto">
+            Our offices in London, New York, and Dubai are ready to welcome you. Join our exclusive newsletter for hidden gems and priority booking access.
+          </p>
+          <div className="flex justify-center flex-wrap gap-4">
+            <button className="bg-white text-booking-black px-10 py-4 rounded-xl font-bold hover:bg-booking-blue hover:text-white transition-all duration-300 shadow-xl">Join Exclusive Club</button>
+            <button className="bg-white/10 text-white border border-white/20 px-10 py-4 rounded-xl font-bold hover:bg-white/20 transition-all duration-300">View Global Map</button>
+          </div>
+        </div>
+      </section>
     </div>
   );
 };

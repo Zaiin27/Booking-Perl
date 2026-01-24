@@ -1,231 +1,153 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { useSelector } from "react-redux";
+import { FaHome, FaSearch, FaUser, FaBars, FaRegBuilding, FaCompass } from "react-icons/fa";
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
   const location = useLocation();
   const { auth } = useSelector((state) => state);
-  
-  // Check if user is logged in (simplified logic)
+
   const isLoggedIn = auth?.isAuthenticated && auth?.user;
-  
- 
 
-  const toggleMenu = () => {
-    setIsMenuOpen(!isMenuOpen);
-  };
+  // Scroll logic for glass effect
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 20);
+    };
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
-  const isActive = (path) => {
-    return location.pathname === path;
-  };
+  useEffect(() => {
+    if (isMenuOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "unset";
+    }
+    return () => {
+      document.body.style.overflow = "unset";
+    };
+  }, [isMenuOpen]);
+
+  const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
+  const closeMenu = () => setIsMenuOpen(false);
+  const isActive = (path) => location.pathname === path;
 
   return (
-    <header className="relative z-50 bg-white shadow-md">
-      {/* Navigation Bar Container */}
-      <div className="relative flex justify-center py-4">
-        {/* White Navigation Bar - Booking.com Style */}
-        <div className="bg-white rounded-lg px-8 py-3 max-w-6xl w-full border-b border-gray-200">
-          <div className="flex items-center justify-between">
-            {/* Logo */}
-            <div className="flex items-center">
-              <Link to="/" className="text-2xl font-outfit font-bold text-primary">
-                BOOKING <span className="text-primary-600">PEARL</span>
-              </Link>
+    <>
+      <header className={`fixed top-0 left-0 right-0 z-[100] transition-all duration-500 ${isScrolled ? 'glass-header py-3' : 'bg-white py-5 shadow-sm'}`}>
+        <div className="max-w-[1440px] mx-auto px-6 lg:px-12 flex items-center justify-between">
+          {/* Elite Branding */}
+          <Link to="/" className="group relative flex items-center gap-2">
+            <div className="w-10 h-10 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-xl flex items-center justify-center shadow-lg shadow-blue-600/20 group-hover:scale-110 transition-transform">
+              <span className="text-white font-black text-xl italic">B</span>
             </div>
+            <span className="hidden sm:block text-xl md:text-2xl font-inter font-black text-[#0F172A] tracking-tighter">
+              BOOKING<span className="bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">PEARL</span>
+            </span>
+          </Link>
 
-            {/* Desktop Navigation - Moved to Right Side */}
-            <div className="hidden lg:flex items-center space-x-8">
-              <nav className="flex items-center space-x-8">
-                <Link
-                  to="/"
-                  className={`font-poppins font-medium ${
-                    isActive("/")
-                      ? "text-primary font-semibold border-b-2 border-primary pb-1"
-                      : "text-gray-700 font-medium hover:text-primary transition-colors"
-                  }`}
-                >
-                  Home
-                </Link>
-                <Link
-                  to="/properties"
-                  className={`font-poppins font-medium ${
-                    isActive("/properties")
-                      ? "text-primary font-semibold border-b-2 border-primary pb-1"
-                      : "text-gray-700 hover:text-primary transition-colors"
-                  }`}
-                >
-                  Properties
-                </Link>
-                <Link
-                  to="/booking-history"
-                  className={`font-poppins font-medium ${
-                    isActive("/booking-history")
-                      ? "text-primary font-semibold border-b-2 border-primary pb-1"
-                      : "text-gray-700 hover:text-primary transition-colors"
-                  }`}
-                >
-                  My Bookings
-                </Link>
-                <Link
-                  to="/faq"
-                  className={`font-poppins font-medium ${
-                    isActive("/faq")
-                      ? "text-primary font-semibold border-b-2 border-primary pb-1"
-                      : "text-gray-700 hover:text-primary transition-colors"
-                  }`}
-                >
-                  FAQ
-                </Link>
-                <Link
-                  to="/contact"
-                  className={`font-poppins font-medium ${
-                    isActive("/contact")
-                      ? "text-primary font-semibold border-b-2 border-primary pb-1"
-                      : "text-gray-700 hover:text-primary transition-colors"
-                  }`}
-                >
-                  Support
-                </Link>
-                <Link
-                  to="/reviews"
-                  className="text-gray-700 font-poppins font-medium hover:text-primary transition-colors"
-                >
-                  Reviews
-                </Link>
-              </nav>
-
-              {/* Profile Image/Action Buttons */}
-              <div className="flex items-center space-x-5 ml-3">
-                {/* Conditional Button - Sign In or User Profile */}
-                {isLoggedIn ? (
-                  /* User Icon Button - When Logged In */
-                  <Link
-                    to="/profile"
-                    className="w-12 h-12 bg-primary rounded-full flex items-center justify-center hover:bg-primary-600 transition-all duration-300 transform hover:scale-105 shadow-md"
-                  >
-                    <svg
-                      className="w-6 h-6 text-white"
-                      fill="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
-                    </svg>
-                  </Link>
-                ) : (
-                  /* Sign In Button - When Not Logged In - Booking.com Style */
-                  <Link
-                    to="/login"
-                    className="bg-primary hover:bg-primary-600 text-white px-6 py-2.5 rounded-md font-semibold text-sm transition-all duration-200 shadow-md hover:shadow-lg"
-                  >
-                    Sign In
-                  </Link>
-                )}
-              </div>
-            </div>
-
-            {/* Mobile Menu Button */}
-            <button onClick={toggleMenu} className="lg:hidden text-gray-700 hover:text-primary p-2">
-              <svg
-                className="w-6 h-6"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
+          {/* Floating Nav Pills (Desktop) */}
+          <nav className="hidden lg:flex items-center gap-1 bg-slate-100/50 p-1.5 rounded-2xl border border-slate-200/50">
+            {[
+              { label: 'Home', path: '/' },
+              { label: 'Properties', path: '/properties' },
+              { label: 'FAQ', path: '/faq' },
+              { label: 'Support', path: '/contact' },
+              { label: 'Reviews', path: '/reviews' }
+            ].map((link) => (
+              <Link
+                key={link.path}
+                to={link.path}
+                className={`nav-link-pill ${isActive(link.path)
+                  ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/20 scale-100'
+                  : 'text-slate-600 hover:text-[#0F172A]'}`}
               >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M4 6h16M4 12h16M4 18h16"
-                />
-              </svg>
+                {link.label}
+              </Link>
+            ))}
+          </nav>
+
+          {/* Cinematic Auth Area (Desktop & Mobile Trigger) */}
+          <div className="flex items-center gap-4">
+            {isLoggedIn ? (
+              <Link
+                to="/profile"
+                className="group relative w-12 h-12 rounded-full p-[2px] bg-gradient-to-tr from-blue-600 to-purple-600 hover:scale-110 transition-all duration-300 hidden lg:block"
+              >
+                <div className="w-full h-full bg-white rounded-full p-0.5">
+                  <div className="w-full h-full bg-slate-100 rounded-full flex items-center justify-center text-blue-600 font-bold overflow-hidden shadow-inner">
+                    <FaUser className="w-5 h-5" />
+                  </div>
+                </div>
+              </Link>
+            ) : (
+              <Link
+                to="/login"
+                className="hidden lg:block px-8 py-3 bg-[#0F172A] hover:bg-blue-600 text-white font-inter font-black text-xs uppercase tracking-widest rounded-xl transition-all shadow-xl shadow-slate-900/10 active:scale-95"
+              >
+                Join Elite
+              </Link>
+            )}
+
+            {/* Hamburger Menu (Mobile/Tablet Only) */}
+            <button
+              onClick={toggleMenu}
+              className="lg:hidden w-12 h-12 bg-slate-100 rounded-xl flex items-center justify-center text-[#0F172A] hover:bg-slate-200 transition-colors active:scale-95"
+            >
+              <FaBars className="text-xl" />
             </button>
           </div>
         </div>
+      </header>
 
-        {/* Mobile Navigation */}
-        {isMenuOpen && (
-          <div className="lg:hidden absolute top-full left-4 right-4 mt-2 bg-white border border-gray-200 rounded-lg shadow-xl">
-            <div className="px-6 py-6 space-y-4">
-              <Link
-                to="/"
-                className={`block font-poppins py-2 ${
-                  isActive("/")
-                    ? "text-primary font-semibold"
-                    : "text-gray-700 font-medium hover:text-primary"
-                }`}
-                onClick={() => setIsMenuOpen(false)}
-              >
-                Home
-              </Link>
-              <Link
-                to="/properties"
-                className={`block font-poppins py-2 ${
-                  isActive("/properties")
-                    ? "text-primary font-semibold"
-                    : "text-gray-700 font-medium hover:text-primary"
-                }`}
-                onClick={() => setIsMenuOpen(false)}
-              >
-                Properties
-              </Link>
-              <Link
-                to="/faq"
-                className={`block font-poppins py-2 ${
-                  isActive("/faq")
-                    ? "text-primary font-semibold"
-                    : "text-gray-700 font-medium hover:text-primary"
-                }`}
-                onClick={() => setIsMenuOpen(false)}
-              >
-                FAQ
-              </Link>
-              <Link
-                to="/contact"
-                className={`block font-poppins py-2 ${
-                  isActive("/contact")
-                    ? "text-primary font-semibold"
-                    : "text-gray-700 font-medium hover:text-primary"
-                }`}
-                onClick={() => setIsMenuOpen(false)}
-              >
-                Support
-              </Link>
-              <Link
-                to="/#reviews"
-                className={`block font-poppins py-2 ${
-                  isActive("/") && location.hash === "#reviews"
-                    ? "text-primary font-semibold"
-                    : "text-gray-700 font-medium hover:text-primary"
-                }`}
-                onClick={() => setIsMenuOpen(false)}
-              >
-                Client Reviews
-              </Link>
-              <div className="pt-4 space-y-3 border-t border-gray-200">
-                {isLoggedIn ? (
-                  <Link
-                    to="/profile"
-                    className="block bg-primary hover:bg-primary-600 text-white px-6 py-3 rounded-md font-semibold text-center transition-colors"
-                    onClick={() => setIsMenuOpen(false)}
-                  >
-                    PROFILE
-                  </Link>
-                ) : (
-                  <Link
-                    to="/login"
-                    className="block bg-primary hover:bg-primary-600 text-white px-6 py-3 rounded-md font-semibold text-center transition-colors"
-                    onClick={() => setIsMenuOpen(false)}
-                  >
-                    SIGN IN
-                  </Link>
-                )}
-              </div>
-            </div>
+
+      {/* Glassmorphic Side Drawer */}
+      <div
+        className={`fixed inset-0 z-[200] lg:hidden transition-all duration-500 ${isMenuOpen ? 'visible opacity-100' : 'invisible opacity-0'}`}
+      >
+        <div className="absolute inset-0 bg-[#0F172A]/40 backdrop-blur-md" onClick={closeMenu}></div>
+        <div className={`absolute top-0 right-0 h-full w-[85vw] max-w-sm glass-drawer shadow-2xl p-10 flex flex-col transition-transform duration-500 ${isMenuOpen ? 'translate-x-0' : 'translate-x-full'}`}>
+          <div className="flex items-center justify-between mb-12">
+            <span className="text-2xl font-black text-[#0F172A] tracking-tighter">
+              BOOKING<span className="text-blue-600">PEARL</span>
+            </span>
+            <button onClick={closeMenu} className="w-10 h-10 bg-slate-100 rounded-full flex items-center justify-center text-[#0F172A]">
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
+            </button>
           </div>
-        )}
+
+          <nav className="flex flex-col gap-6 flex-1">
+            {[
+              { label: 'Discovery Home', path: '/' },
+              { label: 'Premier Properties', path: '/properties' },
+              { label: 'Common Questions', path: '/faq' },
+              { label: 'Concierge Support', path: '/contact' },
+              { label: 'Guest Reviews', path: '/reviews' }
+            ].map((link) => (
+              <Link
+                key={link.path}
+                to={link.path}
+                onClick={closeMenu}
+                className={`text-lg font-inter font-semibold transition-all ${isActive(link.path) ? 'text-blue-600 translate-x-4' : 'text-slate-400 hover:text-[#0F172A]'}`}
+              >
+                {link.label}
+              </Link>
+            ))}
+          </nav>
+
+          <Link
+            to={isLoggedIn ? "/profile" : "/login"}
+            onClick={closeMenu}
+            className="mt-auto px-2 py-5 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-inter font-black text-center uppercase tracking-widest rounded-2xl shadow-2xl shadow-blue-600/40"
+          >
+            {isLoggedIn ? "Elite Profile" : "Join the Elite"}
+          </Link>
+        </div>
       </div>
-    </header>
+    </>
   );
 };
 

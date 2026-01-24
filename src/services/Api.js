@@ -118,6 +118,16 @@ export const api = SplitApiSettings.injectEndpoints({
       },
       providesTags: [{ type: "AuthCheck", id: "auth" }],
     }),
+
+    getContactMessages: builder.query({
+      query: () => {
+        return {
+          url: `${API_END_POINTS.getContactMessages}`,
+          method: "GET",
+        };
+      },
+      providesTags: [{ type: "ContactMessages", id: "list" }],
+    }),
   }),
 
   overrideExisting: true,
@@ -140,4 +150,5 @@ export const {
   useGetOrderAnalyticsQuery,
   useGetOrderHistoryQuery,
   useCheckAuthQuery,
+  useGetContactMessagesQuery,
 } = api;

@@ -46,3 +46,10 @@ export { default as lint } from './lint.png';
 export { default as candy } from './candy.png';
 export { default as apart } from './apart.png';
 export { default as FG2 } from './FG2.png';
+
+// City Images
+export { default as Lahore } from './Lahore.jpeg';
+export { default as Islamabad } from './Islamabad.jpeg';
+export { default as Karachi } from './Karachi.jpeg';
+export { default as Rawalpindi } from './Rawalpindi.jpeg';
+export { default as Faisalabad } from './Faisalabad.png';

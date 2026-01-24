@@ -49,6 +49,7 @@ import StaffPage from "./pages/staffPages/staff";
 import AdminSettings from "./pages/mealAdminPages/settings";
 import ChatManagement from "./pages/mealAdminPages/chats";
 import StaffChatManagement from "./pages/staffPages/chat";
+import AdminContactMessages from "./pages/mealAdminPages/AdminContactMessages";
 
 // Dashboard imports
 import AdminDashboard from "./pages/mealAdminPages/dashboard";
@@ -70,7 +71,7 @@ const AppRouter = () => {
           <Route path="refunds" element={<RefundsPage />} />
           <Route path="philanthropy" element={<PhilanthropyPage />} />
           <Route path="reviews" element={<ReviewsPage />} />
-       
+
           <Route path="profile" element={<ProfilePage />} />
           <Route path="order-now" element={<OrderNowPage />} />
           <Route path="properties" element={<PropertiesListPage />} />
@@ -83,46 +84,46 @@ const AppRouter = () => {
           <Route path="payment-verification" element={<PaymentVerificationPage />} />
           <Route path="booking-history" element={<BookingHistoryPage />} />
           <Route path="extend-booking/:id" element={<ExtendBookingPage />} />
-        {/* Placeholder route for meals page */}
+          {/* Placeholder route for meals page */}
+          <Route
+            path="meals"
+            element={
+              <div className="py-20 bg-gradient-to-b from-[#0F0F23] via-[#1A1A2E] to-[#16213E] text-center">
+                <h1 className="text-4xl font-inter font-bold text-white">
+                  Meals Page - Coming Soon
+                </h1>
+              </div>
+            }
+          />
+        </Route>
+
+        {/* Authentication Routes - No Layout (Full Page) */}
         <Route
-          path="meals"
+          path="/login"
           element={
-            <div className="py-20 bg-gradient-to-b from-[#0F0F23] via-[#1A1A2E] to-[#16213E] text-center">
-              <h1 className="text-4xl font-inter font-bold text-white">
-                Meals Page - Coming Soon
-              </h1>
-            </div>
+            <LoginRedirect>
+              <Login />
+            </LoginRedirect>
           }
         />
-      </Route>
+        <Route
+          path="/signup"
+          element={
+            <SignupRedirect>
+              <Signup />
+            </SignupRedirect>
+          }
+        />
+        <Route path="/forget-password" element={<ForgotPassword />} />
+        <Route path="/reset-password" element={<ResetPassword />} />
 
-      {/* Authentication Routes - No Layout (Full Page) */}
-      <Route
-        path="/login"
-        element={
-          <LoginRedirect>
-            <Login />
-          </LoginRedirect>
-        }
-      />
-      <Route
-        path="/signup"
-        element={
-          <SignupRedirect>
-            <Signup />
-          </SignupRedirect>
-        }
-      />
-      <Route path="/forget-password" element={<ForgotPassword />} />
-      <Route path="/reset-password" element={<ResetPassword />} />
+        {/* Dashboard Redirect Route */}
+        <Route path="/dashboard" element={<DashboardRedirect />} />
 
-      {/* Dashboard Redirect Route */}
-      <Route path="/dashboard" element={<DashboardRedirect />} />
-
-      {/* Unauthorized Page */}
-      <Route path="/unauthorized" element={<UnauthorizedPage />} />
-      {/* Admin Dashboard Routes - Using AppLayout with Role Protection */}
-      {/* <Route
+        {/* Unauthorized Page */}
+        <Route path="/unauthorized" element={<UnauthorizedPage />} />
+        {/* Admin Dashboard Routes - Using AppLayout with Role Protection */}
+        {/* <Route
         path="/admin"
         element={
           <RoleProtectedRoute allowedRoles={["admin"]}>
@@ -130,36 +131,37 @@ const AppRouter = () => {
           </RoleProtectedRoute>
         }
       ></Route> */}
-      {/* Admin Dashboard Routes - Using AppLayout with Role Protection */}
-      <Route
-        path="/admin"
-        element={
-          <RoleProtectedRoute allowedRoles={["admin"]}>
-            <AppLayout />
-          </RoleProtectedRoute>
-        }
-      >
-        <Route index element={<AdminDashboard />} />
-        <Route path="dashboard" element={<AdminDashboard />} />
-        <Route path="properties" element={<PropertiesPage />} />
-        <Route path="properties/create" element={<PropertyForm />} />
-        <Route path="properties/edit/:id" element={<PropertyForm />} />
-        <Route path="properties/create-for-staff/:staffId" element={<PropertyForm />} />
-        <Route path="properties/:id" element={<PropertyDetail />} />
-        <Route path="bookings" element={<BookingsPage />} />
-        <Route path="bookings/:id" element={<BookingDetailPage />} />
-        <Route path="orders" element={<AdminOrders />} />
-        <Route path="tickets" element={<TicketsPage />} />
-        <Route path="tickets/chat" element={<ChatManagement />} />
-        <Route path="staff" element={<AdminStaff />} />
-        <Route path="banner-ads" element={<BannerAdsPage />} />
-        <Route path="banner-ads/:id" element={<BannerAdDetailPage />} />
-        <Route path="banner-ads/:id/edit" element={<BannerAdEditPage />} />
-        <Route path="settings" element={<AdminSettings />} />
-      </Route>
+        {/* Admin Dashboard Routes - Using AppLayout with Role Protection */}
+        <Route
+          path="/admin"
+          element={
+            <RoleProtectedRoute allowedRoles={["admin"]}>
+              <AppLayout />
+            </RoleProtectedRoute>
+          }
+        >
+          <Route index element={<AdminDashboard />} />
+          <Route path="dashboard" element={<AdminDashboard />} />
+          <Route path="properties" element={<PropertiesPage />} />
+          <Route path="properties/create" element={<PropertyForm />} />
+          <Route path="properties/edit/:id" element={<PropertyForm />} />
+          <Route path="properties/create-for-staff/:staffId" element={<PropertyForm />} />
+          <Route path="properties/:id" element={<PropertyDetail />} />
+          <Route path="bookings" element={<BookingsPage />} />
+          <Route path="bookings/:id" element={<BookingDetailPage />} />
+          <Route path="orders" element={<AdminOrders />} />
+          <Route path="tickets" element={<TicketsPage />} />
+          <Route path="tickets/chat" element={<ChatManagement />} />
+          <Route path="staff" element={<AdminStaff />} />
+          <Route path="banner-ads" element={<BannerAdsPage />} />
+          <Route path="banner-ads/:id" element={<BannerAdDetailPage />} />
+          <Route path="banner-ads/:id/edit" element={<BannerAdEditPage />} />
+          <Route path="settings" element={<AdminSettings />} />
+          <Route path="contacts" element={<AdminContactMessages />} />
+        </Route>
 
-      {/* Staff Dashboard Routes - Using AppLayout with Role Protection */}
-      {/* <Route
+        {/* Staff Dashboard Routes - Using AppLayout with Role Protection */}
+        {/* <Route
         path="/staff"
         element={
           <RoleProtectedRoute allowedRoles={["staff"]}>
@@ -167,79 +169,79 @@ const AppRouter = () => {
           </RoleProtectedRoute>
         }
       ></Route> */}
-      {/* Staff Dashboard Routes - Using AppLayout with Role Protection */}
-      <Route
-        path="/staff"
-        element={
-          <RoleProtectedRoute allowedRoles={["staff", "driver"]}>
-            <AppLayout />
-          </RoleProtectedRoute>
-        }
-      >
-        <Route index element={<StaffDashboard />} />
-        <Route path="dashboard" element={<StaffDashboard />} />
-        {/* Redirect typo to correct path */}
-        <Route path="dashbaord" element={<Navigate to="/staff/dashboard" replace />} />
-        <Route path="properties" element={<PropertiesPage />} />
-        <Route path="properties/create" element={<PropertyForm />} />
-        <Route path="properties/:id" element={<PropertyDetail />} />
-        <Route path="properties/edit/:id" element={<PropertyForm />} />
-        <Route path="bookings" element={<BookingsPage />} />
-        <Route path="bookings/:id" element={<BookingDetailPage />} />
-        <Route path="orders" element={<AdminOrders />} />
-        <Route path="tickets" element={<TicketsPage />} />
-        <Route path="tickets/chat" element={<StaffChatManagement />} />
-        <Route path="staff" element={<StaffPage />} />
-        <Route path="settings" element={<AdminSettings />} />
-      </Route>
-      {/* User Dashboard Routes - Removed - Users go to /profile instead */}
+        {/* Staff Dashboard Routes - Using AppLayout with Role Protection */}
+        <Route
+          path="/staff"
+          element={
+            <RoleProtectedRoute allowedRoles={["staff", "driver"]}>
+              <AppLayout />
+            </RoleProtectedRoute>
+          }
+        >
+          <Route index element={<StaffDashboard />} />
+          <Route path="dashboard" element={<StaffDashboard />} />
+          {/* Redirect typo to correct path */}
+          <Route path="dashbaord" element={<Navigate to="/staff/dashboard" replace />} />
+          <Route path="properties" element={<PropertiesPage />} />
+          <Route path="properties/create" element={<PropertyForm />} />
+          <Route path="properties/:id" element={<PropertyDetail />} />
+          <Route path="properties/edit/:id" element={<PropertyForm />} />
+          <Route path="bookings" element={<BookingsPage />} />
+          <Route path="bookings/:id" element={<BookingDetailPage />} />
+          <Route path="orders" element={<AdminOrders />} />
+          <Route path="tickets" element={<TicketsPage />} />
+          <Route path="tickets/chat" element={<StaffChatManagement />} />
+          <Route path="staff" element={<StaffPage />} />
+          <Route path="settings" element={<AdminSettings />} />
+        </Route>
+        {/* User Dashboard Routes - Removed - Users go to /profile instead */}
 
-      {/* Company Owner Dashboard Routes - Using AppLayout with Role Protection */}
-      <Route
-        path="/company-owner"
-        element={
-          <RoleProtectedRoute allowedRoles={["company-owner"]}>
-            <AppLayout />
-          </RoleProtectedRoute>
-        }
-      >
+        {/* Company Owner Dashboard Routes - Using AppLayout with Role Protection */}
         <Route
-          index
+          path="/company-owner"
           element={
-            <div className="p-6 text-white">Company Owner Dashboard - Coming Soon</div>
+            <RoleProtectedRoute allowedRoles={["company-owner"]}>
+              <AppLayout />
+            </RoleProtectedRoute>
           }
-        />
-        <Route
-          path="dashboard"
-          element={
-            <div className="p-6 text-white">Company Owner Dashboard - Coming Soon</div>
-          }
-        />
-        <Route
-          path="orders"
-          element={
-            <div className="p-6 text-white">My Orders - Coming Soon</div>
-          }
-        />
-        <Route
-          path="tickets"
-          element={
-            <div className="p-6 text-white">Support Tickets - Coming Soon</div>
-          }
-        />
-        <Route
-          path="profile"
-          element={
-            <div className="p-6 text-white">Company Owner Profile - Coming Soon</div>
-          }
-        />
-        <Route
-          path="settings"
-          element={
-            <div className="p-6 text-white">Company Owner Settings - Coming Soon</div>
-          }
-        />
-      </Route>
+        >
+          <Route
+            index
+            element={
+              <div className="p-6 text-white">Company Owner Dashboard - Coming Soon</div>
+            }
+          />
+          <Route
+            path="dashboard"
+            element={
+              <div className="p-6 text-white">Company Owner Dashboard - Coming Soon</div>
+            }
+          />
+          <Route
+            path="orders"
+            element={
+              <div className="p-6 text-white">My Orders - Coming Soon</div>
+            }
+          />
+          <Route
+            path="tickets"
+            element={
+              <div className="p-6 text-white">Support Tickets - Coming Soon</div>
+            }
+          />
+          <Route
+            path="profile"
+            element={
+              <div className="p-6 text-white">Company Owner Profile - Coming Soon</div>
+            }
+          />
+          <Route
+            path="settings"
+            element={
+              <div className="p-6 text-white">Company Owner Settings - Coming Soon</div>
+            }
+          />
+        </Route>
 
         {/* Catch all route for 404 */}
         <Route

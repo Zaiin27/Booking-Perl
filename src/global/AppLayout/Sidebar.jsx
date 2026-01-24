@@ -23,6 +23,7 @@ import {
 } from "../../assets/icons";
 import { FaBuilding, FaCalendarCheck, FaImage } from "react-icons/fa";
 import { IoMdArrowDropdown } from "react-icons/io";
+import { FiMail } from "react-icons/fi";
 
 function Sidebar({ isMobileSidebarOpen, toggleSidebar, setActivePage }) {
   const [othersExpanded, setOthersExpanded] = useState(true);
@@ -67,6 +68,7 @@ function Sidebar({ isMobileSidebarOpen, toggleSidebar, setActivePage }) {
           { path: "/admin/bookings", name: "Bookings", icon: FaCalendarCheck },
           { path: "/admin/banner-ads", name: "Banner Ads", icon: FaImage },
           { path: "/admin/staff", name: "Staff", icon: StaffIcon },
+          { path: "/admin/contacts", name: "Contacts", icon: FiMail },
         ],
         bottom: [
           { path: "/admin/settings", name: "Settings", icon: SettingsIcon },
@@ -204,10 +206,10 @@ function Sidebar({ isMobileSidebarOpen, toggleSidebar, setActivePage }) {
 
     const handleNavigation = () => {
       handleClickMobile();
-      
+
       // Always navigate to ensure proper routing
       console.log(`Navigating from ${location.pathname} to ${item.path}`);
-      
+
       // Force navigation
       navigate(item.path, { replace: false });
     };
@@ -217,10 +219,9 @@ function Sidebar({ isMobileSidebarOpen, toggleSidebar, setActivePage }) {
         onClick={handleNavigation}
         className={`
           flex items-center w-full h-[42px] pl-[10px] pr-4 gap-[10px] group transition-all duration-200 relative rounded-md cursor-pointer
-          ${
-            isActive
-              ? "bg-[#7E89AC33] text-white"
-              : "text-white/70 hover:bg-white/5 hover:text-white"
+          ${isActive
+            ? "bg-[#7E89AC33] text-white"
+            : "text-white/70 hover:bg-white/5 hover:text-white"
           }
           ${extraClasses}
         `}
@@ -231,9 +232,8 @@ function Sidebar({ isMobileSidebarOpen, toggleSidebar, setActivePage }) {
         )}
 
         <div
-          className={`w-5 h-5 flex items-center justify-center ${
-            isActive ? "text-white" : "text-white/70"
-          }`}
+          className={`w-5 h-5 flex items-center justify-center ${isActive ? "text-white" : "text-white/70"
+            }`}
         >
           <item.icon />
         </div>
@@ -309,10 +309,10 @@ function Sidebar({ isMobileSidebarOpen, toggleSidebar, setActivePage }) {
                     {currentUser?.name
                       ? currentUser.name.charAt(0).toUpperCase()
                       : currentUser?.email
-                      ? currentUser.email.charAt(0).toUpperCase()
-                      : roleName === "staff"
-                      ? "S"
-                      : "U"}
+                        ? currentUser.email.charAt(0).toUpperCase()
+                        : roleName === "staff"
+                          ? "S"
+                          : "U"}
                   </span>
                 )}
               </div>
@@ -325,8 +325,8 @@ function Sidebar({ isMobileSidebarOpen, toggleSidebar, setActivePage }) {
                       (roleName === "admin"
                         ? "Admin User"
                         : roleName === "staff"
-                        ? "Staff Member"
-                        : "User");
+                          ? "Staff Member"
+                          : "User");
 
                     // If it's longer than 15 characters, truncate it
                     if (displayText.length > 15) {
@@ -336,15 +336,15 @@ function Sidebar({ isMobileSidebarOpen, toggleSidebar, setActivePage }) {
                   })()}
                 </div>
                 <div className="text-[#EDEDED80] text-[10px] font-inter">
-                  {currentUser?.role ? 
-                    currentUser.role.charAt(0).toUpperCase() + currentUser.role.slice(1) : 
+                  {currentUser?.role ?
+                    currentUser.role.charAt(0).toUpperCase() + currentUser.role.slice(1) :
                     (currentRole === "admin"
                       ? "Admin"
                       : currentRole === "staff"
-                      ? "Staff"
-                      : currentRole === "user"
-                      ? "User"
-                      : "User")}
+                        ? "Staff"
+                        : currentRole === "user"
+                          ? "User"
+                          : "User")}
                 </div>
               </div>
               <button className="text-[#EDEDED] hover:text-[#EDEDED80]">
@@ -379,9 +379,8 @@ function Sidebar({ isMobileSidebarOpen, toggleSidebar, setActivePage }) {
 
       {/* Mobile Sidebar - only visible when toggled */}
       <aside
-        className={`fixed inset-y-0 left-0 z-50 transform transition-transform duration-300 ease-in-out ${
-          isMobileSidebarOpen ? "translate-x-0" : "-translate-x-full"
-        } md:hidden`}
+        className={`fixed inset-y-0 left-0 z-50 transform transition-transform duration-300 ease-in-out ${isMobileSidebarOpen ? "translate-x-0" : "-translate-x-full"
+          } md:hidden`}
       >
         {renderSidebarContent()}
       </aside>
