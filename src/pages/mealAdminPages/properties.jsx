@@ -31,14 +31,14 @@ const PropertiesPage = () => {
       console.log("Checking can create property for user:", user);
       console.log("User token:", user?.token);
       console.log("LocalStorage token:", localStorage.getItem('auth_token'));
-      
+
       // Check if user is authenticated
       if (!user || !user.token) {
         console.log("User not authenticated, skipping API call");
         setCanAddProperty(false);
         return;
       }
-      
+
       // Add manual authorization header as backup
       const token = user.token || localStorage.getItem('auth_token');
       const response = await axios.get("/api/v1/properties/can-create", {
@@ -54,7 +54,7 @@ const PropertiesPage = () => {
       console.error("Error checking can create property:", error);
       console.error("Error response:", error.response?.data);
       console.error("Error status:", error.response?.status);
-      
+
       // Fallback logic based on user role
       if (user?.role === 'admin') {
         setCanAddProperty(true);
@@ -86,18 +86,18 @@ const PropertiesPage = () => {
       }
 
       const response = await axios.get("/api/v1/properties", { params });
-      
+
       if (response.data.success) {
         const fetchedProperties = response.data.data.properties;
         setProperties(fetchedProperties);
-        
+
         // For staff, check if they can create property based on current properties
         if (user?.role === 'staff') {
           const canCreate = fetchedProperties.length < 1;
           setCanAddProperty(canCreate);
           console.log("Staff property check: Can create =", canCreate, "Properties count:", fetchedProperties.length);
         }
-        
+
         setPagination({
           ...pagination,
           total: response.data.data.total,
@@ -115,7 +115,7 @@ const PropertiesPage = () => {
   useEffect(() => {
     fetchProperties();
     checkCanCreateProperty();
-    
+
     // Immediate check for admin - ensure button is enabled
     if (user?.role === 'admin') {
       setCanAddProperty(true);
@@ -134,7 +134,7 @@ const PropertiesPage = () => {
 
     try {
       const response = await axios.delete(`/api/v1/properties/${propertyId}`);
-      
+
       if (response.data.success) {
         toast.success("Property deleted successfully");
         fetchProperties();
@@ -152,7 +152,7 @@ const PropertiesPage = () => {
       label: "Property Name",
     },
     {
-      key: "address", 
+      key: "address",
       label: "Address",
     },
     {
@@ -218,44 +218,42 @@ const PropertiesPage = () => {
   ];
 
   return (
-    <div className="p-3 sm:p-4 lg:p-6 bg-[#0A1330] min-h-screen">
+    <div className="p-4 lg:p-6 pb-24 lg:pb-6 bg-[#0A1330] min-h-screen">
       <div className="max-w-8xl mx-auto">
         {/* Header */}
-        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-6">
-          <div>
-            <h1 className="text-2xl sm:text-3xl font-bold text-white">Properties</h1>
-            <p className="text-[#AEB9E1] mt-1 text-sm sm:text-base">Manage your hotel properties</p>
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
+          <div className="flex flex-col gap-1">
+            <h1 className="text-2xl sm:text-3xl font-bold text-white px-1 mt-2">Properties</h1>
+            <p className="text-[#AEB9E1] px-1 text-sm opacity-60">Manage and track your active hotel listings.</p>
           </div>
           <button
             onClick={() => navigate(user?.role === 'staff' ? "/staff/properties/create" : "/admin/properties/create")}
             disabled={!canAddProperty}
-            className={`flex items-center justify-center gap-2 px-4 sm:px-6 py-2 sm:py-3 rounded-lg transition-all duration-300 text-sm sm:text-base ${
-              canAddProperty
-                ? "bg-gradient-to-r from-blue-600 to-purple-600 text-white hover:from-blue-700 hover:to-purple-700 transform hover:scale-105"
-                : "bg-gray-500 text-gray-300 cursor-not-allowed opacity-50"
-            }`}
-            title={!canAddProperty ? (user?.role === 'staff' ? "You already have a property. Contact admin for additional properties." : "Cannot create property") : ""}
+            className={`flex items-center justify-center gap-2 px-6 py-3.5 rounded-2xl font-bold transition-all active:scale-95 shadow-xl w-full sm:w-auto text-sm ${canAddProperty
+              ? "bg-gradient-to-r from-[#9945FF] to-[#14F195] text-white shadow-[#14F19522]"
+              : "bg-[#2A2D53] text-[#AEB9E1] opacity-50 cursor-not-allowed"
+              }`}
           >
-            <FaPlus />
-            <span className="hidden sm:inline">Add New Property</span>
-            <span className="sm:hidden">Add Property</span>
+            <FaPlus className="text-xs" />
+            Add New Property
           </button>
         </div>
 
-        {/* Filters */}
-        <div className="mb-6">
-          <ReusableFilter
-            filters={filterOptions}
-            onFilterChange={handleFilterChange}
-            onSearchChange={handleSearchChange}
-            searchValue={filters.search}
-            searchPlaceholder="Search properties by name or address..."
-          />
-        </div>
+        {/* Content Card */}
+        <div className="bg-[#121B36] rounded-[32px] border border-[#FFFFFF0D] shadow-2xl overflow-hidden">
+          {/* Filters Area */}
+          <div className="p-6 pb-2">
+            <ReusableFilter
+              filters={filterOptions}
+              onFilterChange={handleFilterChange}
+              onSearchChange={handleSearchChange}
+              searchValue={filters.search}
+              searchPlaceholder="Search property name..."
+            />
+          </div>
 
-        {/* Table */}
-        <div className="bg-[#171D41] rounded-lg shadow-lg border border-[#3A3A4E] overflow-x-auto overflow-y-visible">
-          <div className="p-2 sm:p-4">
+          {/* Table Area */}
+          <div className="p-0 sm:p-4">
             <ReusableTable
               columns={columns}
               data={properties}
@@ -269,7 +267,7 @@ const PropertiesPage = () => {
 
           {/* Pagination */}
           {pagination.pages > 0 && (
-            <div className="p-3 sm:p-4 border-t border-[#3A3A4E]">
+            <div className="px-3 pb-3">
               <ReusablePagination
                 currentPage={pagination.page}
                 totalPages={pagination.pages}

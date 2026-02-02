@@ -32,6 +32,7 @@ export const adminApi = SplitApiSettings.injectEndpoints({
         url: API_END_POINTS.getHotelDashboardOverview,
         method: "GET",
       }),
+      providesTags: [{ type: "HotelDashboardOverview" }],
     }),
     getBookingStatsByDateRange: builder.query({
       query: (params) => ({
@@ -204,14 +205,22 @@ export const adminApi = SplitApiSettings.injectEndpoints({
       }),
       invalidatesTags: [{ type: "SiteSettings" }],
     }),
+    updateStaffCommissionStatus: builder.mutation({
+      query: ({ staffId, status }) => ({
+        url: `/api/v1/admin/commission/staff/${staffId}/pay`,
+        method: "PATCH",
+        body: { status },
+      }),
+      invalidatesTags: [{ type: "AdminUsers" }, { type: "HotelDashboardOverview" }],
+    }),
   }),
   overrideExisting: true,
 });
 
-export const { 
+export const {
   useGetAdminDashboardStatsQuery,
   useGetAdminDashboardOverviewQuery,
-  useGetAdminDashboardWeeklyVolumeQuery, 
+  useGetAdminDashboardWeeklyVolumeQuery,
   useGetHotelDashboardOverviewQuery,
   useGetBookingStatsByDateRangeQuery,
   useGetPropertyWiseStatsQuery,
@@ -223,7 +232,7 @@ export const {
   useUpdateTicketStatusMutation,
   useUpdateTicketAdminNotesMutation,
   useClaimTicketMutation,
-  useGetAdminMembersQuery, 
+  useGetAdminMembersQuery,
   useGetAdminUsersQuery,
   useGetSingleStaffQuery,
   useActivateStaffMutation,
@@ -235,5 +244,6 @@ export const {
   useGetTicketsQuery,
   useGetTicketByIdQuery,
   useGetSiteSettingsQuery,
-  useUpdateSiteSettingsMutation
+  useUpdateSiteSettingsMutation,
+  useUpdateStaffCommissionStatusMutation
 } = adminApi;

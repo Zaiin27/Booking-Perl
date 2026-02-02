@@ -90,6 +90,9 @@ const StaffDashboard = () => {
     confirmedBookings = 0,
     activeGuests = 0,
     currency = "USD",
+    totalCommission = 0,
+    totalHotelRevenue = 0,
+    totalUnpaidRevenue = 0,
   } = dashboardData;
 
   // Format currency
@@ -120,30 +123,24 @@ const StaffDashboard = () => {
       <SubscriptionStatus showUpgrade={true} />
 
       {/* Stat Cards Section */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
         <StatCard
-          title="My Property"
-          value={totalProperties.toString()}
-          icon={Building2}
-          gradient="from-blue-500 to-cyan-500"
-        />
-        <StatCard
-          title="Total Revenue"
-          value={formatCurrency(totalRevenue)}
+          title="Service Fees Commission"
+          value={formatCurrency(totalCommission)}
           icon={DollarSign}
-          gradient="from-green-500 to-emerald-500"
-        />
-        <StatCard
-          title="Today's Bookings"
-          value={todayBookings.toString()}
-          icon={Calendar}
           gradient="from-purple-500 to-pink-500"
         />
         <StatCard
-          title="Active Guests"
-          value={activeGuests.toString()}
-          icon={Users}
-          gradient="from-orange-500 to-red-500"
+          title="Hotel Revenue"
+          value={formatCurrency(totalHotelRevenue)}
+          icon={TrendingUp}
+          gradient="from-green-500 to-emerald-500"
+        />
+        <StatCard
+          title="Total Revenue"
+          value={formatCurrency(totalUnpaidRevenue)}
+          icon={CheckCircle}
+          gradient="from-blue-500 to-cyan-500"
         />
       </div>
 

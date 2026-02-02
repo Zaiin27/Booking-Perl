@@ -5,8 +5,7 @@ import {
   ProfileHero,
   UserProfileCard,
   SummaryCards,
-  LinkInputSection,
-  OrdersHistoryTable,
+  HotelRecentBookings,
 } from "../components/profilePage";
 import { useCheckAuthQuery } from "../services/Api";
 import { setUser } from "../store/slices/authSlice";
@@ -18,13 +17,13 @@ const ProfilePage = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { user } = useSelector((state) => state.auth);
-  
+
   // Use regular auth query (AuthWrapper handles validation)
-  const { 
-    data: authData, 
-    isLoading, 
-    error, 
-    refetch 
+  const {
+    data: authData,
+    isLoading,
+    error,
+    refetch
   } = useCheckAuthQuery(undefined, {
     skip: !user?.token && !localStorage.getItem('auth_token'),
   });
@@ -55,7 +54,7 @@ const ProfilePage = () => {
         }}
       >
         <div className="container mx-auto px-4 flex items-center justify-center">
-          <PageLoading 
+          <PageLoading
             message="Loading profile data..."
           />
         </div>
@@ -87,14 +86,12 @@ const ProfilePage = () => {
 
             <SummaryCards />
 
-            <LinkInputSection />
-
-            <OrdersHistoryTable />
+            <HotelRecentBookings />
           </div>
         </div>
       );
     }
-    
+
     return (
       <div
         className="min-h-screen relative flex flex-col items-center justify-center p-4"
@@ -109,7 +106,7 @@ const ProfilePage = () => {
           <div className="text-white text-center">
             <div className="text-red-400 text-6xl mb-4">⚠️</div>
             <p className="text-lg mb-4">Failed to load profile data</p>
-            <button 
+            <button
               onClick={() => refetch()}
               className="bg-gradient-to-r from-[#9945FF] to-[#14F195] text-white px-6 py-2 rounded-full hover:scale-105 transition-all duration-300"
             >
@@ -143,9 +140,7 @@ const ProfilePage = () => {
 
         <SummaryCards />
 
-        <LinkInputSection />
-
-        <OrdersHistoryTable />
+        <HotelRecentBookings />
       </div>
     </div>
   );

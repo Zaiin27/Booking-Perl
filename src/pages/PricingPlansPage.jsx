@@ -80,24 +80,24 @@ const PricingPlansPage = () => {
 
   const fetchMySubscription = async () => {
     if (!user) return; // Don't fetch if user is not logged in
-    
+
     try {
       const token = user?.token || localStorage.getItem("auth_token");
-      
+
       if (!token) {
         console.log("No token found, skipping subscription fetch");
         return;
       }
-      
+
       const response = await axios.get("/api/v1/plans/my-subscription", {
         headers: {
           Authorization: `Bearer ${token}`
         }
       });
-      
+
       if (response.data.success) {
         setCurrentSubscription(response.data.data);
-        
+
         // Log subscription status for debugging
         if (response.data.data.isActive) {
           console.log("Active subscription found:", {
@@ -115,7 +115,7 @@ const PricingPlansPage = () => {
         // Don't show error to user - they can still view plans
         return;
       }
-      
+
       // Silently fail for other errors - user can view plans without subscription
       console.error("Error fetching subscription:", error.response?.data || error.message);
     }
@@ -180,7 +180,7 @@ const PricingPlansPage = () => {
           const now = new Date();
           const endDate = new Date(currentSubscription.subscription.endDate);
           const daysRemaining = Math.ceil((endDate - now) / (1000 * 60 * 60 * 24));
-          
+
           if (daysRemaining > 0) {
             // Show confirmation modal or message
             const confirmUpgrade = window.confirm(
@@ -188,12 +188,12 @@ const PricingPlansPage = () => {
               `Do you want to cancel your current subscription and subscribe to ${plan.displayName}?\n\n` +
               `Note: Your current subscription will be cancelled immediately.`
             );
-            
+
             if (!confirmUpgrade) {
               setProcessingPlan(null);
               return;
             }
-            
+
             // Cancel current subscription first
             try {
               const token = user?.token || localStorage.getItem("auth_token");
@@ -206,7 +206,7 @@ const PricingPlansPage = () => {
                   }
                 }
               );
-              
+
               if (cancelResponse.data.success) {
                 toast.success("Current subscription cancelled. Redirecting to new plan...");
                 // Wait a bit then navigate
@@ -225,7 +225,7 @@ const PricingPlansPage = () => {
             }
           }
         }
-        
+
         // Redirect to payment page for paid plans
         navigate(`/subscribe/${plan.name}`, {
           state: { plan },
@@ -233,7 +233,7 @@ const PricingPlansPage = () => {
       }
     } catch (error) {
       console.error("Error selecting plan:", error);
-      
+
       // If 401, redirect to login
       if (error.response?.status === 401) {
         toast.error("Please login to continue");
@@ -343,18 +343,18 @@ const PricingPlansPage = () => {
                       ✓ Active Plan: {currentSubscription.plan?.displayName || currentSubscription.subscription?.planName || "Free Plan"}
                     </h3>
                     <p className="text-white/70 text-sm mt-1">
-                      {currentSubscription.subscription?.endDate 
+                      {currentSubscription.subscription?.endDate
                         ? (() => {
-                            const now = new Date();
-                            const endDate = new Date(currentSubscription.subscription.endDate);
-                            const daysRemaining = Math.ceil((endDate - now) / (1000 * 60 * 60 * 24));
-                            return daysRemaining > 0 
-                              ? `Expires in ${daysRemaining} day(s) - ${endDate.toLocaleDateString()}`
-                              : `Expired on ${endDate.toLocaleDateString()}`;
-                          })()
+                          const now = new Date();
+                          const endDate = new Date(currentSubscription.subscription.endDate);
+                          const daysRemaining = Math.ceil((endDate - now) / (1000 * 60 * 60 * 24));
+                          return daysRemaining > 0
+                            ? `Expires in ${daysRemaining} day(s) - ${endDate.toLocaleDateString()}`
+                            : `Expired on ${endDate.toLocaleDateString()}`;
+                        })()
                         : currentSubscription.subscription?.planName === "free"
-                        ? "Lifetime access"
-                        : "Currently active"}
+                          ? "Lifetime access"
+                          : "Currently active"}
                     </p>
                     {currentSubscription.subscription?.planName && (
                       <p className="text-green-400 text-xs mt-1 font-semibold">
@@ -385,13 +385,12 @@ const PricingPlansPage = () => {
             return (
               <div
                 key={plan._id || plan.name}
-                className={`relative bg-white/5 backdrop-blur-md rounded-2xl border-2 overflow-hidden transition-all duration-300 hover:scale-105 flex flex-col h-full ${
-                  isCurrentPlan
-                    ? "border-[#14F195] shadow-2xl shadow-[#14F195]/20"
-                    : plan.name === "premium"
+                className={`relative bg-white/5 backdrop-blur-md rounded-2xl border-2 overflow-hidden transition-all duration-300 hover:scale-105 flex flex-col h-full ${isCurrentPlan
+                  ? "border-[#14F195] shadow-2xl shadow-[#14F195]/20"
+                  : plan.name === "premium"
                     ? "border-purple-500/50"
                     : "border-white/10"
-                }`}
+                  }`}
               >
                 {getPlanBadge(plan.name)}
 
@@ -548,30 +547,30 @@ const PricingPlansPage = () => {
                   {(plan.badges?.verified ||
                     plan.badges?.trustedHost ||
                     plan.badges?.premium) && (
-                    <div className="border-t border-white/10 pt-4 mt-4">
-                      <div className="flex items-center gap-2 mb-3">
-                        <FaShieldAlt className="text-[#9945FF]" />
-                        <span className="text-white font-semibold">Badges</span>
+                      <div className="border-t border-white/10 pt-4 mt-4">
+                        <div className="flex items-center gap-2 mb-3">
+                          <FaShieldAlt className="text-[#9945FF]" />
+                          <span className="text-white font-semibold">Badges</span>
+                        </div>
+                        <div className="flex flex-wrap gap-2">
+                          {plan.badges.verified && (
+                            <span className="px-2 py-1 bg-blue-500/20 text-blue-400 rounded text-xs border border-blue-500/30">
+                              ✓ Verified
+                            </span>
+                          )}
+                          {plan.badges.trustedHost && (
+                            <span className="px-2 py-1 bg-green-500/20 text-green-400 rounded text-xs border border-green-500/30">
+                              ✓ Trusted Host
+                            </span>
+                          )}
+                          {plan.badges.premium && (
+                            <span className="px-2 py-1 bg-yellow-500/20 text-yellow-400 rounded text-xs border border-yellow-500/30">
+                              ⭐ Premium
+                            </span>
+                          )}
+                        </div>
                       </div>
-                      <div className="flex flex-wrap gap-2">
-                        {plan.badges.verified && (
-                          <span className="px-2 py-1 bg-blue-500/20 text-blue-400 rounded text-xs border border-blue-500/30">
-                            ✓ Verified
-                          </span>
-                        )}
-                        {plan.badges.trustedHost && (
-                          <span className="px-2 py-1 bg-green-500/20 text-green-400 rounded text-xs border border-green-500/30">
-                            ✓ Trusted Host
-                          </span>
-                        )}
-                        {plan.badges.premium && (
-                          <span className="px-2 py-1 bg-yellow-500/20 text-yellow-400 rounded text-xs border border-yellow-500/30">
-                            ⭐ Premium
-                          </span>
-                        )}
-                      </div>
-                    </div>
-                  )}
+                    )}
 
                   {/* Analytics */}
                   {(plan.analytics?.basic || plan.analytics?.advanced) && (
@@ -595,15 +594,14 @@ const PricingPlansPage = () => {
                   <button
                     onClick={() => handleSelectPlan(plan)}
                     disabled={processingPlan === (plan._id || plan.name) || isCurrentPlan}
-                    className={`w-full py-3 rounded-lg font-semibold transition-all duration-300 ${
-                      isCurrentPlan
-                        ? "bg-green-500/20 text-green-400 border border-green-500/30 cursor-not-allowed"
-                        : isCustomized
+                    className={`w-full py-3 rounded-lg font-semibold transition-all duration-300 ${isCurrentPlan
+                      ? "bg-green-500/20 text-green-400 border border-green-500/30 cursor-not-allowed"
+                      : isCustomized
                         ? "bg-gradient-to-r from-purple-600 to-pink-600 text-white hover:scale-105 hover:shadow-lg hover:shadow-purple-500/50"
                         : plan.name === "premium"
-                        ? "bg-gradient-to-r from-yellow-500 to-orange-500 text-white hover:scale-105 hover:shadow-lg hover:shadow-yellow-500/50"
-                        : "bg-gradient-to-r from-[#9945FF] to-[#14F195] text-white hover:scale-105 hover:shadow-lg hover:shadow-[#9945FF]/50"
-                    }`}
+                          ? "bg-gradient-to-r from-yellow-500 to-orange-500 text-white hover:scale-105 hover:shadow-lg hover:shadow-yellow-500/50"
+                          : "bg-gradient-to-r from-[#9945FF] to-[#14F195] text-white hover:scale-105 hover:shadow-lg hover:shadow-[#9945FF]/50"
+                      }`}
                   >
                     {processingPlan === (plan._id || plan.name) ? (
                       <span className="flex items-center justify-center gap-2">
@@ -643,7 +641,7 @@ const PricingPlansPage = () => {
             <div>
               <h3 className="font-semibold text-white mb-2">What payment methods do you accept?</h3>
               <p className="text-sm">
-                We accept JazzCash, EasyPaisa, and Stripe (for international payments).
+                We accept JazzCash and EasyPaisa.
               </p>
             </div>
             <div>

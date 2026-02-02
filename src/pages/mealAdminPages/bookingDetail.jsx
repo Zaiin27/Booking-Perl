@@ -42,14 +42,14 @@ const BookingDetailPage = () => {
   const fetchBooking = async () => {
     try {
       setLoading(true);
-      
+
       // Get token from Redux store or localStorage
       const token = user?.token || localStorage.getItem("auth_token");
       const headers = {};
       if (token) {
         headers.Authorization = `Bearer ${token}`;
       }
-      
+
       const response = await axios.get(`/api/v1/bookings/${id}`, { headers });
       if (response.data.success) {
         setBooking(response.data.data);
@@ -85,7 +85,7 @@ const BookingDetailPage = () => {
         { [type === "booking" ? "bookingStatus" : "paymentStatus"]: status },
         { headers }
       );
-      
+
       if (response.data.success) {
         toast.success(`${type === "booking" ? "Booking" : "Payment"} status updated successfully`);
         fetchBooking(); // Refresh booking data
@@ -122,9 +122,9 @@ const BookingDetailPage = () => {
 
   const formatCurrency = (amount) => {
     if (!amount && amount !== 0) return "N/A";
-    
+
     const currency = booking?.currency || "USD";
-    
+
     // Support for PKR/Rs (Pakistani Rupees)
     if (currency === "PKR" || currency === "Rs" || currency === "RS" || currency === "pkr") {
       // Format PKR with comma separators and "Rs" prefix
@@ -134,7 +134,7 @@ const BookingDetailPage = () => {
       }).format(amount);
       return `Rs ${formattedAmount}`;
     }
-    
+
     // Default to USD format
     return new Intl.NumberFormat("en-US", {
       style: "currency",
@@ -251,230 +251,141 @@ const BookingDetailPage = () => {
   const nights = calculateNights(booking.checkInDate, booking.checkOutDate);
 
   return (
-    <div className="p-4 sm:p-6 bg-[#0A1330] min-h-screen">
+    <div className="p-4 lg:p-6 pb-24 lg:pb-6 bg-[#0A1330] min-h-screen">
       <div className="max-w-6xl mx-auto">
-        {/* Header */}
-        <div className="mb-6">
+        {/* Header Section */}
+        <div className="mb-8">
           <button
             onClick={() => navigate(isAdmin ? "/admin/bookings" : "/staff/bookings")}
-            className="flex items-center gap-2 text-[#AEB9E1] hover:text-white transition-colors mb-4"
+            className="flex items-center gap-2 text-[#AEB9E1] hover:text-white transition-colors mb-6 group"
           >
-            <FaArrowLeft className="w-4 h-4" />
-            <span className="text-sm font-medium">Back to Bookings</span>
+            <div className="bg-[#121B36] p-2 rounded-xl border border-[#FFFFFF0D] group-hover:bg-[#1C244D] transition-all">
+              <FaArrowLeft className="w-3 h-3" />
+            </div>
+            <span className="text-xs font-bold uppercase tracking-widest opacity-60">Return</span>
           </button>
 
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-            <div>
-              <h1 className="text-2xl sm:text-3xl font-bold text-white mb-2">
-                Booking Details
-              </h1>
-              <p className="text-sm text-[#AEB9E1]">
-                Reference: <span className="font-mono text-blue-400">{booking.bookingReference || booking.booking_id}</span>
+          <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-6">
+            <div className="flex flex-col gap-1">
+              <h1 className="text-3xl sm:text-4xl font-bold text-white px-1">Reservation</h1>
+              <p className="text-[#AEB9E1] px-1 text-sm font-medium opacity-60 flex items-center gap-2">
+                Ref: <span className="text-[#14F195] font-mono tracking-tighter">{booking.bookingReference || booking.booking_id}</span>
               </p>
             </div>
             <div className="flex items-center gap-3 flex-wrap">
               {getStatusBadge(booking.bookingStatus, "booking")}
               {getStatusBadge(booking.paymentStatus, "payment")}
-              {booking.paymentType && (
-                <div className={`inline-flex items-center gap-2 px-4 py-2 rounded-lg border ${
-                  booking.paymentType === 'online' 
-                    ? 'bg-blue-500/20 text-blue-400 border-blue-500/30' 
-                    : 'bg-orange-500/20 text-orange-400 border-orange-500/30'
-                }`}>
-                  <FaCreditCard className="w-4 h-4" />
-                  <span className="font-semibold">
-                    {booking.paymentType === 'online' ? '💳 Online' : '🏨 On Arrival'}
-                  </span>
-                </div>
-              )}
             </div>
           </div>
         </div>
 
-        {/* Main Content Grid */}
+        {/* Unified Layout Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Left Column - Main Details */}
           <div className="lg:col-span-2 space-y-6">
-            {/* Property Information */}
-            <div className="bg-[#171D41] rounded-xl shadow-lg p-6 border border-[#3A3A4E]">
-              <div className="flex items-center gap-3 mb-6">
-                <div className="w-12 h-12 rounded-lg bg-gradient-to-r from-blue-500 to-cyan-500 flex items-center justify-center">
-                  <FaHotel className="w-6 h-6 text-white" />
+
+            {/* Essential Booking Info Card */}
+            <div className="bg-[#121B36] rounded-[32px] p-6 sm:p-8 border border-[#FFFFFF0D] shadow-2xl relative overflow-hidden">
+              <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-[#9945FF] to-[#14F195] opacity-5 blur-3xl"></div>
+
+              <div className="flex items-center gap-4 mb-8">
+                <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-blue-600 to-cyan-600 flex items-center justify-center shadow-lg shadow-blue-500/10">
+                  <FaHotel className="w-7 h-7 text-white" />
                 </div>
                 <div>
-                  <h2 className="text-xl font-bold text-white">Property Information</h2>
-                  <p className="text-sm text-[#AEB9E1]">Hotel & location details</p>
+                  <h2 className="text-xl font-bold text-white leading-tight">Property Details</h2>
+                  <p className="text-[#AEB9E1] text-xs font-medium opacity-60">Hotel & Location information</p>
                 </div>
               </div>
 
-              <div className="space-y-4">
-                <div>
-                  <h3 className="text-lg font-semibold text-white mb-1">
-                    {booking.property_id?.name || "N/A"}
-                  </h3>
+              <div className="grid grid-cols-1 gap-6">
+                <div className="flex flex-col gap-2">
+                  <h3 className="text-2xl font-bold text-white tracking-tight">{booking.property_id?.name || "N/A"}</h3>
                   <div className="flex items-start gap-2 text-[#AEB9E1]">
-                    <FaMapMarkerAlt className="w-4 h-4 mt-1 text-red-400" />
-                    <span className="text-sm">{booking.property_id?.address || "N/A"}</span>
+                    <FaMapMarkerAlt className="w-4 h-4 mt-1 text-[#14F195]" />
+                    <span className="text-sm font-medium leading-relaxed">{booking.property_id?.address || "N/A"}</span>
                   </div>
                 </div>
 
-                {booking.property_id?.contactEmail && (
-                  <div className="flex items-center gap-2 text-[#AEB9E1]">
-                    <FaEnvelope className="w-4 h-4 text-blue-400" />
-                    <span className="text-sm">{booking.property_id.contactEmail}</span>
+                <div className="grid grid-cols-2 gap-4 mt-2">
+                  <div className="bg-[#2A2D53]/30 rounded-2xl p-4 border border-[#FFFFFF05]">
+                    <p className="text-[#AEB9E1]/40 text-[9px] font-bold uppercase tracking-wider mb-1">Check In</p>
+                    <p className="text-white font-bold text-sm">{formatDate(booking.checkInDate)}</p>
+                    <p className="text-[#14F195] text-[10px] font-bold mt-1">{booking.property_id?.checkInTime || "N/A"}</p>
                   </div>
-                )}
-
-                {booking.property_id?.contactPhone && (
-                  <div className="flex items-center gap-2 text-[#AEB9E1]">
-                    <FaPhone className="w-4 h-4 text-green-400" />
-                    <span className="text-sm">{booking.property_id.contactPhone}</span>
+                  <div className="bg-[#2A2D53]/30 rounded-2xl p-4 border border-[#FFFFFF05]">
+                    <p className="text-[#AEB9E1]/40 text-[9px] font-bold uppercase tracking-wider mb-1">Check Out</p>
+                    <p className="text-white font-bold text-sm">{formatDate(booking.checkOutDate)}</p>
+                    <p className="text-red-400 text-[10px] font-bold mt-1">{booking.property_id?.checkOutTime || "N/A"}</p>
                   </div>
-                )}
-
-                {(booking.property_id?.checkInTime || booking.property_id?.checkOutTime) && (
-                  <div className="grid grid-cols-2 gap-4 pt-4 border-t border-[#3A3A4E]">
-                    <div>
-                      <p className="text-xs text-[#AEB9E1] mb-1">Check-in Time</p>
-                      <p className="text-sm font-semibold text-white">
-                        {booking.property_id.checkInTime || "N/A"}
-                      </p>
-                    </div>
-                    <div>
-                      <p className="text-xs text-[#AEB9E1] mb-1">Check-out Time</p>
-                      <p className="text-sm font-semibold text-white">
-                        {booking.property_id.checkOutTime || "N/A"}
-                      </p>
-                    </div>
-                  </div>
-                )}
+                </div>
               </div>
             </div>
 
-            {/* Guest Information */}
-            <div className="bg-[#171D41] rounded-xl shadow-lg p-6 border border-[#3A3A4E]">
-              <div className="flex items-center gap-3 mb-6">
-                <div className="w-12 h-12 rounded-lg bg-gradient-to-r from-purple-500 to-pink-500 flex items-center justify-center">
-                  <FaUsers className="w-6 h-6 text-white" />
+            {/* Guest Profile Card */}
+            <div className="bg-[#121B36] rounded-[32px] p-6 sm:p-8 border border-[#FFFFFF0D] shadow-2xl overflow-hidden">
+              <div className="flex items-center gap-4 mb-8">
+                <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-purple-600 to-pink-600 flex items-center justify-center shadow-lg">
+                  <FaUsers className="w-7 h-7 text-white" />
                 </div>
                 <div>
-                  <h2 className="text-xl font-bold text-white">Guest Information</h2>
-                  <p className="text-sm text-[#AEB9E1]">Booking guest details</p>
+                  <h2 className="text-xl font-bold text-white leading-tight">Guest Profile</h2>
+                  <p className="text-[#AEB9E1] text-xs font-medium opacity-60">Customer and occupancy details</p>
                 </div>
               </div>
 
-              <div className="space-y-4">
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div>
-                    <p className="text-xs text-[#AEB9E1] mb-1">Guest Name</p>
-                    <p className="text-base font-semibold text-white">{booking.guestName || "N/A"}</p>
-                  </div>
-                  <div>
-                    <p className="text-xs text-[#AEB9E1] mb-1">Email Address</p>
-                    <p className="text-base font-semibold text-white">{booking.guestEmail || "N/A"}</p>
-                  </div>
-                  <div>
-                    <p className="text-xs text-[#AEB9E1] mb-1">Phone Number</p>
-                    <p className="text-base font-semibold text-white">{booking.guestPhone || "N/A"}</p>
-                  </div>
-                  <div>
-                    <p className="text-xs text-[#AEB9E1] mb-1">Number of Guests</p>
-                    <p className="text-base font-semibold text-white">{booking.numberOfGuests || 0} guests</p>
-                  </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                <div className="space-y-1">
+                  <p className="text-[#AEB9E1]/40 text-[9px] font-bold uppercase tracking-wider">Full Name</p>
+                  <p className="text-white font-bold text-lg">{booking.guestName || "N/A"}</p>
                 </div>
-              </div>
-            </div>
-
-            {/* Booking Dates & Rooms */}
-            <div className="bg-[#171D41] rounded-xl shadow-lg p-6 border border-[#3A3A4E]">
-              <div className="flex items-center gap-3 mb-6">
-                <div className="w-12 h-12 rounded-lg bg-gradient-to-r from-green-500 to-emerald-500 flex items-center justify-center">
-                  <FaCalendarAlt className="w-6 h-6 text-white" />
+                <div className="space-y-1">
+                  <p className="text-[#AEB9E1]/40 text-[9px] font-bold uppercase tracking-wider">Status</p>
+                  <p className="text-white font-bold text-lg flex items-center gap-2">
+                    <span className="w-2 h-2 rounded-full bg-[#14F195] animate-pulse"></span>
+                    {booking.numberOfGuests || 0} Guests
+                  </p>
                 </div>
-                <div>
-                  <h2 className="text-xl font-bold text-white">Booking Period</h2>
-                  <p className="text-sm text-[#AEB9E1]">Check-in & check-out dates</p>
+                <div className="space-y-1">
+                  <p className="text-[#AEB9E1]/40 text-[9px] font-bold uppercase tracking-wider">Email Contact</p>
+                  <p className="text-white font-medium text-sm truncate">{booking.guestEmail || "N/A"}</p>
                 </div>
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
-                <div className="text-center p-4 bg-[#0A1330] rounded-lg border border-[#3A3A4E]">
-                  <FaCalendarAlt className="w-6 h-6 text-green-400 mx-auto mb-2" />
-                  <p className="text-xs text-[#AEB9E1] mb-1">Check-in</p>
-                  <p className="text-sm font-bold text-white">{formatDate(booking.checkInDate)}</p>
-                  {booking.checkInDate && (
-                    <p className="text-xs text-[#AEB9E1] mt-1">
-                      {new Date(booking.checkInDate).toLocaleDateString("en-US", {
-                        month: "short",
-                        day: "numeric",
-                        year: "numeric",
-                      })}
-                    </p>
-                  )}
-                </div>
-
-                <div className="text-center p-4 bg-[#0A1330] rounded-lg border border-[#3A3A4E]">
-                  <FaBed className="w-6 h-6 text-purple-400 mx-auto mb-2" />
-                  <p className="text-xs text-[#AEB9E1] mb-1">Duration</p>
-                  <p className="text-sm font-bold text-white">{nights} {nights === 1 ? "Night" : "Nights"}</p>
-                </div>
-
-                <div className="text-center p-4 bg-[#0A1330] rounded-lg border border-[#3A3A4E]">
-                  <FaCalendarAlt className="w-6 h-6 text-red-400 mx-auto mb-2" />
-                  <p className="text-xs text-[#AEB9E1] mb-1">Check-out</p>
-                  <p className="text-sm font-bold text-white">{formatDate(booking.checkOutDate)}</p>
-                  {booking.checkOutDate && (
-                    <p className="text-xs text-[#AEB9E1] mt-1">
-                      {new Date(booking.checkOutDate).toLocaleDateString("en-US", {
-                        month: "short",
-                        day: "numeric",
-                        year: "numeric",
-                      })}
-                    </p>
-                  )}
+                <div className="space-y-1">
+                  <p className="text-[#AEB9E1]/40 text-[9px] font-bold uppercase tracking-wider">Phone Number</p>
+                  <p className="text-white font-medium text-sm">{booking.guestPhone || "N/A"}</p>
                 </div>
               </div>
             </div>
 
-            {/* Room Details */}
+            {/* Booked Rooms Container */}
             {booking.bookedRooms && booking.bookedRooms.length > 0 && (
-              <div className="bg-[#171D41] rounded-xl shadow-lg p-6 border border-[#3A3A4E]">
-                <div className="flex items-center gap-3 mb-6">
-                  <div className="w-12 h-12 rounded-lg bg-gradient-to-r from-orange-500 to-red-500 flex items-center justify-center">
-                    <FaBed className="w-6 h-6 text-white" />
+              <div className="bg-[#121B36] rounded-[32px] p-6 sm:p-8 border border-[#FFFFFF0D] shadow-2xl">
+                <div className="flex items-center gap-4 mb-8">
+                  <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-green-600 to-emerald-600 flex items-center justify-center shadow-lg">
+                    <FaBed className="w-7 h-7 text-white" />
                   </div>
                   <div>
-                    <h2 className="text-xl font-bold text-white">Room Details</h2>
-                    <p className="text-sm text-[#AEB9E1]">Selected rooms & types</p>
+                    <h2 className="text-xl font-bold text-white leading-tight">Selected Units</h2>
+                    <p className="text-[#AEB9E1] text-xs font-medium opacity-60">Room types and individual pricing</p>
                   </div>
                 </div>
 
-                <div className="space-y-3">
+                <div className="space-y-4">
                   {booking.bookedRooms.map((room, index) => (
-                    <div
-                      key={index}
-                      className="flex items-center justify-between p-4 bg-[#0A1330] rounded-lg border border-[#3A3A4E]"
-                    >
-                      <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 rounded-lg bg-gradient-to-r from-purple-500/20 to-pink-500/20 border border-purple-500/30 flex items-center justify-center">
-                          <FaBed className="w-5 h-5 text-purple-400" />
+                    <div key={index} className="bg-[#2A2D53]/20 rounded-2xl p-5 border border-[#FFFFFF05] group hover:bg-[#2A2D53]/40 transition-all">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-4">
+                          <div className="w-10 h-10 rounded-xl bg-white/5 flex items-center justify-center">
+                            <FaBed className="text-[#14F195]" size={16} />
+                          </div>
+                          <div>
+                            <h4 className="text-white font-bold text-base capitalize">{room.quantity}x {room.roomType}</h4>
+                            <p className="text-[#AEB9E1]/60 text-[10px] font-bold uppercase">{room.roomType === 'single' ? 'Single' : 'Standard'} Occupancy</p>
+                          </div>
                         </div>
-                        <div>
-                          <p className="text-base font-semibold text-white capitalize">
-                            {room.quantity}x {room.roomType || "Room"}
-                          </p>
-                          <p className="text-xs text-[#AEB9E1]">
-                            {room.roomType === "single" ? "Single Occupancy" : "Double Occupancy"}
-                          </p>
+                        <div className="text-right">
+                          <p className="text-white font-bold text-base">{formatCurrency(room.price || 0)}</p>
+                          <p className="text-[#AEB9E1]/40 text-[10px] uppercase font-bold">Per Night</p>
                         </div>
-                      </div>
-                      <div className="text-right">
-                        <p className="text-sm font-semibold text-white">
-                          {formatCurrency(room.price || 0)}/night
-                        </p>
-                        <p className="text-xs text-[#AEB9E1]">
-                          Total: {formatCurrency((room.price || 0) * (room.quantity || 1) * nights)}
-                        </p>
                       </div>
                     </div>
                   ))}
@@ -483,162 +394,97 @@ const BookingDetailPage = () => {
             )}
           </div>
 
-          {/* Right Column - Summary & Actions */}
+          {/* Management Sidebar */}
           <div className="lg:col-span-1 space-y-6">
-            {/* Status Actions - Only for Admin - Moved to top */}
+            {/* Admin Controls */}
             {isAdmin && (
-              <div className="bg-[#171D41] rounded-xl shadow-lg p-6 border border-[#3A3A4E] relative z-10 overflow-visible">
-                <h3 className="text-lg font-bold text-white mb-4">Manage Booking</h3>
-                
-                <div className="space-y-4">
-                  {/* Booking Status Update */}
-                  <div className="relative" style={{ zIndex: 100 }}>
-                    <label className="block text-sm font-medium text-[#AEB9E1] mb-2">
-                      Booking Status
-                    </label>
-                    <select
-                      value={booking.bookingStatus || "pending"}
-                      onChange={(e) => handleStatusUpdate(e.target.value, "booking")}
-                      disabled={updating}
-                      className="w-full px-4 py-2 bg-[#0A1330] border border-[#3A3A4E] rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-[#14F195] appearance-none cursor-pointer"
-                      style={{ zIndex: 100 }}
-                    >
-                      <option value="pending">Pending</option>
-                      <option value="confirmed">Confirmed</option>
-                      <option value="active">Active</option>
-                      <option value="completed">Completed</option>
-                      <option value="cancelled">Cancelled</option>
-                    </select>
+              <div className="bg-[#121B36] rounded-[32px] p-6 border border-[#FFFFFF0D] shadow-2xl">
+                <h3 className="text-lg font-bold text-white mb-6 px-1 flex items-center gap-2">
+                  <span className="w-2 h-4 bg-[#9945FF] rounded-full"></span>
+                  Manage Status
+                </h3>
+
+                <div className="space-y-5">
+                  <div>
+                    <p className="text-[#AEB9E1]/40 text-[9px] font-bold uppercase tracking-widest mb-2 ml-1">Booking State</p>
+                    <div className="relative">
+                      <select
+                        value={booking.bookingStatus || "pending"}
+                        onChange={(e) => handleStatusUpdate(e.target.value, "booking")}
+                        disabled={updating}
+                        className="w-full h-12 bg-[#171D41] border border-[#FFFFFF0D] rounded-2xl text-white px-4 text-sm font-bold focus:ring-[#14F195] appearance-none cursor-pointer"
+                      >
+                        <option value="pending">Pending</option>
+                        <option value="confirmed">Confirmed</option>
+                        <option value="active">Active</option>
+                        <option value="completed">Completed</option>
+                        <option value="cancelled">Cancelled</option>
+                      </select>
+                      <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-[#AEB9E1]/40">
+                        <FaEdit size={12} />
+                      </div>
+                    </div>
                   </div>
 
-                  {/* Payment Status Update */}
-                  <div className="relative" style={{ zIndex: 99 }}>
-                    <label className="block text-sm font-medium text-[#AEB9E1] mb-2">
-                      Payment Status
-                    </label>
-                    <select
-                      value={booking.paymentStatus || "pending"}
-                      onChange={(e) => handleStatusUpdate(e.target.value, "payment")}
-                      disabled={updating}
-                      className="w-full px-4 py-2 bg-[#0A1330] border border-[#3A3A4E] rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-[#14F195] appearance-none cursor-pointer"
-                      style={{ zIndex: 99 }}
-                    >
-                      <option value="pending">Pending</option>
-                      <option value="paid">Paid</option>
-                      <option value="failed">Failed</option>
-                      <option value="refunded">Refunded</option>
-                    </select>
+                  <div>
+                    <p className="text-[#AEB9E1]/40 text-[9px] font-bold uppercase tracking-widest mb-2 ml-1">Payment State</p>
+                    <div className="relative">
+                      <select
+                        value={booking.paymentStatus || "pending"}
+                        onChange={(e) => handleStatusUpdate(e.target.value, "payment")}
+                        disabled={updating}
+                        className="w-full h-12 bg-[#171D41] border border-[#FFFFFF0D] rounded-2xl text-white px-4 text-sm font-bold focus:ring-[#14F195] appearance-none cursor-pointer"
+                      >
+                        <option value="pending">Pending</option>
+                        <option value="paid">Paid</option>
+                        <option value="failed">Failed</option>
+                        <option value="refunded">Refunded</option>
+                      </select>
+                      <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-[#AEB9E1]/40">
+                        <FaCreditCard size={12} />
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
             )}
 
-            {/* Booking Summary - Moved below with higher z-index */}
-            <div className="bg-[#171D41] rounded-xl shadow-lg p-6 border border-[#3A3A4E] sticky top-6" style={{ zIndex: 1 }}>
-              <div className="flex items-center gap-3 mb-6">
-                <div className="w-10 h-10 rounded-lg bg-gradient-to-r from-green-500 to-emerald-500 flex items-center justify-center">
-                  <FaFileInvoice className="w-5 h-5 text-white" />
-                </div>
-                <h2 className="text-xl font-bold text-white">Booking Summary</h2>
-              </div>
+            {/* Financial Summary */}
+            <div className="bg-[#121B36] rounded-[32px] p-8 border border-[#FFFFFF0D] shadow-2xl relative overflow-hidden">
+              <div className="absolute top-0 right-0 w-24 h-24 bg-[#14F195] opacity-5 blur-3xl rounded-full"></div>
+              <h3 className="text-lg font-bold text-white mb-8 flex items-center justify-between">
+                <span>Payment Info</span>
+                <FaFileInvoice className="text-[#14F195]" size={14} />
+              </h3>
 
-              <div className="space-y-4">
-                {/* Payment Type */}
-                {booking.paymentType && (
-                  <div className="p-3 bg-[#0A1330] rounded-lg border border-[#3A3A4E]">
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm text-[#AEB9E1]">Payment Type</span>
-                      <div className={`inline-flex items-center gap-2 px-3 py-1 rounded-lg text-xs font-semibold ${
-                        booking.paymentType === 'online' 
-                          ? 'bg-blue-500/20 text-blue-400 border border-blue-500/30' 
-                          : 'bg-orange-500/20 text-orange-400 border border-orange-500/30'
-                      }`}>
-                        <span>{booking.paymentType === 'online' ? '💳' : '🏨'}</span>
-                        <span>{booking.paymentType === 'online' ? 'Online' : 'On Arrival'}</span>
-                      </div>
+              <div className="space-y-6">
+                <div className="flex justify-between items-center text-sm">
+                  <span className="text-[#AEB9E1] font-medium">Nightly Rate</span>
+                  <span className="text-white font-bold">{formatCurrency(booking.totalAmount / (nights || 1))}</span>
+                </div>
+                <div className="flex justify-between items-center text-sm">
+                  <span className="text-[#AEB9E1] font-medium">Platform Fee</span>
+                  <span className="text-orange-400 font-bold">{formatCurrency(booking.platformFee || 0)}</span>
+                </div>
+                <div className="flex justify-between items-center text-sm">
+                  <span className="text-[#AEB9E1] font-medium">Calculation</span>
+                  <span className="text-white font-bold">x{nights} Nights</span>
+                </div>
+
+                <div className="pt-6 border-t border-[#FFFFFF0D]">
+                  <div className="flex justify-between items-end">
+                    <div>
+                      <p className="text-[#AEB9E1]/40 text-[9px] font-bold uppercase mb-1">TOTAL RECEIVABLE</p>
+                      <p className="text-3xl font-bold text-[#14F195] tracking-tighter">
+                        {formatCurrency(booking.totalAmount || 0)}
+                      </p>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-[10px] font-bold text-white bg-white/5 px-2 py-1 rounded-lg border border-white/5">
+                        {booking.paymentType?.toUpperCase()}
+                      </p>
                     </div>
                   </div>
-                )}
-
-                {/* Calculate base amount (total - platform fee) */}
-                {(() => {
-                  const baseAmount = booking.totalAmount - (booking.platformFee || 0);
-                  return (
-                    <>
-                      {baseAmount > 0 && (
-                        <div className="flex justify-between items-center py-2 border-b border-[#3A3A4E]">
-                          <span className="text-sm text-[#AEB9E1]">Room Charges</span>
-                          <span className="text-sm font-semibold text-white">
-                            {formatCurrency(baseAmount)}
-                          </span>
-                        </div>
-                      )}
-                    </>
-                  );
-                })()}
-
-                {/* Platform Fee */}
-                {booking.platformFee > 0 && (
-                  <div className="flex justify-between items-center py-2 border-b border-[#3A3A4E]">
-                    <span className="text-sm text-[#AEB9E1]">Platform Fee</span>
-                    <span className="text-sm font-semibold text-orange-400">
-                      {formatCurrency(booking.platformFee)}
-                    </span>
-                  </div>
-                )}
-
-                {/* Commission Breakdown - Only for Admin */}
-                {isAdmin && booking.commissionAmount > 0 && (
-                  <>
-                    <div className="pt-2 border-t border-[#3A3A4E]">
-                      <div className="flex justify-between items-center py-2">
-                        <span className="text-sm text-[#AEB9E1]">Commission ({booking.commissionPercentage || 0}%)</span>
-                        <span className="text-sm font-semibold text-amber-400">
-                          {formatCurrency(booking.commissionAmount || 0)}
-                        </span>
-                      </div>
-                      <div className="flex justify-between items-center py-2 border-b border-[#3A3A4E]">
-                        <span className="text-sm text-[#AEB9E1]">Hotel Owner Amount</span>
-                        <span className="text-sm font-semibold text-green-400">
-                          {formatCurrency(booking.hotelOwnerAmount || 0)}
-                        </span>
-                      </div>
-                    </div>
-                  </>
-                )}
-
-                <div className="flex justify-between items-center py-2 border-b border-[#3A3A4E]">
-                  <span className="text-sm text-[#AEB9E1]">Nights</span>
-                  <span className="text-sm font-semibold text-white">{nights}</span>
-                </div>
-
-                <div className="flex justify-between items-center py-2 border-b border-[#3A3A4E]">
-                  <span className="text-sm text-[#AEB9E1]">Total Rooms</span>
-                  <span className="text-sm font-semibold text-white">
-                    {booking.totalRooms || 0}
-                  </span>
-                </div>
-
-                <div className="pt-4 border-t-2 border-[#14F195]">
-                  <div className="flex justify-between items-center">
-                    <span className="text-base font-bold text-white">Total Amount</span>
-                    <span className="text-xl font-bold text-[#14F195]">
-                      {formatCurrency(booking.totalAmount || 0)}
-                    </span>
-                  </div>
-                </div>
-
-                <div className="pt-4 space-y-2">
-                  <div className="flex items-center gap-2 text-xs text-[#AEB9E1]">
-                    <FaClock className="w-3 h-3" />
-                    <span>Booked on: {formatDateTime(booking.createdAt)}</span>
-                  </div>
-                  {booking.updatedAt && (
-                    <div className="flex items-center gap-2 text-xs text-[#AEB9E1]">
-                      <FaClock className="w-3 h-3" />
-                      <span>Updated: {formatDateTime(booking.updatedAt)}</span>
-                    </div>
-                  )}
                 </div>
               </div>
             </div>

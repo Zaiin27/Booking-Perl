@@ -10,6 +10,7 @@ const ActionsMenu = ({
   onDelete,
   onOpenInChat,
   onAddProperty,
+  onPayCommission,
   position = "bottom",
   rowData = null,
   tableType = "tickets",
@@ -57,6 +58,12 @@ const ActionsMenu = ({
     onClose();
   };
 
+  const handlePayCommissionClick = () => {
+    console.log("Pay Commission clicked, calling onPayCommission with:", rowData);
+    onPayCommission(rowData);
+    onClose();
+  };
+
 
   // Define which actions to show based on table type
   const getActionsToShow = () => {
@@ -68,7 +75,7 @@ const ActionsMenu = ({
       case "bookings":
         return ["view"]; // Only show View for bookings
       case "staff":
-        return ["edit", "delete", "addProperty"];
+        return ["edit", "delete", "addProperty", "payCommission"];
       case "properties":
         // For properties, only show actions that have handlers
         const actions = ["view"];
@@ -92,11 +99,9 @@ const ActionsMenu = ({
 
   return (
     <div
-      className={`absolute z-[99999] ${
-        tableType === "tickets" ? "w-40" : "w-32"
-      } bg-[#060B27] border border-[#3A3A4E] rounded-lg shadow-xl py-1 ${
-        position === "top" ? "bottom-full mb-2" : "top-full mt-2"
-      } right-0`}
+      className={`absolute z-[99999] ${tableType === "tickets" ? "w-40" : tableType === "staff" ? "w-48" : "w-32"
+        } bg-[#060B27] border border-[#3A3A4E] rounded-lg shadow-xl py-1 ${position === "top" ? "bottom-full mb-2" : "top-full mt-2"
+        } right-0`}
     >
       {actionsToShow.includes("view") && (
         <button
@@ -145,6 +150,16 @@ const ActionsMenu = ({
         >
           <Plus className="w-4 h-4" />
           Add Property
+        </button>
+      )}
+
+      {actionsToShow.includes("payCommission") && (
+        <button
+          onClick={handlePayCommissionClick}
+          className="w-full flex items-center gap-2 px-3 py-2 text-xs text-white hover:bg-[#3A3A4E] transition-colors whitespace-nowrap"
+        >
+          <Plus className="w-4 h-4" />
+          Commission Received
         </button>
       )}
 

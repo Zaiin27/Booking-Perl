@@ -98,7 +98,7 @@ const BannerAdsPage = () => {
       console.error("Error fetching banner ads:", error);
       const errorMessage = error.response?.data?.message || error.message || "Failed to fetch banner ads";
       setError(errorMessage);
-      
+
       // Handle 401 unauthorized - redirect to login
       if (error.response?.status === 401) {
         toast.error("Session expired. Please login again.");
@@ -106,7 +106,7 @@ const BannerAdsPage = () => {
         navigate("/login", { state: { returnUrl: "/admin/banner-ads" } });
         return;
       }
-      
+
       toast.error(errorMessage);
     } finally {
       setLoading(false);
@@ -116,7 +116,7 @@ const BannerAdsPage = () => {
   const handleDelete = async (ad) => {
     // Handle both object and ID
     const adId = ad?._id || ad?.id || ad;
-    
+
     if (!window.confirm("Are you sure you want to delete this banner ad?")) {
       return;
     }
@@ -219,62 +219,60 @@ const BannerAdsPage = () => {
   }
 
   return (
-    <div className="p-4 sm:p-6 bg-[#0A1330] min-h-screen">
+    <div className="p-4 lg:p-6 pb-24 lg:pb-6 bg-[#0A1330] min-h-screen">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
-          <div>
-            <h1 className="text-2xl sm:text-3xl font-bold text-white mb-2">Banner Ads</h1>
-            <p className="text-[#AEB9E1] text-sm sm:text-base">
-              Manage promotional banner ads displayed on the home page
-            </p>
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
+          <div className="flex flex-col gap-1">
+            <h1 className="text-2xl sm:text-3xl font-bold text-white px-1 mt-2">Banner Ads</h1>
+            <p className="text-[#AEB9E1] px-1 text-sm opacity-60">Manage your promotional campaigns.</p>
           </div>
           <button
             onClick={handleAddNew}
-            className="flex items-center gap-2 bg-gradient-to-r from-[#9945FF] to-[#14F195] text-white px-4 py-2 rounded-lg hover:scale-105 transition-transform"
+            className="flex items-center justify-center gap-2 bg-gradient-to-r from-[#9945FF] to-[#14F195] text-white px-6 py-3.5 rounded-2xl font-bold hover:opacity-90 transition-all active:scale-95 shadow-xl shadow-[#14F19522] w-full sm:w-auto text-sm"
           >
-            <FaPlus />
-            <span>Add New Banner Ad</span>
+            <FaPlus className="text-xs" />
+            Add New Ad
           </button>
         </div>
 
-        {/* Filters */}
-        <div className="mb-6">
-          <ReusableFilter
-            filters={filters}
-            setFilters={setFilters}
-            filterFields={[
-              {
-                name: "search",
-                type: "text",
-                placeholder: "Search by title or property...",
-              },
-              {
-                name: "isActive",
-                type: "select",
-                placeholder: "All Status",
-                options: [
-                  { value: "", label: "All Status" },
-                  { value: "true", label: "Active" },
-                  { value: "false", label: "Inactive" },
-                ],
-              },
-            ]}
-          />
-        </div>
+        {/* Content Card */}
+        <div className="bg-[#121B36] rounded-[32px] border border-[#FFFFFF0D] shadow-2xl overflow-hidden">
+          {/* Filters Area */}
+          <div className="p-6 pb-2">
+            <ReusableFilter
+              searchValue={filters.search}
+              onSearchChange={(val) => setFilters({ ...filters, search: val })}
+              searchPlaceholder="Search ads by title..."
+              filters={[
+                {
+                  key: "isActive",
+                  label: "All Status",
+                  selectedValue: filters.isActive === "true" ? "Active" : filters.isActive === "false" ? "Inactive" : "All Status",
+                  options: [
+                    { value: "", label: "All Status" },
+                    { value: "true", label: "Active" },
+                    { value: "false", label: "Inactive" },
+                  ]
+                }
+              ]}
+              onFilterChange={(key, val) => setFilters({ ...filters, [key]: val === "Active" ? "true" : val === "Inactive" ? "false" : "" })}
+            />
+          </div>
 
-        {/* Table */}
-        <div className="bg-[#171D41] rounded-lg shadow-lg border border-[#3A3A4E] overflow-x-auto overflow-y-visible">
-          <ReusableTable
-            columns={columns}
-            data={bannerAds}
-            isLoading={loading}
-            onView={handleView}
-            onEdit={handleEdit}
-            onDelete={handleDelete}
-            tableType="bannerAds"
-            emptyMessage="No banner ads found. Click 'Add New Banner Ad' to create one."
-          />
+          {/* Table Area */}
+          <div className="p-0 sm:p-4">
+            <ReusableTable
+              columns={columns}
+              data={bannerAds}
+              isLoading={loading}
+              onView={handleView}
+              onEdit={handleEdit}
+              onDelete={handleDelete}
+              tableType="bannerAds"
+              emptyMessage="No banner ads found."
+            />
+          </div>
         </div>
 
         {/* Pagination */}

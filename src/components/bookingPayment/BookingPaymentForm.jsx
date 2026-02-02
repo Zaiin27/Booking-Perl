@@ -1,32 +1,26 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { useStripe, useElements } from '@stripe/react-stripe-js';
-import StripeCardElement from "../StripeCardElement.jsx";
 import { toast } from "react-hot-toast";
 import axios from "../../utils/axios";
-import { FaArrowLeft, FaCheckCircle, FaCreditCard, FaHotel, FaMobile, FaWallet } from "react-icons/fa";
+import { FaArrowLeft, FaCheckCircle, FaHotel, FaMobile, FaWallet } from "react-icons/fa";
 
 const BookingPaymentForm = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const bookingReference = searchParams.get('booking');
-  
-  const stripe = useStripe();
-  const elements = useElements();
-  
+
   const [booking, setBooking] = useState(null);
   const [loading, setLoading] = useState(true);
   const [processing, setProcessing] = useState(false);
-  const [cardError, setCardError] = useState(null);
-  const [paymentMethod, setPaymentMethod] = useState('stripe');
+  const [paymentMethod, setPaymentMethod] = useState('jazzcash');
   const [mobileNumber, setMobileNumber] = useState('');
 
   // Format currency based on booking currency
   const formatCurrency = (amount) => {
     if (!amount && amount !== 0) return "N/A";
-    
+
     const currency = booking?.currency || "USD";
-    
+
     // Support for PKR/Rs (Pakistani Rupees)
     if (currency === "PKR" || currency === "Rs" || currency === "RS" || currency === "pkr") {
       // Format PKR with comma separators and "Rs" prefix
@@ -36,7 +30,7 @@ const BookingPaymentForm = () => {
       }).format(amount);
       return `Rs ${formattedAmount}`;
     }
-    
+
     // Default to USD format
     return new Intl.NumberFormat("en-US", {
       style: "currency",
@@ -44,15 +38,6 @@ const BookingPaymentForm = () => {
       minimumFractionDigits: 2,
       maximumFractionDigits: 2,
     }).format(amount);
-  };
-
-  // Get currency for payment API calls
-  const getPaymentCurrency = () => {
-    const currency = booking?.currency || "USD";
-    if (currency === "PKR" || currency === "Rs" || currency === "RS" || currency === "pkr") {
-      return "PKR";
-    }
-    return "usd"; // Stripe uses lowercase "usd"
   };
 
   // Fetch booking details
@@ -88,9 +73,7 @@ const BookingPaymentForm = () => {
     setProcessing(true);
 
     try {
-      if (paymentMethod === 'stripe') {
-        await handleStripePayment();
-      } else if (paymentMethod === 'jazzcash') {
+      if (paymentMethod === 'jazzcash') {
         await handleJazzCashPayment();
       } else if (paymentMethod === 'easypaisa') {
         await handleEasyPaisaPayment();
@@ -100,60 +83,6 @@ const BookingPaymentForm = () => {
       toast.error("Payment failed. Please try again.");
     } finally {
       setProcessing(false);
-    }
-  };
-
-  const handleStripePayment = async () => {
-    if (!stripe || !elements) {
-      toast.error("Stripe is not loaded yet. Please try again.");
-      return;
-    }
-
-    const cardElement = elements.getElement('cardNumber');
-    if (!cardElement) {
-      toast.error("Card element not found. Please try again.");
-      return;
-    }
-
-    if (cardError) {
-      toast.error(cardError);
-      return;
-    }
-
-    // Create payment intent for booking
-    const response = await axios.post("/api/v1/payments/create-booking-payment-intent", {
-      amount: booking.totalAmount,
-      currency: getPaymentCurrency(),
-      booking_reference: booking.bookingReference,
-      booking_id: booking.booking_id,
-      description: `Payment for booking ${booking.bookingReference}`,
-    });
-
-    if (response.data.success) {
-      const { client_secret } = response.data.data;
-      
-      const { error, paymentIntent } = await stripe.confirmCardPayment(client_secret, {
-        payment_method: {
-          card: cardElement,
-        }
-      });
-
-      if (error) {
-        console.log("Stripe confirmation error:", error);
-        toast.error(error.message);
-      } else if (paymentIntent.status === 'succeeded') {
-        toast.success("Payment processed successfully! Your booking is confirmed.");
-        navigate("/booking-success", { 
-          state: { 
-            booking: booking,
-            paymentIntent: paymentIntent 
-          } 
-        });
-      } else {
-        toast.error("Payment was not successful. Please try again.");
-      }
-    } else {
-      toast.error("Failed to create payment intent. Please try again.");
     }
   };
 
@@ -174,22 +103,22 @@ const BookingPaymentForm = () => {
 
     if (response.data.success) {
       const { transaction_id, payment_url } = response.data.data;
-      
+
       // Show JazzCash payment instructions
       toast.success("JazzCash payment initiated! Please complete payment on your mobile device.");
-      
+
       // Open JazzCash payment URL in new tab
       if (payment_url) {
         window.open(payment_url, '_blank');
       }
-      
+
       // Navigate to payment verification page
-      navigate("/payment-verification", { 
-        state: { 
+      navigate("/payment-verification", {
+        state: {
           booking: booking,
           paymentMethod: 'jazzcash',
           transactionId: transaction_id
-        } 
+        }
       });
     } else {
       toast.error(response.data.message || "Failed to initiate JazzCash payment");
@@ -213,22 +142,22 @@ const BookingPaymentForm = () => {
 
     if (response.data.success) {
       const { transaction_id, payment_url } = response.data.data;
-      
+
       // Show EasyPaisa payment instructions
       toast.success("EasyPaisa payment initiated! Please complete payment on your mobile device.");
-      
+
       // Open EasyPaisa payment URL in new tab
       if (payment_url) {
         window.open(payment_url, '_blank');
       }
-      
+
       // Navigate to payment verification page
-      navigate("/payment-verification", { 
-        state: { 
+      navigate("/payment-verification", {
+        state: {
           booking: booking,
           paymentMethod: 'easypaisa',
           transactionId: transaction_id
-        } 
+        }
       });
     } else {
       toast.error(response.data.message || "Failed to initiate EasyPaisa payment");
@@ -275,13 +204,13 @@ const BookingPaymentForm = () => {
               <FaHotel className="text-blue-400" />
               Booking Summary
             </h2>
-            
+
             <div className="space-y-4">
               <div>
                 <h3 className="text-lg font-semibold text-white">{booking.property_id?.name}</h3>
                 <p className="text-[#AEB9E1]">{booking.property_id?.address}</p>
               </div>
-              
+
               <div className="border-t border-[#3A3A4E] pt-4">
                 <div className="flex justify-between text-[#AEB9E1] mb-2">
                   <span>Guest:</span>
@@ -317,7 +246,7 @@ const BookingPaymentForm = () => {
           {/* Payment Form */}
           <div className="bg-[#171D41] rounded-xl shadow-lg p-6 border border-[#3A3A4E]">
             <h2 className="text-2xl font-semibold mb-6 text-white flex items-center gap-2">
-              <FaCreditCard className="text-green-400" />
+              <FaWallet className="text-green-400" />
               Payment Details
             </h2>
 
@@ -328,31 +257,12 @@ const BookingPaymentForm = () => {
                   Select Payment Method
                 </label>
                 <div className="grid grid-cols-1 gap-3">
-                  {/* Stripe Option */}
-                  <div 
-                    className={`p-4 rounded-lg border-2 cursor-pointer transition-all ${
-                      paymentMethod === 'stripe' 
-                        ? 'border-blue-500 bg-blue-500/10' 
-                        : 'border-[#3A3A4E] hover:border-blue-400'
-                    }`}
-                    onClick={() => setPaymentMethod('stripe')}
-                  >
-                    <div className="flex items-center gap-3">
-                      <FaCreditCard className="text-blue-400 text-xl" />
-                      <div>
-                        <h3 className="text-white font-semibold">Credit/Debit Card</h3>
-                        <p className="text-[#AEB9E1] text-sm">Pay securely with Stripe</p>
-                      </div>
-                    </div>
-                  </div>
-
                   {/* JazzCash Option */}
-                  <div 
-                    className={`p-4 rounded-lg border-2 cursor-pointer transition-all ${
-                      paymentMethod === 'jazzcash' 
-                        ? 'border-green-500 bg-green-500/10' 
-                        : 'border-[#3A3A4E] hover:border-green-400'
-                    }`}
+                  <div
+                    className={`p-4 rounded-lg border-2 cursor-pointer transition-all ${paymentMethod === 'jazzcash'
+                      ? 'border-green-500 bg-green-500/10'
+                      : 'border-[#3A3A4E] hover:border-green-400'
+                      }`}
                     onClick={() => setPaymentMethod('jazzcash')}
                   >
                     <div className="flex items-center gap-3">
@@ -365,12 +275,11 @@ const BookingPaymentForm = () => {
                   </div>
 
                   {/* EasyPaisa Option */}
-                  <div 
-                    className={`p-4 rounded-lg border-2 cursor-pointer transition-all ${
-                      paymentMethod === 'easypaisa' 
-                        ? 'border-purple-500 bg-purple-500/10' 
-                        : 'border-[#3A3A4E] hover:border-purple-400'
-                    }`}
+                  <div
+                    className={`p-4 rounded-lg border-2 cursor-pointer transition-all ${paymentMethod === 'easypaisa'
+                      ? 'border-purple-500 bg-purple-500/10'
+                      : 'border-[#3A3A4E] hover:border-purple-400'
+                      }`}
                     onClick={() => setPaymentMethod('easypaisa')}
                   >
                     <div className="flex items-center gap-3">
@@ -403,33 +312,15 @@ const BookingPaymentForm = () => {
                 </div>
               )}
 
-              {/* Stripe Card Information */}
-              {paymentMethod === 'stripe' && (
-                <div>
-                  <label className="block text-sm font-medium text-[#AEB9E1] mb-2">
-                    Card Information
-                  </label>
-                  <StripeCardElement
-                    onError={(error) => setCardError(error.message)}
-                    onSuccess={() => setCardError(null)}
-                  />
-                  {cardError && (
-                    <p className="text-red-400 text-sm mt-2">{cardError}</p>
-                  )}
-                </div>
-              )}
-
               <div className="bg-[#2A2A3E] rounded-lg p-4 border border-[#3A3A4E]">
                 <div className="flex items-center gap-2 text-[#AEB9E1] mb-2">
                   <FaCheckCircle className="text-green-400" />
                   <span className="text-sm">
-                    {paymentMethod === 'stripe' && "Secure payment powered by Stripe"}
                     {paymentMethod === 'jazzcash' && "Secure payment via JazzCash"}
                     {paymentMethod === 'easypaisa' && "Secure payment via EasyPaisa"}
                   </span>
                 </div>
                 <p className="text-xs text-[#AEB9E1]">
-                  {paymentMethod === 'stripe' && "Your payment information is encrypted and secure. We never store your card details."}
                   {paymentMethod === 'jazzcash' && "Your payment will be processed securely through JazzCash. You'll receive a confirmation SMS."}
                   {paymentMethod === 'easypaisa' && "Your payment will be processed securely through EasyPaisa. You'll receive a confirmation SMS."}
                 </p>
@@ -437,7 +328,7 @@ const BookingPaymentForm = () => {
 
               <button
                 onClick={handlePayment}
-                disabled={processing || (paymentMethod === 'stripe' && (!stripe || !elements))}
+                disabled={processing}
                 className="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-gray-600 disabled:cursor-not-allowed text-white font-semibold py-4 px-6 rounded-lg transition flex items-center justify-center gap-2"
               >
                 {processing ? (
@@ -447,7 +338,6 @@ const BookingPaymentForm = () => {
                   </>
                 ) : (
                   <>
-                    {paymentMethod === 'stripe' && <FaCreditCard />}
                     {paymentMethod === 'jazzcash' && <FaMobile />}
                     {paymentMethod === 'easypaisa' && <FaWallet />}
                     Pay {formatCurrency(booking.totalAmount)}

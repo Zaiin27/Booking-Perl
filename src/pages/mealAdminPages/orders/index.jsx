@@ -17,7 +17,7 @@ const OrdersPage = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [modalState, setModalState] = useState({
     isOpen: false,
-    mode: "view", 
+    mode: "view",
     order: null,
   });
   const [deleteConfirmState, setDeleteConfirmState] = useState({
@@ -49,7 +49,7 @@ const OrdersPage = () => {
   });
 
   const [debouncedSearchQuery, setDebouncedSearchQuery] = useState(searchQuery);
-  
+
   const [debouncedFilters, setDebouncedFilters] = useState(filters);
 
   const [isFilterLoading, setIsFilterLoading] = useState(false);
@@ -58,24 +58,24 @@ const OrdersPage = () => {
     if (searchQuery !== debouncedSearchQuery && searchQuery !== "") {
       setIsFilterLoading(true);
     }
-    
+
     const timer = setTimeout(() => {
       setDebouncedSearchQuery(searchQuery);
       setIsFilterLoading(false);
-    }, 2000); 
+    }, 2000);
 
     return () => clearTimeout(timer);
   }, [searchQuery, debouncedSearchQuery]);
 
   useEffect(() => {
-    if (JSON.stringify(filters) !== JSON.stringify(debouncedFilters) && 
-        (filters.status.selectedValue !== "All Statuses" || 
-         filters.payment.selectedValue !== "All Payment Types")) {
+    if (JSON.stringify(filters) !== JSON.stringify(debouncedFilters) &&
+      (filters.status.selectedValue !== "All Statuses" ||
+        filters.payment.selectedValue !== "All Payment Types")) {
       setIsFilterLoading(true);
     }
 
-    
-    
+
+
     const timer = setTimeout(() => {
       setDebouncedFilters(filters);
       setIsFilterLoading(false);
@@ -87,7 +87,7 @@ const OrdersPage = () => {
   const queryParams = useMemo(() => ({
     page: currentPage,
     limit: 20,
-    ...(debouncedSearchQuery && { q: debouncedSearchQuery }), 
+    ...(debouncedSearchQuery && { q: debouncedSearchQuery }),
     ...(debouncedFilters.status.selectedValue !== "All Statuses" && { status: debouncedFilters.status.selectedValue }),
     ...(debouncedFilters.payment.selectedValue !== "All Payment Types" && { payment: debouncedFilters.payment.selectedValue }),
   }), [currentPage, debouncedSearchQuery, debouncedFilters]);
@@ -105,12 +105,12 @@ const OrdersPage = () => {
 
 
 
-  const ordersData = Array.isArray(ordersResponse?.data?.orders) 
-    ? ordersResponse.data.orders 
-    : Array.isArray(ordersResponse?.data) 
-      ? ordersResponse.data 
-      : Array.isArray(ordersResponse) 
-        ? ordersResponse 
+  const ordersData = Array.isArray(ordersResponse?.data?.orders)
+    ? ordersResponse.data.orders
+    : Array.isArray(ordersResponse?.data)
+      ? ordersResponse.data
+      : Array.isArray(ordersResponse)
+        ? ordersResponse
         : [];
   const totalItems = ordersResponse?.data?.total || ordersResponse?.total || ordersResponse?.count || 0;
   const totalPages = Math.ceil(totalItems / 20) || 1;
@@ -118,27 +118,27 @@ const OrdersPage = () => {
   const transformOrderData = (orders) => {
     return orders.map(order => {
       return {
-      id: order.order_id,
-      _id: order._id,
-      order_id: order.order_id,
-      timestamp: order.timestamp ? new Date(order.timestamp).toLocaleString() : "N/A",
-      customerEmail: order.customer_email || "N/A",
-      customer_email: order.customer_email || "N/A",
-      amount: order.amount !== null && order.amount !== undefined && !isNaN(parseFloat(order.amount)) ? parseFloat(order.amount) : 0,
-      payment: order.payment || "No", 
-      discount: order.discount ? `${order.discount}%` : "0",
-      status: order.status || "PENDING",
-      assignedStaff: order.assigned_staff ? 
-        (typeof order.assigned_staff === 'object' ? 
-          (order.assigned_staff.name || "Unassigned") : 
-          "Unassigned") : 
-        "Unassigned",
-      assigned_staff: order.assigned_staff ? 
-        (typeof order.assigned_staff === 'object' ? 
-          (order.assigned_staff.name || "Unassigned") : 
-          "Unassigned") : 
-        "Unassigned",
-      cart_link: order.cart_link
+        id: order.order_id,
+        _id: order._id,
+        order_id: order.order_id,
+        timestamp: order.timestamp ? new Date(order.timestamp).toLocaleString() : "N/A",
+        customerEmail: order.customer_email || "N/A",
+        customer_email: order.customer_email || "N/A",
+        amount: order.amount !== null && order.amount !== undefined && !isNaN(parseFloat(order.amount)) ? parseFloat(order.amount) : 0,
+        payment: order.payment || "No",
+        discount: order.discount ? `${order.discount}%` : "0",
+        status: order.status || "PENDING",
+        assignedStaff: order.assigned_staff ?
+          (typeof order.assigned_staff === 'object' ?
+            (order.assigned_staff.name || "Unassigned") :
+            "Unassigned") :
+          "Unassigned",
+        assigned_staff: order.assigned_staff ?
+          (typeof order.assigned_staff === 'object' ?
+            (order.assigned_staff.name || "Unassigned") :
+            "Unassigned") :
+          "Unassigned",
+        cart_link: order.cart_link
       };
     });
   };
@@ -166,38 +166,38 @@ const OrdersPage = () => {
       },
     }));
     setCurrentPage(1);
-    
+
     setIsFilterLoading(true);
   };
 
   const handleSearchChange = (value) => {
     setSearchQuery(value);
     setCurrentPage(1);
-    
+
     if (value !== debouncedSearchQuery) {
       setIsFilterLoading(true);
     }
   };
-  
+
 
   const handleStatusUpdate = async (row, newStatus) => {
     const orderId = row._id || row.order_id || row.id;
     const loadingToast = toastUtils.loading(`Updating order ${orderId} status...`);
-    
+
     try {
-      await updateOrderStatus({ 
-        orderId, 
-        status: newStatus 
+      await updateOrderStatus({
+        orderId,
+        status: newStatus
       }).unwrap();
-      
+
       toastUtils.dismiss(loadingToast);
-      
+
       toastUtils.success(`Order ${orderId} status updated to ${newStatus} successfully!`);
-      
+
       refetch();
     } catch (error) {
       toastUtils.dismiss(loadingToast);
-      
+
       toastUtils.error(`Failed to update order ${orderId} status. Please try again.`);
     }
   };
@@ -251,7 +251,7 @@ const OrdersPage = () => {
 
   const closeModal = () => {
     setModalState({ isOpen: false, mode: "view", order: null });
-    
+
     setTimeout(() => {
       document.body.style.overflow = "unset";
     }, 150);
@@ -272,17 +272,16 @@ const OrdersPage = () => {
     { label: "Assigned Staff", key: "assigned_staff" },
   ];
 
-  const csvData = Array.isArray(transformedOrdersData) 
+  const csvData = Array.isArray(transformedOrdersData)
     ? transformedOrdersData.map((order) => ({
-    ...order,
-        amount: typeof order.amount === 'number' ? `$${order.amount.toFixed(2)}` : `$${order.amount}`,
-        discount: `${order.discount || 0}%`,
-      }))
+      ...order,
+      amount: typeof order.amount === 'number' ? `$${order.amount.toFixed(2)}` : `$${order.amount}`,
+      discount: `${order.discount || 0}%`,
+    }))
     : [];
 
-  const csvFilename = `orders_export_${
-    new Date().toISOString().split("T")[0]
-  }.csv`;
+  const csvFilename = `orders_export_${new Date().toISOString().split("T")[0]
+    }.csv`;
 
   if (isLoading && !ordersResponse) {
     return <PageLoading message="Loading orders..." />;
@@ -303,60 +302,60 @@ const OrdersPage = () => {
   }
 
   return (
-    <div className="p-6">
-      <div className="flex flex-col bg-[#171D41] rounded-t-lg p-6">
-        <div className="flex items-center justify-between mb-6">
-          <h1 className="text-2xl font-bold text-white">Orders</h1>
+    <div className="p-4 lg:p-6 pb-24 lg:pb-6 bg-[#0A1330] min-h-screen">
+      <div className="max-w-7xl mx-auto">
+        {/* Header Section */}
+        <div className="flex flex-col gap-1 mb-8">
+          <h1 className="text-2xl sm:text-3xl font-black text-white px-1 mt-2">Product Orders</h1>
+          <p className="text-[#AEB9E1] px-1 text-sm opacity-60">Monitor and manage all incoming product orders.</p>
+        </div>
 
-          <div className="flex-1 ml-8">
+        {/* Main Content Card */}
+        <div className="bg-[#121B36] rounded-[32px] border border-[#FFFFFF0D] shadow-2xl overflow-hidden relative">
+          <LoadingOverlay
+            isLoading={isLoading || isFilterLoading}
+            message={isFilterLoading ? "Searching..." : "Loading orders..."}
+          />
+
+          {/* Filters Area */}
+          <div className="p-6 pb-2">
             <ReusableFilter
               filters={Object.values(filters)}
               onFilterChange={handleFilterChange}
-              searchPlaceholder="Order ID..."
+              searchPlaceholder="Search order ID..."
               onSearchChange={handleSearchChange}
               searchValue={searchQuery}
             />
           </div>
-        </div>
 
-        {/* Orders Table */}
-        <div className="bg-[#171D41] rounded-lg border border-[#EDEDED33] p-4 relative">
-          <LoadingOverlay 
-            isLoading={isLoading || isFilterLoading}
-            message={
-              isLoading && !ordersResponse
-                ? "Loading orders..." 
-                : isFilterLoading 
-                  ? (searchQuery !== debouncedSearchQuery ? "Searching..." : "Applying filters...") 
-                  : "Loading orders..."
-            }
-          />
-          
-          <ReusableTable
-            columns={columns}
-            data={currentData}
-            onRowClick={handleRowClick}
-            selectedRow={selectedRow}
-            actions={true}
-            onView={handleViewOrder}
-            onEdit={handleEditOrder}
-            onDelete={handleDeleteOrder}
-            onStatusChange={handleStatusUpdate}
-            tableType="orders"
-          />
-        </div>
-      </div>
+          {/* Table Area */}
+          <div className="p-0 sm:p-4">
+            <ReusableTable
+              columns={columns}
+              data={currentData}
+              onRowClick={handleRowClick}
+              selectedRow={selectedRow}
+              actions={true}
+              onView={handleViewOrder}
+              onEdit={handleEditOrder}
+              onDelete={handleDeleteOrder}
+              onStatusChange={handleStatusUpdate}
+              tableType="orders"
+            />
+          </div>
 
-        {/* Pagination */}
-      <div className="bg-[#171D41] rounded-b-lg px-3 pb-3">
-        <ReusablePagination
-          currentPage={currentPage}
-          totalPages={totalPages}
-          onPageChange={handlePageChange}
-          totalItems={totalItems}
-          itemsPerPage={itemsPerPage}
-          showPageInfo={true}
-        />
+          {/* Pagination */}
+          <div className="px-3 pb-3">
+            <ReusablePagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              onPageChange={handlePageChange}
+              totalItems={totalItems}
+              itemsPerPage={itemsPerPage}
+              showPageInfo={true}
+            />
+          </div>
+        </div>
       </div>
 
       {/* Hidden CSV Export */}

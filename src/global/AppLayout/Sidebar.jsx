@@ -70,9 +70,7 @@ function Sidebar({ isMobileSidebarOpen, toggleSidebar, setActivePage }) {
           { path: "/admin/staff", name: "Staff", icon: StaffIcon },
           { path: "/admin/contacts", name: "Contacts", icon: FiMail },
         ],
-        bottom: [
-          { path: "/admin/settings", name: "Settings", icon: SettingsIcon },
-        ],
+        bottom: [],
       },
       staff: {
         main: [
@@ -80,9 +78,7 @@ function Sidebar({ isMobileSidebarOpen, toggleSidebar, setActivePage }) {
           { path: "/staff/properties", name: "Properties", icon: FaBuilding },
           { path: "/staff/bookings", name: "Bookings", icon: FaCalendarCheck },
         ],
-        bottom: [
-          { path: "/staff/settings", name: "Settings", icon: SettingsIcon },
-        ],
+        bottom: [],
       },
       "company-owner": {
         main: [
@@ -104,11 +100,6 @@ function Sidebar({ isMobileSidebarOpen, toggleSidebar, setActivePage }) {
             icon: TicketsIcon,
           },
           { path: "/company-owner/profile", name: "Profile", icon: StaffIcon },
-          {
-            path: "/company-owner/settings",
-            name: "Settings",
-            icon: SettingsIcon,
-          },
         ],
       },
       user: {
@@ -134,11 +125,6 @@ function Sidebar({ isMobileSidebarOpen, toggleSidebar, setActivePage }) {
             path: "/user/profile",
             name: "Profile",
             icon: StaffIcon,
-          },
-          {
-            path: "/user/settings",
-            name: "Settings",
-            icon: SettingsIcon,
           },
         ],
       },
@@ -191,7 +177,7 @@ function Sidebar({ isMobileSidebarOpen, toggleSidebar, setActivePage }) {
       navigate("/login");
     }
   };
-  const isMobile = window.innerWidth <= 768; // Adjust the breakpoint as needed
+  const isMobile = window.innerWidth < 1024; // Adjust the breakpoint as needed
 
   const handleClickMobile = () => {
     if (isMobile) {
@@ -258,12 +244,12 @@ function Sidebar({ isMobileSidebarOpen, toggleSidebar, setActivePage }) {
     console.log("Menu items:", menuItems);
 
     return (
-      <div className="sidebar-content w-[18.5625rem] bg-[#060B27] flex flex-col h-[100vh] relative pl-0 sm:pl-4 py-0 sm:py-4">
+      <div className="sidebar-content w-[18.5625rem] bg-[#060B27] flex flex-col h-full relative pl-0 sm:pl-4 py-0 sm:py-4">
         <div className="bg-[#121B36] rounded-lg flex flex-col h-full">
           {/* Mobile close button */}
           <button
             onClick={toggleSidebar}
-            className="absolute top-4 right-4 text-white/70 hover:text-white md:hidden z-50"
+            className="absolute top-4 right-4 text-white/70 hover:text-white lg:hidden z-50"
           >
             <XIcon size={20} />
           </button>
@@ -276,7 +262,7 @@ function Sidebar({ isMobileSidebarOpen, toggleSidebar, setActivePage }) {
           </div>
 
           {/* Navigation Section */}
-          <nav className="flex-1 px-4">
+          <nav className="flex-1 px-4 overflow-y-auto scrollbar-hide">
             <div className="space-y-1">
               {finalMenuItems?.main?.map((item, index) => (
                 <div key={index}>{renderNavLink(item)}</div>
@@ -291,6 +277,18 @@ function Sidebar({ isMobileSidebarOpen, toggleSidebar, setActivePage }) {
               {finalMenuItems?.bottom?.map((item, index) => (
                 <div key={index}>{renderNavLink(item)}</div>
               ))}
+              {/* Logout Button moved here */}
+              <button
+                onClick={handleLogout}
+                className="flex items-center w-full h-[42px] pl-[10px] pr-4 gap-[10px] text-white/70 hover:bg-white/5 hover:text-white transition-all duration-200 rounded-md cursor-pointer group"
+              >
+                <div className="w-5 h-5 flex items-center justify-center text-white/70 group-hover:text-white">
+                  <LogoutIcon color="currentColor" />
+                </div>
+                <span className="text-[15px] font-medium leading-[25px] font-inter">
+                  Log out
+                </span>
+              </button>
             </div>
           </nav>
 
@@ -352,18 +350,7 @@ function Sidebar({ isMobileSidebarOpen, toggleSidebar, setActivePage }) {
               </button>
             </div>
 
-            {/* Logout Button */}
-            <button
-              onClick={handleLogout}
-              className="flex items-center w-full h-[42px] pl-[10px] pr-4 gap-[10px] text-[#EDEDED] rounded-lg bg-[#7E89AC33] hover:bg-white/5 transition-all duration-200"
-            >
-              <div className="w-5 h-5 flex items-center justify-center">
-                <LogoutIcon color="#EDEDED" />
-              </div>
-              <span className="text-sm font-medium leading-[25px] font-inter">
-                Log out
-              </span>
-            </button>
+
           </div>
         </div>
       </div>
@@ -373,14 +360,14 @@ function Sidebar({ isMobileSidebarOpen, toggleSidebar, setActivePage }) {
   return (
     <>
       {/* Desktop Sidebar - always visible on larger screens */}
-      <aside className="hidden md:block mt-0 bg-[#1A202C]">
+      <aside className="hidden lg:block mt-0 bg-[#1A202C] h-full">
         {renderSidebarContent()}
       </aside>
 
       {/* Mobile Sidebar - only visible when toggled */}
       <aside
-        className={`fixed inset-y-0 left-0 z-50 transform transition-transform duration-300 ease-in-out ${isMobileSidebarOpen ? "translate-x-0" : "-translate-x-full"
-          } md:hidden`}
+        className={`fixed top-0 h-[100vh] left-0 z-[60] transform transition-transform duration-300 ease-in-out ${isMobileSidebarOpen ? "translate-x-0" : "-translate-x-full"
+          } lg:hidden`}
       >
         {renderSidebarContent()}
       </aside>
@@ -388,7 +375,7 @@ function Sidebar({ isMobileSidebarOpen, toggleSidebar, setActivePage }) {
       {/* Overlay when mobile sidebar is open */}
       {isMobileSidebarOpen && (
         <div
-          className="fixed inset-0 bg-black/30 z-40 md:hidden"
+          className="fixed inset-0 bg-black/30 z-[55] lg:hidden"
           onClick={toggleSidebar}
         />
       )}

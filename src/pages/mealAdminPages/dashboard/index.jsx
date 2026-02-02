@@ -103,7 +103,7 @@ const AdminDashboard = () => {
   // Format currency
   const formatCurrency = (amount) => {
     if (!amount && amount !== 0) return "N/A";
-    
+
     // Support for PKR/Rs (Pakistani Rupees)
     if (currency === "PKR" || currency === "Rs" || currency === "RS" || currency === "pkr") {
       const formattedAmount = new Intl.NumberFormat("en-PK", {
@@ -112,7 +112,7 @@ const AdminDashboard = () => {
       }).format(amount);
       return `Rs ${formattedAmount}`;
     }
-    
+
     // Default to USD format
     return new Intl.NumberFormat("en-US", {
       style: "currency",
@@ -123,9 +123,17 @@ const AdminDashboard = () => {
   };
 
   return (
-    <div className="p-4 sm:p-6 bg-[#0A1330] min-h-screen">
+    <div className="p-4 sm:p-6 bg-[#0A1330] min-h-screen pb-24 md:pb-6">
+      {/* Mobile Welcome Section */}
+      <div className="md:hidden mb-6 mt-2">
+        <h2 className="text-2xl font-bold text-white">Hey, {user?.name?.split(' ')[0] || 'Admin'}! 👋</h2>
+        <p className="text-[#AEB9E1] text-sm opacity-60">Here's your business performance today.</p>
+      </div>
+
       {/* Subscription Status */}
-      <SubscriptionStatus showUpgrade={true} />
+      <div className="mb-6">
+        <SubscriptionStatus showUpgrade={true} />
+      </div>
 
       {/* Stat Cards Section */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">

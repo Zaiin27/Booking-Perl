@@ -9,7 +9,7 @@ import StaffDetailsModal from "./features/StaffDetailsModal";
 import AddStaffMember from "./features/AddStaffMember";
 import ConfirmModal from "../../../components/ConfirmModal";
 import PageLoading from "../../../components/PageLoading";
-import { useGetAdminUsersQuery, useGetSingleStaffQuery, useActivateStaffMutation, useDeactivateStaffMutation, useUpdateStaffMutation, useChangeStaffPasswordMutation, useCreateStaffMutation, useDeleteUserMutation } from "../../../services/admin/adminApi";
+import { useGetAdminUsersQuery, useGetSingleStaffQuery, useActivateStaffMutation, useDeactivateStaffMutation, useUpdateStaffMutation, useChangeStaffPasswordMutation, useCreateStaffMutation, useDeleteUserMutation, useUpdateStaffCommissionStatusMutation } from "../../../services/admin/adminApi";
 import toast from "react-hot-toast";
 
 const StaffPage = () => {
@@ -62,7 +62,7 @@ const StaffPage = () => {
 
   // Debounced search query
   const [debouncedSearchQuery, setDebouncedSearchQuery] = useState(searchQuery);
-  
+
   // Debounced filters
   const [debouncedFilters, setDebouncedFilters] = useState(filters);
 
@@ -74,7 +74,7 @@ const StaffPage = () => {
     if (searchQuery !== debouncedSearchQuery && searchQuery !== "") {
       setIsFilterLoading(true);
     }
-    
+
     const timer = setTimeout(() => {
       setDebouncedSearchQuery(searchQuery);
       setIsFilterLoading(false);
@@ -85,12 +85,12 @@ const StaffPage = () => {
 
   useEffect(() => {
     // Only show loading when filters actually change (not on initial load)
-    if (JSON.stringify(filters) !== JSON.stringify(debouncedFilters) && 
-        (filters.status.selectedValue !== "All Statuses" || 
-         filters.role.selectedValue !== "All Roles")) {
+    if (JSON.stringify(filters) !== JSON.stringify(debouncedFilters) &&
+      (filters.status.selectedValue !== "All Statuses" ||
+        filters.role.selectedValue !== "All Roles")) {
       setIsFilterLoading(true);
     }
-    
+
     const timer = setTimeout(() => {
       setDebouncedFilters(filters);
       setIsFilterLoading(false);
@@ -104,7 +104,7 @@ const StaffPage = () => {
     page: currentPage,
     limit: 5,
     ...(debouncedSearchQuery && { q: debouncedSearchQuery }),
-    ...(debouncedFilters.status.selectedValue !== "All Statuses" && { 
+    ...(debouncedFilters.status.selectedValue !== "All Statuses" && {
       active: debouncedFilters.status.selectedValue === "Active" ? true : false
     }),
     ...(debouncedFilters.role.selectedValue !== "All Roles" && { role: debouncedFilters.role.selectedValue }),
@@ -127,6 +127,7 @@ const StaffPage = () => {
   const [changeStaffPassword, { isLoading: isChangingPassword }] = useChangeStaffPasswordMutation();
   const [createStaff, { isLoading: isCreating }] = useCreateStaffMutation();
   const [deleteUser, { isLoading: isDeleting }] = useDeleteUserMutation();
+  const [updateStaffCommissionStatus, { isLoading: isUpdatingCommission }] = useUpdateStaffCommissionStatusMutation();
 
   // Get single staff data for edit modal
   const staffId = modalState.staff?._id || modalState.staff?.id;
@@ -144,8 +145,8 @@ const StaffPage = () => {
 
 
   // Extract data from API response with proper validation
-  const apiStaffData = Array.isArray(usersResponse?.data?.users) 
-    ? usersResponse.data.users 
+  const apiStaffData = Array.isArray(usersResponse?.data?.users)
+    ? usersResponse.data.users
     : [];
 
   // Fallback static data for when API is not available
@@ -190,17 +191,17 @@ const StaffPage = () => {
   // Transform API data to match table structure
   const transformApiData = (users) => {
     return users.map(user => {
-      
-      const displayName = user.hasOwnProperty('name') && user.name && user.name.trim() !== '' 
-        ? user.name 
-        : 'N/A'; 
-      
+
+      const displayName = user.hasOwnProperty('name') && user.name && user.name.trim() !== ''
+        ? user.name
+        : 'N/A';
+
       return {
         id: user.id,
-        _id: user.id, 
+        _id: user.id,
         name: displayName,
         email: user.email,
-        role: user.role.charAt(0).toUpperCase() + user.role.slice(1), 
+        role: user.role.charAt(0).toUpperCase() + user.role.slice(1),
         status: user.isActive ? 'Active' : 'Inactive',
         isVerified: user.isVerified,
         createdAt: user.createdAt
@@ -248,13 +249,13 @@ const StaffPage = () => {
 
       // Close add staff modal
       setAddStaffModalOpen(false);
-      
+
       // Refetch data to show the new staff member
       refetch();
     } catch (error) {
       console.error("Error creating staff:", error?.data?.message || error?.message);
       console.error("Full error:", error);
-      
+
       // Show error toast
       toast.error(error?.data?.message || error?.message || "Failed to create staff member");
     }
@@ -289,7 +290,7 @@ const StaffPage = () => {
       },
     }));
     setCurrentPage(1); // Reset to first page when filters change
-    
+
     // Show loading immediately when filter changes
     setIsFilterLoading(true);
   };
@@ -298,7 +299,7 @@ const StaffPage = () => {
   const handleSearchChange = (value) => {
     setSearchQuery(value);
     setCurrentPage(1); // Reset to first page when search changes
-    
+
     // Show loading immediately when user types
     if (value !== debouncedSearchQuery) {
       setIsFilterLoading(true);
@@ -347,20 +348,37 @@ const StaffPage = () => {
     const staffId = staff._id || staff.id;
     console.log("Extracted staffId:", staffId);
     console.log("Navigating to:", `/admin/properties/${staffId}/create`);
-    
+
     if (!staffId) {
       console.error("No staff ID found in staff object:", staff);
       return;
     }
-    
+
     navigate(`/admin/properties/create-for-staff/${staffId}`);
+  };
+
+  // Handle pay commission for staff
+  const handlePayCommission = async (staff) => {
+    try {
+      const staffId = staff._id || staff.id;
+      if (!staffId) {
+        toast.error("Staff ID not found");
+        return;
+      }
+
+      await updateStaffCommissionStatus({ staffId, status: "paid" }).unwrap();
+      toast.success("Staff commission marked as paid successfully!");
+    } catch (error) {
+      console.error("Error updating commission status:", error);
+      toast.error(error?.data?.message || "Failed to update commission status");
+    }
   };
 
   const confirmDeleteStaff = async () => {
     if (deleteConfirmState.staff) {
       try {
         const staffId = deleteConfirmState.staff._id || deleteConfirmState.staff.id;
-        
+
         if (!staffId) {
           console.error("No staff ID found for deletion");
           toast.error("Failed to delete user: User ID not found.");
@@ -377,7 +395,7 @@ const StaffPage = () => {
         toast.error(error?.data?.message || error?.message || "Failed to delete user");
       }
     }
-    
+
     setDeleteConfirmState({
       isOpen: false,
       staff: null,
@@ -387,7 +405,7 @@ const StaffPage = () => {
   const handleSaveStaff = async (updatedStaff) => {
     try {
       const staffId = updatedStaff.data?.id || updatedStaff._id || updatedStaff.id;
-      
+
       if (!staffId) {
         console.error("No staff ID found for update");
         toast.error("Failed to update staff member: Staff ID not found.");
@@ -398,7 +416,7 @@ const StaffPage = () => {
         name: updatedStaff.name,
         email: updatedStaff.email,
         paymentType: updatedStaff.paymentType,
-        role: updatedStaff.role.toLowerCase(), 
+        role: updatedStaff.role.toLowerCase(),
         isActive: updatedStaff.status === "Active"
       };
 
@@ -419,10 +437,10 @@ const StaffPage = () => {
     } catch (error) {
       console.error("Error updating staff:", error?.data?.message || error?.message);
       console.error("Full error:", error);
-      
+
       // Show error toast
       toast.error(error?.data?.message || error?.message || "Failed to update staff member");
-      
+
       // Don't close modal on error, let user see the error
     }
   };
@@ -431,19 +449,19 @@ const StaffPage = () => {
   const handleStatusChange = async (row, newStatus) => {
     try {
       const staffId = row._id || row.id;
-      
+
       if (!staffId) {
         console.error("No staff ID found for status change");
         return;
       }
-      
+
       // Validate MongoDB ObjectId format
       const objectIdRegex = /^[0-9a-fA-F]{24}$/;
       if (!objectIdRegex.test(staffId)) {
         console.error("Invalid staff ID format");
         return;
       }
-      
+
       if (newStatus === "active") {
         await activateStaff(staffId).unwrap();
         toast.success("Staff member activated successfully!");
@@ -476,16 +494,15 @@ const StaffPage = () => {
   ];
 
   // Format data for CSV export
-  const csvData = Array.isArray(staffData) 
+  const csvData = Array.isArray(staffData)
     ? staffData.map((staff) => ({
-        ...staff,
-      }))
+      ...staff,
+    }))
     : [];
 
   // CSV filename with current date
-  const csvFilename = `staff_export_${
-    new Date().toISOString().split("T")[0]
-  }.csv`;
+  const csvFilename = `staff_export_${new Date().toISOString().split("T")[0]
+    }.csv`;
 
   // Loading state
   if (isLoading) {
@@ -584,39 +601,35 @@ const StaffPage = () => {
   }
 
   return (
-    <div className="p-3 lg:p-6">
-      {/* Add Staff Member Button - Add this to your existing header */}
-      <div className="flex justify-end mb-4 lg:mb-6">
+    <div className="p-4 lg:p-6 pb-24 lg:pb-6">
+      {/* Page Header Area */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+        <h2 className="text-2xl lg:text-3xl font-bold text-white">Staff Management</h2>
         <button
           onClick={handleOpenAddStaffModal}
-          className="bg-gradient-to-r from-[#9945FF] to-[#14F195] rounded-full text-white px-4 lg:px-6 py-2 font-medium hover:opacity-90 transition-opacity flex items-center gap-2 text-sm lg:text-base"
+          className="bg-gradient-to-r from-[#9945FF] to-[#14F195] rounded-2xl text-white px-6 py-3.5 font-bold hover:opacity-90 transition-all active:scale-95 flex items-center justify-center gap-2 text-sm shadow-xl shadow-[#14F19522] w-full sm:w-auto"
         >
-          <Plus className="w-4 h-4" />
+          <Plus size={18} strokeWidth={3} />
           Add Staff Member
         </button>
       </div>
 
-      {/* Main Content */}
-      <div className="bg-[#171D41] rounded-t-lg p-6">
-        {/* Staff Table Header */}
-        <div className="flex lg:flex-row lg:items-center justify-between mb-4 lg:mb-6 gap-3 lg:gap-0">
-          <h2 className="text-xl lg:text-2xl font-bold text-white">Staff</h2>
-
-          {/* Table Controls with ReusableFilter */}
-          <div className="w-full lg:flex-1 lg:ml-8">
-            <ReusableFilter
-              filters={Object.values(filters)}
-              onFilterChange={handleFilterChange}
-              searchPlaceholder="Search Staff..."
-              onSearchChange={handleSearchChange}
-              searchValue={searchQuery}
-            />
-          </div>
+      {/* Main Content Card */}
+      <div className="bg-[#121B36] rounded-[32px] border border-[#FFFFFF0D] shadow-2xl overflow-hidden">
+        {/* Search & Filter Section */}
+        <div className="p-6 pb-2">
+          <ReusableFilter
+            filters={Object.values(filters)}
+            onFilterChange={handleFilterChange}
+            searchPlaceholder="Search staff by name or email..."
+            onSearchChange={handleSearchChange}
+            searchValue={searchQuery}
+          />
         </div>
 
         {/* Staff Table */}
-        <div className="bg-[#171D41] rounded-lg border border-[#EDEDED33] p-4">
-    
+        <div className="p-0 sm:p-4">
+
           {Array.isArray(currentData) && currentData.length > 0 ? (
             <ReusableTable
               columns={columns}
@@ -628,6 +641,7 @@ const StaffPage = () => {
               onEdit={handleEditStaff}
               onDelete={handleDeleteStaff}
               onAddProperty={handleAddProperty}
+              onPayCommission={handlePayCommission}
               onStatusChange={handleStatusChange}
               tableType="staff"
               isLoading={isFilterLoading || isLoading}
@@ -638,18 +652,17 @@ const StaffPage = () => {
             </div>
           )}
         </div>
-      </div>
-
-      {/* Pagination */}
-      <div className="bg-[#171D41] rounded-b-lg px-3 pb-3">
-        <ReusablePagination
-          currentPage={currentPage}
-          totalPages={totalPages || 1}
-          onPageChange={handlePageChange}
-          totalItems={totalItems}
-          itemsPerPage={itemsPerPage}
-          showPageInfo={true}
-        />
+        {/* Pagination */}
+        <div className="px-3 pb-3">
+          <ReusablePagination
+            currentPage={currentPage}
+            totalPages={totalPages || 1}
+            onPageChange={handlePageChange}
+            totalItems={totalItems}
+            itemsPerPage={itemsPerPage}
+            showPageInfo={true}
+          />
+        </div>
       </div>
 
       {/* Hidden CSV Export Link */}
@@ -693,9 +706,8 @@ const StaffPage = () => {
         onConfirm={confirmDeleteStaff}
         title="Are you sure?"
         itemName={deleteConfirmState.staff?.name || "Staff Member"}
-        itemDescription={`${deleteConfirmState.staff?.role || "Staff"} - ${
-          deleteConfirmState.staff?.email || "No email"
-        }`}
+        itemDescription={`${deleteConfirmState.staff?.role || "Staff"} - ${deleteConfirmState.staff?.email || "No email"
+          }`}
         itemDate={`Status: ${deleteConfirmState.staff?.status || "Unknown"}`}
         confirmButtonText="Delete"
         type="delete"

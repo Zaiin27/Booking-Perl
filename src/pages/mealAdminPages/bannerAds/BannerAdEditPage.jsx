@@ -5,10 +5,10 @@ import { Formik, Field, Form, ErrorMessage } from "formik";
 import * as Yup from "yup";
 import axios from "../../../utils/axios";
 import { toast } from "react-hot-toast";
-import { 
-  FaArrowLeft, 
+import {
+  FaArrowLeft,
   FaSave,
-  FaImage, 
+  FaImage,
   FaCalendar,
   FaBuilding,
   FaTag,
@@ -76,9 +76,9 @@ const BannerAdEditPage = () => {
           Authorization: `Bearer ${token}`
         } : {},
       });
-      
+
       console.log("Properties API response:", response.data);
-      
+
       if (response.data.success) {
         // Handle different response formats
         const propertiesData = response.data.data?.properties || response.data.data || response.data.properties || [];
@@ -267,41 +267,49 @@ const BannerAdEditPage = () => {
   }
 
   return (
-    <div className="p-4 sm:p-6 bg-[#0A1330] min-h-screen">
-      <div className="max-w-6xl mx-auto">
-        {/* Header */}
-        <div className="flex items-center justify-between mb-6">
+    <div className="p-4 lg:p-6 pb-24 lg:pb-6 bg-[#0A1330] min-h-screen">
+      <div className="max-w-4xl mx-auto">
+        {/* Header Section */}
+        <div className="flex flex-col sm:flex-row sm:items-center gap-6 mb-10 overflow-visible mt-2">
           <button
             onClick={() => navigate(`/admin/banner-ads/${id}`)}
-            className="flex items-center gap-2 text-[#AEB9E1] hover:text-white transition-colors"
+            className="p-3 bg-[#121B36] rounded-xl border border-[#FFFFFF0D] hover:bg-[#1C244D] transition-all self-start shadow-xl"
           >
-            <FaArrowLeft />
-            <span>Back to Details</span>
+            <FaArrowLeft className="text-[#14F195]" size={14} />
           </button>
-          <h1 className="text-2xl sm:text-3xl font-bold text-white">Edit Banner Ad</h1>
-          <div className="w-24"></div> {/* Spacer for centering */}
+          <div className="flex-1 flex flex-col gap-1">
+            <h1 className="text-3xl sm:text-4xl font-bold text-white tracking-tight">Edit Banner</h1>
+            <p className="text-[#AEB9E1] text-xs font-bold uppercase tracking-widest opacity-60">Creative Asset Management</p>
+          </div>
         </div>
 
-        {/* Form */}
-        <div className="bg-[#171D41] rounded-lg shadow-lg border border-[#3A3A4E] overflow-hidden">
-          {/* Banner Image Preview Section */}
-          <div className="relative w-full h-64 md:h-96 bg-gradient-to-r from-purple-900 via-purple-800 to-purple-900">
+        {/* Unified Layout Card */}
+        <div className="bg-[#121B36] rounded-[32px] border border-[#FFFFFF0D] shadow-2xl relative overflow-hidden">
+          <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-[#9945FF] to-[#14F195] opacity-5 blur-3xl -z-10"></div>
+
+          {/* Visual Preview Segment */}
+          <div className="relative w-full h-64 md:h-80 overflow-hidden">
             {imagePreview ? (
               <img
                 src={imagePreview}
-                alt="Banner preview"
+                alt="Creative preview"
                 className="w-full h-full object-cover"
               />
             ) : (
-              <div className="w-full h-full flex items-center justify-center">
-                <FaImage className="text-white text-6xl opacity-50" />
+              <div className="w-full h-full bg-[#171D41] flex items-center justify-center">
+                <FaImage className="text-white text-6xl opacity-10" />
               </div>
             )}
-            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent"></div>
+            <div className="absolute inset-x-0 bottom-0 h-32 bg-gradient-to-t from-[#121B36] to-transparent"></div>
+            <div className="absolute bottom-6 left-6 right-6">
+              <div className="bg-[#14F19520] backdrop-blur-md px-4 py-2 rounded-xl border border-[#14F19520] inline-block">
+                <span className="text-[#14F195] text-[10px] font-bold uppercase tracking-widest">Live Preview</span>
+              </div>
+            </div>
           </div>
 
-          {/* Form Content */}
-          <div className="p-6 md:p-8">
+          {/* Form Content Segment */}
+          <div className="p-6 md:p-10">
             <Formik
               initialValues={initialValues}
               validationSchema={validationSchema}
@@ -309,359 +317,224 @@ const BannerAdEditPage = () => {
               enableReinitialize
             >
               {({ values, setFieldValue }) => (
-                <Form className="space-y-6">
-                  {/* Image Upload */}
-                  <div className="bg-[#2A2A3E] rounded-lg p-6 border border-[#3A3A4E]">
-                    <h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
-                      <FaImage className="text-[#9945FF]" />
-                      Banner Image
-                    </h3>
-                    <div className="flex gap-4">
-                      <div className="flex-1">
+                <Form className="space-y-12">
+
+                  {/* Media Injection Section */}
+                  <div className="space-y-6">
+                    <div className="flex items-center gap-3">
+                      <span className="w-2 h-6 bg-pink-500 rounded-full"></span>
+                      <h3 className="text-lg font-bold text-white">Visual Identity</h3>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <div className="h-48 border-2 border-dashed border-[#FFFFFF0D] rounded-[32px] flex items-center justify-center group hover:border-[#14F195/40] transition-colors relative">
                         <input
                           type="file"
                           accept="image/*"
                           onChange={(e) => handleImageChange(e, setFieldValue)}
-                          className="w-full px-4 py-2 bg-[#171D41] border border-[#3A3A4E] rounded-lg text-white file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-[#9945FF] file:text-white hover:file:bg-[#7A35DF]"
+                          className="absolute inset-0 opacity-0 cursor-pointer z-10"
                         />
+                        <div className="flex flex-col items-center gap-4">
+                          <div className="w-14 h-14 rounded-full bg-white/5 flex items-center justify-center group-hover:scale-110 transition-transform">
+                            <FaImage size={18} className="text-[#AEB9E1]" />
+                          </div>
+                          <div className="text-center px-4">
+                            <p className="text-white font-bold text-sm">Replace Media</p>
+                            <p className="text-[#AEB9E1]/30 text-[9px] font-bold uppercase mt-1 px-4">Drag drop or tap to browse</p>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="space-y-2 flex flex-col justify-center">
+                        <label className="text-[#AEB9E1]/40 text-[10px] font-bold uppercase tracking-widest ml-1">Remote Resource (URL)</label>
                         <Field
                           type="text"
                           name="image"
-                          placeholder="Or paste image URL/base64"
-                          className="mt-2 w-full px-4 py-2 bg-[#171D41] border border-[#3A3A4E] rounded-lg text-white placeholder-[#AEB9E1] focus:outline-none focus:ring-2 focus:ring-[#9945FF]"
+                          placeholder="Direct URL if not uploading"
+                          className="w-full h-14 bg-[#171D41] border border-[#FFFFFF0D] rounded-2xl px-5 text-white font-bold placeholder-[#AEB9E1]/20 outline-none"
                           onChange={(e) => {
                             setFieldValue("image", e.target.value);
                             setImagePreview(e.target.value);
                           }}
                         />
-                        <ErrorMessage
-                          name="image"
-                          component="div"
-                          className="text-red-400 text-sm mt-1"
-                        />
+                        <ErrorMessage name="image" component="div" className="text-red-400 text-[10px] font-bold uppercase ml-1" />
                       </div>
                     </div>
                   </div>
 
-                  {/* Title and Description */}
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div className="bg-[#2A2A3E] rounded-lg p-6 border border-[#3A3A4E]">
-                      <h3 className="text-lg font-semibold text-white mb-4">Title & CTA</h3>
-                      <div className="space-y-4">
-                        <div>
-                          <label className="block text-sm font-medium mb-2 text-[#AEB9E1]">
-                            Title *
-                          </label>
-                          <Field
-                            type="text"
-                            name="title"
-                            placeholder="e.g., Boost Your Social Game"
-                            className="w-full px-4 py-2 bg-[#171D41] border border-[#3A3A4E] rounded-lg text-white placeholder-[#AEB9E1] focus:outline-none focus:ring-2 focus:ring-[#9945FF]"
-                          />
-                          <ErrorMessage
-                            name="title"
-                            component="div"
-                            className="text-red-400 text-sm mt-1"
-                          />
-                        </div>
-
-                        <div>
-                          <label className="block text-sm font-medium mb-2 text-[#AEB9E1]">
-                            CTA Button Text
-                          </label>
-                          <Field
-                            type="text"
-                            name="ctaText"
-                            placeholder="Book Now"
-                            className="w-full px-4 py-2 bg-[#171D41] border border-[#3A3A4E] rounded-lg text-white placeholder-[#AEB9E1] focus:outline-none focus:ring-2 focus:ring-[#9945FF]"
-                          />
-                          <ErrorMessage
-                            name="ctaText"
-                            component="div"
-                            className="text-red-400 text-sm mt-1"
-                          />
-                        </div>
-                      </div>
+                  {/* Messaging Section */}
+                  <div className="space-y-6">
+                    <div className="flex items-center gap-3">
+                      <span className="w-2 h-6 bg-[#14F195] rounded-full"></span>
+                      <h3 className="text-lg font-bold text-white">Copy & Impact</h3>
                     </div>
 
-                    <div className="bg-[#2A2A3E] rounded-lg p-6 border border-[#3A3A4E]">
-                      <h3 className="text-lg font-semibold text-white mb-4">Description</h3>
-                      <div>
-                        <label className="block text-sm font-medium mb-2 text-[#AEB9E1]">
-                          Description *
-                        </label>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <div className="space-y-2">
+                        <label className="text-[#AEB9E1]/40 text-[10px] font-bold uppercase tracking-widest ml-1">Headline Text *</label>
                         <Field
-                          as="textarea"
-                          name="description"
-                          rows={4}
-                          placeholder="Get real tools, real quick. Free followers, likes, and insights..."
-                          className="w-full px-4 py-2 bg-[#171D41] border border-[#3A3A4E] rounded-lg text-white placeholder-[#AEB9E1] focus:outline-none focus:ring-2 focus:ring-[#9945FF]"
+                          name="title"
+                          placeholder="Main catching title"
+                          className="w-full h-14 bg-[#171D41] border border-[#FFFFFF0D] rounded-2xl px-5 text-white font-bold placeholder-[#AEB9E1]/20 outline-none"
                         />
-                        <ErrorMessage
-                          name="description"
-                          component="div"
-                          className="text-red-400 text-sm mt-1"
+                        <ErrorMessage name="title" component="div" className="text-red-400 text-[10px] font-bold uppercase ml-1" />
+                      </div>
+
+                      <div className="space-y-2">
+                        <label className="text-[#AEB9E1]/40 text-[10px] font-bold uppercase tracking-widest ml-1">Button Text (CTA)</label>
+                        <Field
+                          name="ctaText"
+                          placeholder="e.g. BOOK NOW"
+                          className="w-full h-14 bg-[#171D41] border border-[#FFFFFF0D] rounded-2xl px-5 text-white font-bold placeholder-[#AEB9E1]/20 outline-none"
                         />
                       </div>
                     </div>
-                  </div>
 
-                  {/* Property Selection */}
-                  <div className="bg-[#2A2A3E] rounded-lg p-6 border border-[#3A3A4E]">
-                    <h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
-                      <FaBuilding className="text-[#9945FF]" />
-                      Property Selection
-                    </h3>
-                    <div>
-                      <label className="block text-sm font-medium mb-2 text-[#AEB9E1]">
-                        Property *
-                      </label>
+                    <div className="space-y-2">
+                      <label className="text-[#AEB9E1]/40 text-[10px] font-bold uppercase tracking-widest ml-1">Supporting Description *</label>
                       <Field
-                        as="select"
-                        name="property_id"
-                        className="w-full px-4 py-2 bg-[#171D41] border border-[#3A3A4E] rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-[#9945FF] disabled:opacity-50 disabled:cursor-not-allowed"
-                        disabled={loadingProperties}
-                      >
-                        <option value="">
-                          {loadingProperties ? "Loading properties..." : "Select a property"}
-                        </option>
-                        {properties.length === 0 && !loadingProperties && (
-                          <option value="" disabled>No properties available</option>
-                        )}
-                        {properties.map((property) => {
-                          const propertyId = property._id?.toString() || property._id;
-                          return (
-                            <option key={propertyId} value={propertyId}>
-                              {property.name} - {property.address}
-                            </option>
-                          );
-                        })}
-                      </Field>
-                      {loadingProperties && (
-                        <p className="text-[#AEB9E1] text-sm mt-2">Loading properties...</p>
-                      )}
-                      {properties.length === 0 && !loadingProperties && (
-                        <p className="text-yellow-400 text-sm mt-2">
-                          No properties found. Please create a property first.
-                        </p>
-                      )}
-                      {values.property_id && !loadingProperties && properties.length > 0 && (
-                        (() => {
-                          const selectedProperty = properties.find(
-                            (p) => (p._id?.toString() || p._id) === values.property_id
-                          );
-                          if (!selectedProperty) {
-                            return (
-                              <p className="text-yellow-400 text-sm mt-2">
-                                ⚠️ Selected property not found in list. The property may have been deleted.
-                              </p>
-                            );
-                          }
-                          return (
-                            <p className="text-green-400 text-xs mt-2">
-                              ✓ Selected: {selectedProperty.name}
-                            </p>
-                          );
-                        })()
-                      )}
-                      <ErrorMessage
-                        name="property_id"
-                        component="div"
-                        className="text-red-400 text-sm mt-1"
+                        as="textarea"
+                        name="description"
+                        rows={4}
+                        className="w-full bg-[#171D41] border border-[#FFFFFF0D] rounded-[24px] p-5 text-white font-medium outline-none placeholder-[#AEB9E1]/20 resize-none min-h-[120px]"
                       />
+                      <ErrorMessage name="description" component="div" className="text-red-400 text-[10px] font-bold uppercase ml-1" />
                     </div>
                   </div>
 
-                  {/* Priority, Status, and Dates */}
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div className="bg-[#2A2A3E] rounded-lg p-6 border border-[#3A3A4E]">
-                      <h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
-                        <FaTag className="text-[#9945FF]" />
-                        Priority & Status
-                      </h3>
-                      <div className="space-y-4">
-                        <div>
-                          <label className="block text-sm font-medium mb-2 text-[#AEB9E1]">
-                            Priority (1-10)
-                          </label>
-                          <Field
-                            type="number"
-                            name="priority"
-                            min="1"
-                            max="10"
-                            className="w-full px-4 py-2 bg-[#171D41] border border-[#3A3A4E] rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-[#9945FF]"
-                          />
-                          <ErrorMessage
-                            name="priority"
-                            component="div"
-                            className="text-red-400 text-sm mt-1"
-                          />
-                        </div>
+                  {/* Deployment Logic Section */}
+                  <div className="space-y-6">
+                    <div className="flex items-center gap-3">
+                      <span className="w-2 h-6 bg-[#9945FF] rounded-full"></span>
+                      <h3 className="text-lg font-bold text-white">Distribution Logic</h3>
+                    </div>
 
-                        <div>
-                          <label className="flex items-center gap-2 cursor-pointer">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                      <div className="space-y-2">
+                        <label className="text-[#AEB9E1]/40 text-[10px] font-bold uppercase tracking-widest ml-1">Target Property *</label>
+                        <Field
+                          as="select"
+                          name="property_id"
+                          className="w-full h-14 bg-[#171D41] border border-[#FFFFFF0D] rounded-2xl px-5 text-white font-bold appearance-none cursor-pointer"
+                        >
+                          <option value="">Choose Property</option>
+                          {properties.map((p) => (
+                            <option key={p._id} value={p._id}>{p.name}</option>
+                          ))}
+                        </Field>
+                        <ErrorMessage name="property_id" component="div" className="text-red-400 text-[10px] font-bold uppercase ml-1" />
+                      </div>
+
+                      <div className="space-y-2">
+                        <label className="text-[#AEB9E1]/40 text-[10px] font-bold uppercase tracking-widest ml-1">Display Priority</label>
+                        <Field
+                          type="number"
+                          name="priority"
+                          className="w-full h-14 bg-[#171D41] border border-[#FFFFFF0D] rounded-2xl px-5 text-white font-bold outline-none"
+                        />
+                      </div>
+
+                      <div className="flex items-center px-4">
+                        <label className="flex items-center gap-4 cursor-pointer group">
+                          <div className="relative">
                             <Field
                               type="checkbox"
                               name="isActive"
-                              className="w-4 h-4 text-[#9945FF] bg-[#171D41] border-[#3A3A4E] rounded focus:ring-[#9945FF]"
+                              className="sr-only peer"
                             />
-                            <span className="text-[#AEB9E1]">Active (Show on home page)</span>
-                          </label>
-                        </div>
+                            <div className="w-12 h-6 bg-[#0A1330] rounded-full border border-[#FFFFFF0D] peer-checked:bg-[#14F19520] peer-checked:border-[#14F19530] transition-all"></div>
+                            <div className="absolute left-1 top-1 w-4 h-4 bg-[#AEB9E1] rounded-full peer-checked:left-7 peer-checked:bg-[#14F195] transition-all duration-300"></div>
+                          </div>
+                          <span className="text-[#AEB9E1] font-bold text-sm">Visibility (Live)</span>
+                        </label>
                       </div>
                     </div>
 
-                    <div className="bg-[#2A2A3E] rounded-lg p-6 border border-[#3A3A4E]">
-                      <h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
-                        <FaCalendar className="text-[#9945FF]" />
-                        Dates
-                      </h3>
-                      <div className="space-y-4">
-                        <div>
-                          <label className="block text-sm font-medium mb-2 text-[#AEB9E1]">
-                            Start Date *
-                          </label>
-                          <Field
-                            type="date"
-                            name="startDate"
-                            className="w-full px-4 py-2 bg-[#171D41] border border-[#3A3A4E] rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-[#9945FF]"
-                          />
-                          <ErrorMessage
-                            name="startDate"
-                            component="div"
-                            className="text-red-400 text-sm mt-1"
-                          />
-                        </div>
-
-                                <div>
-                                  <label className="block text-sm font-medium mb-2 text-[#AEB9E1]">
-                                    End Date (Optional - Leave empty for unlimited)
-                                  </label>
-                                  <Field
-                                    type="date"
-                                    name="endDate"
-                                    className="w-full px-4 py-2 bg-[#171D41] border border-[#3A3A4E] rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-[#9945FF]"
-                                  />
-                                  <p className="text-[#AEB9E1] text-xs mt-2">
-                                    Set an end date to automatically remove the ad from the home page. Leave empty to run indefinitely.
-                                  </p>
-                                  <ErrorMessage
-                                    name="endDate"
-                                    component="div"
-                                    className="text-red-400 text-sm mt-1"
-                                  />
-                                </div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <div className="space-y-2">
+                        <label className="text-[#AEB9E1]/40 text-[10px] font-bold uppercase tracking-widest ml-1">Activation Period (Start)</label>
+                        <Field
+                          type="date"
+                          name="startDate"
+                          className="w-full h-14 bg-[#171D41] border border-[#FFFFFF0D] rounded-2xl px-5 text-white font-bold outline-none"
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <label className="text-[#AEB9E1]/40 text-[10px] font-bold uppercase tracking-widest ml-1">Termination Period (End)</label>
+                        <Field
+                          type="date"
+                          name="endDate"
+                          className="w-full h-14 bg-[#171D41] border border-[#FFFFFF0D] rounded-2xl px-5 text-white font-bold outline-none"
+                        />
                       </div>
                     </div>
                   </div>
 
-                  {/* Advertiser Information */}
-                  <div className="bg-[#2A2A3E] rounded-lg p-6 border border-[#3A3A4E]">
-                    <h3 className="text-lg font-semibold text-white mb-4 flex items-center gap-2">
-                      <FaUser className="text-[#9945FF]" />
-                      Advertiser Information
-                    </h3>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div>
-                        <label className="block text-sm font-medium mb-2 text-[#AEB9E1]">
-                          Advertiser Name
-                        </label>
-                        <Field
-                          type="text"
-                          name="advertiserName"
-                          placeholder="Hotel/Company name"
-                          className="w-full px-4 py-2 bg-[#171D41] border border-[#3A3A4E] rounded-lg text-white placeholder-[#AEB9E1] focus:outline-none focus:ring-2 focus:ring-[#9945FF]"
-                        />
-                      </div>
-
-                      <div>
-                        <label className="block text-sm font-medium mb-2 text-[#AEB9E1]">
-                          Advertiser Email
-                        </label>
-                        <Field
-                          type="email"
-                          name="advertiserEmail"
-                          placeholder="advertiser@example.com"
-                          className="w-full px-4 py-2 bg-[#171D41] border border-[#3A3A4E] rounded-lg text-white placeholder-[#AEB9E1] focus:outline-none focus:ring-2 focus:ring-[#9945FF]"
-                        />
-                        <ErrorMessage
-                          name="advertiserEmail"
-                          component="div"
-                          className="text-red-400 text-sm mt-1"
-                        />
-                      </div>
+                  {/* Financial & Partner Info */}
+                  <div className="space-y-6">
+                    <div className="flex items-center gap-3">
+                      <span className="w-2 h-6 bg-[#F7B91C] rounded-full"></span>
+                      <h3 className="text-lg font-bold text-white">Partner Management</h3>
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
-                      <div>
-                        <label className="block text-sm font-medium mb-2 text-[#AEB9E1]">
-                          Amount Paid
-                        </label>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <div className="space-y-2">
+                        <label className="text-[#AEB9E1]/40 text-[10px] font-bold uppercase tracking-widest ml-1">Advertiser ID / Name</label>
                         <Field
-                          type="number"
-                          name="amountPaid"
-                          min="0"
-                          className="w-full px-4 py-2 bg-[#171D41] border border-[#3A3A4E] rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-[#9945FF]"
+                          name="advertiserName"
+                          className="w-full h-14 bg-[#171D41] border border-[#FFFFFF0D] rounded-2xl px-5 text-white font-bold outline-none"
                         />
                       </div>
-
-                      <div>
-                        <label className="block text-sm font-medium mb-2 text-[#AEB9E1]">
-                          Currency
-                        </label>
-                        <Field
-                          as="select"
-                          name="currency"
-                          className="w-full px-4 py-2 bg-[#171D41] border border-[#3A3A4E] rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-[#9945FF]"
-                        >
-                          <option value="PKR">PKR (Rs)</option>
-                          <option value="USD">USD ($)</option>
-                        </Field>
+                      <div className="space-y-2">
+                        <label className="text-[#AEB9E1]/40 text-[10px] font-bold uppercase tracking-widest ml-1">Registered Payout (Amount)</label>
+                        <div className="relative">
+                          <Field
+                            name="amountPaid"
+                            type="number"
+                            className="w-full h-14 bg-[#171D41] border border-[#FFFFFF0D] rounded-2xl px-5 pr-16 text-white font-bold outline-none"
+                          />
+                          <div className="absolute right-4 top-1/2 -translate-y-1/2 h-8 px-2 bg-[#0A1330] rounded-lg border border-[#FFFFFF05] flex items-center text-[10px] font-bold text-[#AEB9E1]">
+                            {values.currency}
                           </div>
                         </div>
                       </div>
-
-                  {/* Click Limit (Optional) */}
-                  <div className="bg-[#2A2A3E] rounded-lg p-6 border border-[#3A3A4E]">
-                    <h3 className="text-lg font-semibold text-white mb-4">Click Tracking (Optional)</h3>
-                    <div>
-                      <label className="block text-sm font-medium mb-2 text-[#AEB9E1]">
-                        Click Limit (Leave empty for unlimited)
-                      </label>
-                      <Field
-                        type="number"
-                        name="clickLimit"
-                        min="1"
-                        placeholder="e.g., 1000 (ad will be removed after this many clicks)"
-                        className="w-full px-4 py-2 bg-[#171D41] border border-[#3A3A4E] rounded-lg text-white placeholder-[#AEB9E1] focus:outline-none focus:ring-2 focus:ring-[#9945FF]"
-                      />
-                      <p className="text-[#AEB9E1] text-xs mt-2">
-                        Set a limit on how many times users can click "Book Now". Once reached, the ad will be automatically removed from the home page.
-                      </p>
-                      <ErrorMessage
-                        name="clickLimit"
-                        component="div"
-                        className="text-red-400 text-sm mt-1"
-                      />
                     </div>
                   </div>
 
-                  {/* Submit Buttons */}
-                  <div className="flex gap-4 pt-4 border-t border-[#3A3A4E]">
-                    <button
-                      type="button"
-                      onClick={() => navigate(`/admin/banner-ads/${id}`)}
-                      className="flex-1 px-6 py-3 bg-[#2A2A3E] hover:bg-[#3A3A4E] text-white rounded-lg transition-colors"
-                    >
-                      Cancel
-                    </button>
+                  {/* Operational Controls */}
+                  <div className="space-y-6">
+                    <div className="flex items-center gap-3">
+                      <span className="w-2 h-6 bg-blue-400 rounded-full"></span>
+                      <h3 className="text-lg font-bold text-white">Operational Gates</h3>
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-[#AEB9E1]/40 text-[10px] font-bold uppercase tracking-widest ml-1">Conversion Limit (Click Cap)</label>
+                      <Field
+                        type="number"
+                        name="clickLimit"
+                        placeholder="Leave empty for unlimited traction"
+                        className="w-full h-14 bg-[#171D41] border border-[#FFFFFF0D] rounded-2xl px-5 text-white font-bold outline-none placeholder-[#AEB9E1]/20"
+                      />
+                      <p className="text-[#AEB9E1]/30 text-[9px] font-medium leading-relaxed px-1">Defines after how many user interactions the creative asset should be withdrawn automatically.</p>
+                    </div>
+                  </div>
+
+                  {/* Submission Suite */}
+                  <div className="flex flex-col sm:flex-row gap-4 pt-10 border-t border-[#FFFFFF0D]">
                     <button
                       type="submit"
                       disabled={submitting}
-                      className="flex-1 px-6 py-3 bg-gradient-to-r from-[#9945FF] to-[#14F195] text-white rounded-lg hover:scale-105 transition-transform disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                      className="flex-1 h-16 bg-gradient-to-r from-[#9945FF] to-[#14F195] text-white rounded-[24px] font-bold text-lg tracking-tight shadow-xl shadow-[#14F19522] hover:opacity-95 transition-all active:scale-[0.98] disabled:opacity-50 flex items-center justify-center gap-3"
                     >
-                      <FaSave />
-                      {submitting ? "Saving..." : "Save Changes"}
+                      <FaSave size={18} />
+                      {submitting ? "COMMITTING DATA..." : "AUTHORIZE CHANGES"}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => navigate(`/admin/banner-ads/${id}`)}
+                      className="h-16 px-10 bg-[#0A1330] text-[#AEB9E1] rounded-[24px] font-bold text-sm tracking-widest border border-[#FFFFFF0D] hover:bg-white/5 transition-all"
+                    >
+                      ABORT
                     </button>
                   </div>
                 </Form>

@@ -42,7 +42,7 @@ const BookingsPage = () => {
       }
 
       const response = await axios.get("/api/v1/bookings/admin", { params });
-      
+
       if (response.data.success) {
         setBookings(response.data.data.bookings);
         setPagination({
@@ -71,7 +71,7 @@ const BookingsPage = () => {
       if (paymentStatus) payload.paymentStatus = paymentStatus;
 
       const response = await axios.patch(`/api/v1/bookings/${bookingId}/status`, payload);
-      
+
       if (response.data.success) {
         toast.success("Status updated successfully");
         fetchBookings();
@@ -198,30 +198,29 @@ const BookingsPage = () => {
   };
 
   return (
-    <div className="p-3 sm:p-4 lg:p-6 bg-[#0A1330] min-h-screen">
+    <div className="p-4 lg:p-6 pb-24 lg:pb-6 bg-[#0A1330] min-h-screen">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
-        <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-6">
-          <div>
-            <h1 className="text-2xl sm:text-3xl font-bold text-white">Bookings Management</h1>
-            <p className="text-[#AEB9E1] mt-1 text-sm sm:text-base">View and manage all property bookings</p>
+        <div className="flex flex-col gap-1 mb-8">
+          <h1 className="text-2xl sm:text-3xl font-bold text-white px-1 mt-2">Bookings</h1>
+          <p className="text-[#AEB9E1] px-1 text-sm sm:text-base opacity-60">Monitor and manage all hotel reservations.</p>
+        </div>
+
+        {/* Content Card */}
+        <div className="bg-[#121B36] rounded-[32px] border border-[#FFFFFF0D] shadow-2xl overflow-hidden">
+          {/* Filters Area */}
+          <div className="p-6 pb-2">
+            <ReusableFilter
+              filters={filterOptions}
+              onFilterChange={handleFilterChange}
+              onSearchChange={handleSearchChange}
+              searchValue={filters.search}
+              searchPlaceholder="Search reference, guest..."
+            />
           </div>
-        </div>
 
-        {/* Filters */}
-        <div className="mb-6">
-          <ReusableFilter
-            filters={filterOptions}
-            onFilterChange={handleFilterChange}
-            onSearchChange={handleSearchChange}
-            searchValue={filters.search}
-            searchPlaceholder="Search bookings by reference, name, email..."
-          />
-        </div>
-
-        {/* Table */}
-        <div className="bg-[#171D41] rounded-lg shadow-lg border border-[#3A3A4E] overflow-x-auto overflow-y-visible">
-          <div className="p-2 sm:p-4">
+          {/* Table Area */}
+          <div className="p-0 sm:p-4">
             <ReusableTable
               columns={columns}
               data={bookings}

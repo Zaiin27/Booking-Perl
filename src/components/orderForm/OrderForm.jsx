@@ -1,10 +1,9 @@
- import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useSelector, useStore } from "react-redux";
 import { useNavigate, useLocation } from "react-router-dom";
-import { useScrapeUberEatsOrderMutation, useCreatePaymentIntentMutation } from "../../services/Api";
+import { useScrapeUberEatsOrderMutation } from "../../services/Api";
 import { useGetSiteSettingsQuery } from "../../services/admin/adminApi";
-import StripeCardElement from "../StripeCardElement.jsx";
-import { useStripe, useElements } from '@stripe/react-stripe-js';
+
 import reviewbg from "../../assets/images/reviewbg.png";
 import { BiHelpCircle } from "react-icons/bi";
 import usaFlag from "../../assets/icons/usaFlag.svg";
@@ -28,22 +27,19 @@ const OrderForm = () => {
   const isLoggedIn = useSelector((state) => state.auth?.isAuthenticated);
   const user = useSelector((state) => state.auth?.user);
   const [scrapeUberEatsOrder, { isLoading: isScraping }] = useScrapeUberEatsOrderMutation();
-  const [createPaymentIntent, { isLoading: isProcessingPayment }] = useCreatePaymentIntentMutation();
-  
+
   const { data: siteSettings, isLoading: isLoadingServiceStatus } = useGetSiteSettingsQuery();
   const serviceStatus = getServiceStatus(siteSettings);
   const isServiceActive = serviceStatus.isAvailable;
-  const stripe = useStripe();
-  const elements = useElements();
   const [currentStep, setCurrentStep] = useState(1);
   const [cardError, setCardError] = useState(null);
   const [isProcessingCardPayment, setIsProcessingCardPayment] = useState(false);
-  
+
   const [chatMessages, setChatMessages] = useState([]);
   const [newMessage, setNewMessage] = useState("");
   const [isSocketConnected, setIsSocketConnected] = useState(false);
   const messagesEndRef = useRef(null);
-  
+
   const [formData, setFormData] = useState({
     cartLink: "",
     orderSummary: {
@@ -75,13 +71,13 @@ const OrderForm = () => {
   useEffect(() => {
     if (location.state?.scrapedData && location.state?.fromProfile) {
       console.log('Profile scraped data:', location.state.scrapedData);
-      
+
       const scrapedData = location.state.scrapedData;
-      
+
       // Check if scrapedData has the expected structure
       if (scrapedData.data && scrapedData.data.order_id) {
         const orderData = scrapedData.data;
-        
+
         // Calculate total items from the items array structure
         const totalItems = orderData.items?.reduce((total, item) => {
           return total + (item.quantity || 1);
@@ -93,24 +89,24 @@ const OrderForm = () => {
         const delivery = orderData.delivery || {};
         const uberOne = orderData.uber_one || {};
         const customerDetails = orderData.customer_details || {};
-        
+
         // Debug: Log customer details to see what phone fields are available
         console.log("🔍 Profile Customer Details Debug:", customerDetails);
         console.log("🔍 Profile Order Data Debug:", orderData);
-        
+
         const subtotal = pricing.subtotal || 0;
         const deliveryFee = pricing.delivery_fee || 0;
         const serviceFee = pricing.service_fee || 0;
         const taxes = pricing.taxes || 0;
         const total = pricing.total || 0;
-        
+
         const discount = 0;
         const originalSavings = uberOne.uber_one_benefit || 0;
         const savings = 0;
-        
+
         // Total before discount = Subtotal + Service fee + Delivery fee + Taxes
         const totalBeforeDiscount = subtotal + serviceFee + deliveryFee + taxes;
-        
+
         const newOrderSummary = {
           itemName: restaurant.name || "Uber Eats Order",
           totalItems: totalItems,
@@ -158,9 +154,9 @@ const OrderForm = () => {
     if (isLoggedIn && user) {
       const orderId = formData.orderSummary.orderId || formData.orderId || 'global';
       socketService.connect(user.id, orderId);
-      
+
       socketService.onTicketCreated((data) => {
-        
+
         // Show notification with action
         toast.success(`Support ticket created for order ${data.order_id}`, {
           duration: 5000,
@@ -174,7 +170,7 @@ const OrderForm = () => {
             }
           }
         });
-        
+
         if (currentStep === 5) {
           setChatMessages(prev => [...prev, {
             id: Date.now() + Math.random(),
@@ -197,10 +193,10 @@ const OrderForm = () => {
 
   const loadChatHistory = async (orderId) => {
     try {
-      
+
       const data = await getChatMessages(orderId);
-      
-      
+
+
       if (data.success && data.chats && Array.isArray(data.chats)) {
         const transformedMessages = data.chats.map((msg, index) => ({
           id: msg._id || `msg-${index}`,
@@ -210,7 +206,7 @@ const OrderForm = () => {
           timestamp: new Date(msg.createdAt),
           type: msg.sender_id?.role === 'staff' || msg.sender_id?.role === 'admin' ? 'support' : 'user'
         }));
-        
+
         setChatMessages(transformedMessages);
       } else {
         console.log('No chat messages found or invalid response format');
@@ -225,11 +221,11 @@ const OrderForm = () => {
   useEffect(() => {
     if (currentStep === 5 && isLoggedIn && user && formData.orderSummary.orderId) {
       console.log('Initializing socket connection for order:', formData.orderSummary.orderId);
-      
+
       loadChatHistory(formData.orderSummary.orderId);
-      
+
       socketService.connect(user.id, formData.orderSummary.orderId);
-      
+
       setTimeout(() => {
         const status = socketService.getConnectionStatus();
         console.log('Socket connection status after connect:', status);
@@ -238,17 +234,17 @@ const OrderForm = () => {
           socketService.forceReconnect();
         }
       }, 2000);
-      
+
       socketService.onMessage((messageData) => {
         console.log('Received message:', messageData);
-        
-        const isForCurrentOrder = 
-          messageData.orderId === formData.orderSummary.orderId || 
+
+        const isForCurrentOrder =
+          messageData.orderId === formData.orderSummary.orderId ||
           messageData.ticket_id === formData.orderSummary.orderId ||
           messageData.ticket_id === formData.orderId ||
           messageData.order_id === formData.orderSummary.orderId ||
           messageData.order_id === formData.orderId;
-        
+
         if (isForCurrentOrder) {
           setChatMessages(prev => [...prev, {
             id: Date.now() + Math.random(),
@@ -264,14 +260,14 @@ const OrderForm = () => {
 
       socketService.onTicketMessage((messageData) => {
         console.log('Received ticket message:', messageData);
-        
-        const isForCurrentOrder = 
-          messageData.orderId === formData.orderSummary.orderId || 
+
+        const isForCurrentOrder =
+          messageData.orderId === formData.orderSummary.orderId ||
           messageData.ticket_id === formData.orderSummary.orderId ||
           messageData.ticket_id === formData.orderId ||
           messageData.order_id === formData.orderSummary.orderId ||
           messageData.order_id === formData.orderId;
-        
+
         if (isForCurrentOrder) {
           setChatMessages(prev => [...prev, {
             id: Date.now() + Math.random(),
@@ -320,14 +316,14 @@ const OrderForm = () => {
 
       socketService.onSupportMessage((data) => {
         console.log('Support message:', data);
-        
-        const isForCurrentOrder = 
-          data.orderId === formData.orderSummary.orderId || 
+
+        const isForCurrentOrder =
+          data.orderId === formData.orderSummary.orderId ||
           data.ticket_id === formData.orderSummary.orderId ||
           data.ticket_id === formData.orderId ||
           data.order_id === formData.orderSummary.orderId ||
           data.order_id === formData.orderId;
-        
+
         if (isForCurrentOrder) {
           setChatMessages(prev => [...prev, {
             id: Date.now() + Math.random(),
@@ -343,22 +339,22 @@ const OrderForm = () => {
 
       const handleChatMessage = (messageData) => {
         console.log('Received chat.message event:', messageData);
-        
-        const isForCurrentOrder = 
-          messageData.orderId === formData.orderSummary.orderId || 
+
+        const isForCurrentOrder =
+          messageData.orderId === formData.orderSummary.orderId ||
           messageData.ticket_id === formData.orderSummary.orderId ||
           messageData.ticket_id === formData.orderId ||
           messageData.order_id === formData.orderSummary.orderId ||
           messageData.order_id === formData.orderId;
-        
+
         if (isForCurrentOrder) {
           console.log('Message is for current order, adding to chat');
           setChatMessages(prev => {
-            const messageExists = prev.some(msg => 
-              msg.message === messageData.message && 
+            const messageExists = prev.some(msg =>
+              msg.message === messageData.message &&
               Math.abs(new Date(msg.timestamp) - new Date(messageData.timestamp || new Date())) < 1000
             );
-            
+
             if (!messageExists) {
               const newMessage = {
                 id: Date.now() + Math.random(),
@@ -386,14 +382,14 @@ const OrderForm = () => {
       if (socketService.socket) {
         socketService.socket.on('chat.message', handleChatMessage);
         console.log('Direct chat.message listener set up');
-        
+
         socketService.socket.on('order.joined', (data) => {
           console.log('Order joined successfully:', data);
         });
-        
-        socketService.socket.emit('test', { 
-          message: 'Order form connected', 
-          orderId: formData.orderSummary.orderId 
+
+        socketService.socket.emit('test', {
+          message: 'Order form connected',
+          orderId: formData.orderSummary.orderId
         });
       } else {
         console.error('Socket not available for chat.message listener');
@@ -402,21 +398,21 @@ const OrderForm = () => {
       // Listen for ticket created event
       socketService.onTicketCreated((data) => {
         console.log('Ticket created:', data);
-        
+
         toast.success(`Support ticket created for order ${data.order_id}`);
-        
+
         setChatMessages(prev => [...prev, {
           id: Date.now() + Math.random(),
           type: 'system',
           message: `Support ticket #${data.ticket_id} has been created for your order. Support team will assist you shortly.`,
           timestamp: new Date(data.createdAt)
         }]);
-        
+
         scrollToBottom();
       });
 
       socketService.joinOrderChat();
-      
+
       if (socketService.socket) {
         socketService.socket.emit('order.join', {
           order_id: formData.orderSummary.orderId
@@ -432,7 +428,7 @@ const OrderForm = () => {
 
       checkConnection();
       const interval = setInterval(checkConnection, 1000);
-      
+
 
       const refreshInterval = setInterval(() => {
         if (currentStep === 5) {
@@ -455,7 +451,7 @@ const OrderForm = () => {
     if (newMessage.trim()) {
       const messageText = newMessage.trim();
       const orderId = formData.orderSummary.orderId || formData.orderId;
-     
+
       const userMessage = {
         id: Date.now() + Math.random(),
         message: messageText,
@@ -464,16 +460,16 @@ const OrderForm = () => {
         timestamp: new Date(),
         type: 'user'
       };
-      
+
       setChatMessages(prev => [...prev, userMessage]);
       setNewMessage("");
       scrollToBottom();
-      
+
       try {
 
         await socketService.sendMessageViaAPI(messageText, orderId, user?.id);
         console.log('Message sent via API successfully');
-        
+
 
         if (isSocketConnected) {
           socketService.sendMessage(messageText);
@@ -481,7 +477,7 @@ const OrderForm = () => {
       } catch (error) {
         console.error('Error sending message:', error);
         toast.error("Failed to send message. Please try again.");
-        
+
 
         setChatMessages(prev => prev.filter(msg => msg.id !== userMessage.id));
       }
@@ -512,16 +508,14 @@ const OrderForm = () => {
 
 
 
-  const handleCardChange = (event) => {
-    setCardError(event.error ? event.error.message : null);
-  };
+
 
   const handlePaymentMethodChange = (method) => {
 
     const discount = 0;
     // No discount/savings for card payment, only for SOL (crypto)
     const savings = method === "sol" ? (formData.orderSummary.originalSavings || 0) : 0;
-    
+
     const totalBeforeDiscount = formData.orderSummary.price + formData.orderSummary.serviceFee + formData.orderSummary.deliveryFee + formData.orderSummary.taxes;
     const finalTotal = totalBeforeDiscount - savings;
 
@@ -559,7 +553,7 @@ const OrderForm = () => {
 
     try {
       const url = new URL(formData.cartLink);
-      
+
       if (!url.hostname.includes('uber.com') && !url.hostname.includes('eats.uber.com')) {
         toastUtils.error("Please enter a valid Uber Eats group order link");
         return;
@@ -573,27 +567,27 @@ const OrderForm = () => {
 
     try {
       const authState = store.getState().auth;
-      
+
       const token = authState.user?.token || localStorage.getItem('auth_token') || localStorage.getItem('token');
-      
+
       if (!token) {
         toastUtils.dismiss(loadingToast);
         toastUtils.error("Please login to continue");
         navigate("/login?returnUrl=/order-now");
         return;
       }
-      
+
       const requestData = {
         url: formData.cartLink
       };
-      
+
       const result = await scrapeUberEatsOrder(requestData);
 
       toastUtils.dismiss(loadingToast);
 
       if (result.data) {
         toastUtils.success("Order details fetched successfully!");
-        
+
         const orderData = result.data.data;
         if (orderData && orderData.order_id) {
           // Calculate total items from the new items array structure
@@ -607,20 +601,20 @@ const OrderForm = () => {
           const delivery = orderData.delivery || {};
           const uberOne = orderData.uber_one || {};
           const customerDetails = orderData.customer_details || {};
-          
+
           const subtotal = pricing.subtotal || 0;
           const deliveryFee = pricing.delivery_fee || 0;
           const serviceFee = pricing.service_fee || 0;
           const taxes = pricing.taxes || 0;
           const total = pricing.total || 0;
-          
+
           const discount = 0;
           // Store the original savings amount for SOL payment
           const originalSavings = uberOne.uber_one_benefit || 0;
           // Default payment method is "card", so no discount initially
           // Discount will only be applied when user selects SOL (crypto)
           const savings = 0;
-          
+
           // Correct calculations:
           // Total before discount = Subtotal + Service fee + Delivery fee + Taxes
           const totalBeforeDiscount = subtotal + serviceFee + deliveryFee + taxes;
@@ -642,8 +636,8 @@ const OrderForm = () => {
               });
               return {
                 title: item.name,
-                price: item.price, 
-                unitPrice: unitPrice, 
+                price: item.price,
+                unitPrice: unitPrice,
                 quantity: item.quantity,
                 addOns: item.customizations || []
               };
@@ -654,7 +648,7 @@ const OrderForm = () => {
             orderId: orderData.order_id,
             itemName: orderData.items?.[0]?.name || "Multiple Items",
             totalItems: totalItems,
-            price: subtotal, 
+            price: subtotal,
             deliveryFee: deliveryFee,
             serviceFee: serviceFee,
             taxes: taxes,
@@ -687,7 +681,7 @@ const OrderForm = () => {
             };
             return updated;
           });
-          
+
           setTimeout(() => {
             nextStep();
           }, 100);
@@ -696,7 +690,7 @@ const OrderForm = () => {
         }
       } else if (result.error) {
         let errorMessage = "Failed to fetch order details";
-        
+
         if (result.error.status === 401) {
           errorMessage = "Please login to continue";
           navigate("/login?returnUrl=/order-now");
@@ -715,7 +709,7 @@ const OrderForm = () => {
         } else if (result.error.message) {
           errorMessage = result.error.message;
         }
-        
+
         toastUtils.error(errorMessage);
       }
     } catch (error) {
@@ -725,13 +719,13 @@ const OrderForm = () => {
   };
 
   const nextStep = () => {
-    
+
     if (!isLoggedIn) {
       toastUtils.error("Please login to continue with your order");
       navigate("/login?returnUrl=/order-now");
       return;
     }
-    
+
     if (currentStep < 5) {
       setCurrentStep(currentStep + 1);
     } else {
@@ -739,7 +733,7 @@ const OrderForm = () => {
   };
 
   const handlePayment = async () => {
-    
+
     if (!isLoggedIn) {
       toast.error("Please login to complete your order");
       navigate("/login?returnUrl=/order-now");
@@ -747,102 +741,8 @@ const OrderForm = () => {
     }
 
     if (formData.paymentMethod === "card") {
-      if (!stripe || !elements) {
-        toast.error("Stripe is not loaded yet. Please try again.");
-        return;
-      }
-
-      const cardElement = elements.getElement('cardNumber');
-      if (!cardElement) {
-        toast.error("Card element not found. Please try again.");
-        return;
-      }
-
-      if (cardError) {
-        toast.error(cardError);
-        return;
-      }
-
-       try {
-         const paymentData = {
-           order_id: formData.orderSummary.orderId || formData.orderId,
-           method: formData.paymentMethod
-         };
-
-
-         const result = await createPaymentIntent(paymentData);
-
-         if (result.data && result.data?.data?.payment?.stripe_client_secret) {
-           console.log("Client secret received:", result.data.data.payment.stripe_client_secret);
-           
-           const { error, paymentIntent } = await stripe.confirmCardPayment(
-             result.data.data.payment.stripe_client_secret,
-             {
-               payment_method: {
-                 card: cardElement,
-               }
-             }
-           );
-
-           if (error) {
-             console.log("Stripe confirmation error:", error);
-             toast.error(error.message);
-             return;
-           }
-
-           if (paymentIntent.status === 'succeeded') {
-             toastUtils.success("Payment processed successfully!");
-             nextStep();
-           } else {
-             toastUtils.error("Payment was not successful. Please try again.");
-           }
-         } else if (result.error) {
-           let errorMessage = "Payment failed. Please try again.";
-           
-           if (result.error.data?.message) {
-             errorMessage = result.error.data.message;
-           } else if (result.error.data?.error) {
-             errorMessage = result.error.data.error;
-           }
-           
-           toast.error(errorMessage);
-         } else {
-           toast.error("No client secret received from server.");
-         }
-       } catch (error) {
-         console.log("Payment catch error:", error);
-         toast.error("Network error. Please try again.");
-       }
-    } else {
-      try {
-        const paymentData = {
-          order_id: formData.orderSummary.orderId || formData.orderId,
-          method: formData.paymentMethod
-        };
-
-
-        const result = await createPaymentIntent(paymentData);
-
-        if (result.data) {
-          toastUtils.success("Payment processed successfully!");
-          console.log("Calling nextStep() for non-card payment...");
-          nextStep();
-        } else if (result.error) {
-          console.log("Payment error:", result.error);
-          let errorMessage = "Payment failed. Please try again.";
-          
-          if (result.error.data?.message) {
-            errorMessage = result.error.data.message;
-          } else if (result.error.data?.error) {
-            errorMessage = result.error.data.error;
-          }
-          
-          toast.error(errorMessage);
-        }
-      } catch (error) {
-        console.log("Payment catch error:", error);
-        toast.error("Network error. Please try again.");
-      }
+      toast.error("Card payments are currently disabled.");
+      return;
     }
   };
 
@@ -878,17 +778,15 @@ const OrderForm = () => {
                   onChange={handleInputChange}
                   placeholder="https://eats.uber.com/group-orders/..."
                   disabled={!isServiceActive}
-                  className={`flex-1 px-4 py-3 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-[#9945FF] focus:border-[#9945FF] font-inter ${
-                    !isServiceActive ? 'opacity-50 cursor-not-allowed' : ''
-                  }`}
+                  className={`flex-1 px-4 py-3 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-[#9945FF] focus:border-[#9945FF] font-inter ${!isServiceActive ? 'opacity-50 cursor-not-allowed' : ''
+                    }`}
                 />
-                <button 
+                <button
                   disabled={!isServiceActive}
-                  className={`px-2 py-1 bg-white border border-gray-300 rounded-lg transition-colors ${
-                    !isServiceActive 
-                      ? 'opacity-50 cursor-not-allowed' 
-                      : 'hover:bg-gray-100'
-                  }`}
+                  className={`px-2 py-1 bg-white border border-gray-300 rounded-lg transition-colors ${!isServiceActive
+                    ? 'opacity-50 cursor-not-allowed'
+                    : 'hover:bg-gray-100'
+                    }`}
                 >
                   <img src={reloadIcon} alt="reload" className="w-8 h-8" />
                 </button>
@@ -920,10 +818,10 @@ const OrderForm = () => {
                     {serviceStatus.hoursLink.includes('me.senew-tech.com') ? (
                       <>
                         Visit{' '}
-                        <a 
-                          href="https://me.senew-tech.com" 
-                          className="underline hover:text-red-700" 
-                          target="_blank" 
+                        <a
+                          href="https://me.senew-tech.com"
+                          className="underline hover:text-red-700"
+                          target="_blank"
                           rel="noopener noreferrer"
                         >
                           me.senew-tech.com
@@ -940,11 +838,10 @@ const OrderForm = () => {
               <button
                 onClick={handleFetchOrder}
                 disabled={isScraping}
-                className={`w-full py-4 px-8 rounded-full font-inter text-lg font-medium text-white transition-all duration-300 ${
-                  isScraping 
-                    ? 'opacity-70 cursor-not-allowed' 
-                    : 'hover:scale-105'
-                }`}
+                className={`w-full py-4 px-8 rounded-full font-inter text-lg font-medium text-white transition-all duration-300 ${isScraping
+                  ? 'opacity-70 cursor-not-allowed'
+                  : 'hover:scale-105'
+                  }`}
                 style={{
                   background: "linear-gradient(135deg, #9945FF 0%, #14F195 100%)",
                 }}
@@ -959,7 +856,7 @@ const OrderForm = () => {
                 )}
               </button>
             )}
-            
+
             {!isLoggedIn && (
               <div className="mt-4 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
                 <div className="flex items-center gap-2 text-yellow-800">
@@ -1049,7 +946,7 @@ const OrderForm = () => {
                     {formData.orderSummary.customer?.phone || "N/A"}
                   </span>
                 </div>
-                
+
                 {/* Items from participants */}
                 {formData.orderSummary.participants?.map((participant, participantIndex) => (
                   <div key={participantIndex} className="border-b border-gray-200 pb-3">
@@ -1185,7 +1082,7 @@ const OrderForm = () => {
                 PROCEED TO PAYMENT
               </button>
             </div>
-            
+
             {/* Login prompt for unauthenticated users */}
             {!isLoggedIn && (
               <div className="mt-4 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
@@ -1211,11 +1108,10 @@ const OrderForm = () => {
               </h3>
               <div className="space-y-4">
                 <label
-                  className={`flex flex-col gap-3 p-4 border rounded-lg cursor-not-allowed opacity-50 ${
-                    formData.paymentMethod === "sol"
-                      ? "border-[#9945FF] bg-gradient-to-r from-[#9945FF]/5 to-[#14F195]/5"
-                      : "border-gray-200"
-                  }`}
+                  className={`flex flex-col gap-3 p-4 border rounded-lg cursor-not-allowed opacity-50 ${formData.paymentMethod === "sol"
+                    ? "border-[#9945FF] bg-gradient-to-r from-[#9945FF]/5 to-[#14F195]/5"
+                    : "border-gray-200"
+                    }`}
                 >
                   <div className="flex items-center gap-3">
                     <div className="relative">
@@ -1269,11 +1165,10 @@ const OrderForm = () => {
                 </label>
 
                 <label
-                  className={`flex flex-col gap-3 p-4 border rounded-lg cursor-not-allowed opacity-50 ${
-                    formData.paymentMethod === "usdc"
-                      ? "border-[#9945FF] bg-gradient-to-r from-[#9945FF]/5 to-[#14F195]/5"
-                      : "border-gray-200"
-                  }`}
+                  className={`flex flex-col gap-3 p-4 border rounded-lg cursor-not-allowed opacity-50 ${formData.paymentMethod === "usdc"
+                    ? "border-[#9945FF] bg-gradient-to-r from-[#9945FF]/5 to-[#14F195]/5"
+                    : "border-gray-200"
+                    }`}
                 >
                   <div className="flex items-center gap-3">
                     <div className="relative">
@@ -1327,11 +1222,10 @@ const OrderForm = () => {
                 </label>
 
                 <label
-                  className={`flex flex-col gap-3 p-4 border rounded-lg cursor-pointer hover:bg-gray-50 ${
-                    formData.paymentMethod === "card"
-                      ? "border-[#9945FF] bg-gradient-to-r from-[#9945FF]/5 to-[#14F195]/5"
-                      : "border-gray-200"
-                  }`}
+                  className={`flex flex-col gap-3 p-4 border rounded-lg cursor-pointer hover:bg-gray-50 ${formData.paymentMethod === "card"
+                    ? "border-[#9945FF] bg-gradient-to-r from-[#9945FF]/5 to-[#14F195]/5"
+                    : "border-gray-200"
+                    }`}
                 >
                   <div className="flex items-center gap-3">
                     <div className="relative">
@@ -1373,14 +1267,7 @@ const OrderForm = () => {
                     </div>
                   </div>
 
-                  {formData.paymentMethod === "card" && (
-                    <div className="ml-9 pt-4 border-t border-gray-200">
-                      <StripeCardElement 
-                        onCardChange={handleCardChange}
-                        error={cardError}
-                      />
-                    </div>
-                  )}
+
                 </label>
               </div>
             </div>
@@ -1525,10 +1412,10 @@ const OrderForm = () => {
                     "linear-gradient(135deg, #14F195 0%, #9945FF 100%)",
                 }}
               >
-                 {isProcessingPayment || isProcessingCardPayment ? "PROCESSING..." : "PAY WITH CARD"}
+                {isProcessingPayment || isProcessingCardPayment ? "PROCESSING..." : "PAY WITH CARD"}
               </button>
             </div>
-            
+
             {/* Login prompt for unauthenticated users */}
             {!isLoggedIn && (
               <div className="mt-4 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
@@ -1668,8 +1555,8 @@ const OrderForm = () => {
                 <div className="flex justify-between border-t-2 border-white/60 pt-4">
                   <span className="text-[#343853]">Payment By:</span>
                   <span className="font-medium">
-                    {formData.paymentMethod === "card" ? "Card" : 
-                     formData.paymentMethod === "sol" ? "SOL" : "SOL"}
+                    {formData.paymentMethod === "card" ? "Card" :
+                      formData.paymentMethod === "sol" ? "SOL" : "SOL"}
                   </span>
                 </div>
               </div>
@@ -1828,29 +1715,25 @@ const OrderForm = () => {
                 </div>
               ) : (
                 chatMessages.map((message) => (
-                  <div key={message.id} className={`flex items-start gap-3 ${
-                    message.type === 'user' ? 'flex-row-reverse' : ''
-                  }`}>
+                  <div key={message.id} className={`flex items-start gap-3 ${message.type === 'user' ? 'flex-row-reverse' : ''
+                    }`}>
                     <div className="w-8 h-8 rounded-full bg-gradient-to-r from-[#9945FF] to-[#14F195] flex items-center justify-center flex-shrink-0">
                       <img src={userIcon} alt="user" className="w-full h-full" />
                     </div>
-                    <div className={`rounded-lg p-3 shadow-sm border max-w-[80%] ${
-                      message.type === 'user' 
-                        ? 'bg-gradient-to-r from-[#9945FF] to-[#14F195] text-white' 
-                        : 'bg-white border-gray-100'
-                    }`}>
-                      <p className={`text-sm font-inter ${
-                        message.type === 'system' 
-                          ? 'text-[#6B7280] italic' 
-                          : message.type === 'user'
+                    <div className={`rounded-lg p-3 shadow-sm border max-w-[80%] ${message.type === 'user'
+                      ? 'bg-gradient-to-r from-[#9945FF] to-[#14F195] text-white'
+                      : 'bg-white border-gray-100'
+                      }`}>
+                      <p className={`text-sm font-inter ${message.type === 'system'
+                        ? 'text-[#6B7280] italic'
+                        : message.type === 'user'
                           ? 'text-white'
                           : 'text-[#374151]'
-                      }`}>
+                        }`}>
                         {message.message}
                       </p>
-                      <p className={`text-xs mt-1 ${
-                        message.type === 'user' ? 'text-white/70' : 'text-[#9CA3AF]'
-                      }`}>
+                      <p className={`text-xs mt-1 ${message.type === 'user' ? 'text-white/70' : 'text-[#9CA3AF]'
+                        }`}>
                         {message.timestamp.toLocaleTimeString()}
                       </p>
                     </div>
@@ -2063,8 +1946,8 @@ const OrderForm = () => {
                           <div className="flex justify-between border-t-2 border-white/60 pt-4">
                             <span className="text-[#374151]">Payment By:</span>
                             <span className="font-medium">
-                              {formData.paymentMethod === "card" ? "Card" : 
-                               formData.paymentMethod === "sol" ? "SOL" : "SOL"}
+                              {formData.paymentMethod === "card" ? "Card" :
+                                formData.paymentMethod === "sol" ? "SOL" : "SOL"}
                             </span>
                           </div>
                         </div>
@@ -2082,13 +1965,12 @@ const OrderForm = () => {
                               <div key={step.id} className="relative">
                                 <div className="flex items-center gap-3">
                                   <div
-                                    className={`w-12 h-12 rounded-full flex items-center justify-center flex-shrink-0 ${
-                                      isCompleted
-                                        ? "bg-[#16EE96]"
-                                        : isActive
+                                    className={`w-12 h-12 rounded-full flex items-center justify-center flex-shrink-0 ${isCompleted
+                                      ? "bg-[#16EE96]"
+                                      : isActive
                                         ? "relative"
                                         : "bg-white border-1 border-white"
-                                    }`}
+                                      }`}
                                   >
                                     {isCompleted ? null : isActive ? ( // Completed step - no icon, just solid green circle
                                       // Active step - gradient background with gradient border and BsBoxSeamFill icon
@@ -2129,11 +2011,10 @@ const OrderForm = () => {
                                       STEP {step.id}
                                     </div>
                                     <div
-                                      className={`font-inter font-medium leading-tight ${
-                                        isActive
-                                          ? "text-white font-semibold text-sm"
-                                          : "text-white/80 text-sm"
-                                      }`}
+                                      className={`font-inter font-medium leading-tight ${isActive
+                                        ? "text-white font-semibold text-sm"
+                                        : "text-white/80 text-sm"
+                                        }`}
                                     >
                                       {step.title}
                                     </div>
@@ -2141,11 +2022,10 @@ const OrderForm = () => {
                                 </div>
                                 {index < 3 && (
                                   <div
-                                    className={`absolute left-6 top-14 w-0.5 h-6 ${
-                                      isCompleted
-                                        ? "bg-[#16EE96]"
-                                        : "bg-white/20"
-                                    }`}
+                                    className={`absolute left-6 top-14 w-0.5 h-6 ${isCompleted
+                                      ? "bg-[#16EE96]"
+                                      : "bg-white/20"
+                                      }`}
                                   ></div>
                                 )}
                               </div>

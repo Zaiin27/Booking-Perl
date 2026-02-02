@@ -13,7 +13,7 @@ const PropertyForm = () => {
   const { user } = useSelector((state) => state.auth);
   const isEditMode = Boolean(id);
   const isStaffProperty = Boolean(staffId);
-  
+
   console.log("PropertyForm - id:", id, "staffId:", staffId, "isStaffProperty:", isStaffProperty);
   console.log("PropertyForm - user:", user);
   const [loading, setLoading] = useState(false);
@@ -40,7 +40,7 @@ const PropertyForm = () => {
     const reader = new FileReader();
     reader.onloadend = () => {
       const base64String = reader.result;
-      
+
       // Update preview
       const newPreviews = [...imagePreviews];
       newPreviews[index] = base64String;
@@ -97,45 +97,45 @@ const PropertyForm = () => {
       .max(100, "Property name must be less than 100 characters")
       .matches(/^[a-zA-Z0-9\s\-&.,'()]+$/, "Property name contains invalid characters")
       .required("Property name is required"),
-    
+
     address: Yup.string()
       .min(10, "Address must be at least 10 characters")
       .max(500, "Address must be less than 500 characters")
       .required("Address is required"),
-    
+
     description: Yup.string()
       .max(1000, "Description must be less than 1000 characters"),
-    
+
     contactEmail: Yup.string()
       .email("Please enter a valid email address")
       .required("Contact email is required"),
-    
+
     contactPhone: Yup.string()
       .matches(/^[\+]?[1-9][\d]{0,15}$/, "Please enter a valid phone number")
       .max(15, "Phone number must be less than 15 digits"),
-    
+
     checkInTime: Yup.string()
       .matches(/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/, "Please enter valid time format (HH:MM)")
       .required("Check-in time is required"),
-    
+
     checkOutTime: Yup.string()
       .matches(/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/, "Please enter valid time format (HH:MM)")
       .required("Check-out time is required")
-      .test('checkout-after-checkin', 'Check-out time must be after or equal to check-in time', function(value) {
+      .test('checkout-after-checkin', 'Check-out time must be after or equal to check-in time', function (value) {
         const { checkInTime } = this.parent;
         if (!checkInTime || !value) return true;
-        
+
         console.log("Time validation - Check-in:", checkInTime, "Check-out:", value);
-        
+
         const checkIn = new Date(`2000-01-01T${checkInTime}`);
         const checkOut = new Date(`2000-01-01T${value}`);
-        
+
         const isValid = checkOut >= checkIn;
         console.log("Time validation result:", isValid);
-        
+
         return isValid; // Allow same time
       }),
-    
+
     roomTypes: Yup.array()
       .of(
         Yup.object({
@@ -155,21 +155,21 @@ const PropertyForm = () => {
         })
       )
       .min(1, "At least one room type is required")
-      .test('total-rooms', 'Total rooms must be at least 1', function(roomTypes) {
+      .test('total-rooms', 'Total rooms must be at least 1', function (roomTypes) {
         if (!roomTypes) return false;
         const totalRooms = roomTypes.reduce((sum, room) => sum + (room.count || 0), 0);
         return totalRooms > 0;
       })
-      .test('unique-room-types', 'Each room type can only be added once', function(roomTypes) {
+      .test('unique-room-types', 'Each room type can only be added once', function (roomTypes) {
         if (!roomTypes) return true;
         const types = roomTypes.map(room => room.type);
         return new Set(types).size === types.length;
       }),
-    
+
     status: Yup.string()
       .oneOf(['active', 'inactive', 'maintenance'], "Invalid status")
       .required("Status is required"),
-    
+
     currency: Yup.string()
       .oneOf(['USD', 'PKR'], "Currency must be USD or PKR")
       .required("Currency is required"),
@@ -192,13 +192,13 @@ const PropertyForm = () => {
     try {
       const targetStaffId = staffId || user?.id;
       if (!targetStaffId) return;
-      
+
       // If staff is creating property for themselves, use their own paymentType from auth state
       if (user?.role === 'staff' && !staffId && user?.paymentType) {
         setPropertyPaymentType(user.paymentType);
         return;
       }
-      
+
       // If admin is creating property for a staff, use admin endpoint
       if (user?.role === 'admin' && staffId) {
         const response = await axios.get(`/api/v1/admin/users/${targetStaffId}`);
@@ -238,17 +238,17 @@ const PropertyForm = () => {
     try {
       setLoading(true);
       const response = await axios.get(`/api/v1/properties/${id}`);
-      
+
       if (response.data.success) {
         const property = response.data.data;
         const photos = property.photos || [];
-        
+
         // Set image previews
         const previews = [null, null];
         if (photos[0]) previews[0] = photos[0];
         if (photos[1]) previews[1] = photos[1];
         setImagePreviews(previews);
-        
+
         setInitialValues({
           name: property.name || "",
           address: property.address || "",
@@ -279,9 +279,9 @@ const PropertyForm = () => {
   const handleSubmit = async (values, { setSubmitting }) => {
     console.log("=== FORM SUBMISSION STARTED ===");
     console.log("Form values:", values);
-    
+
     try {
-      
+
       const payload = {
         ...values,
         roomTypes: values.roomTypes.filter(room => room.count > 0),
@@ -292,7 +292,7 @@ const PropertyForm = () => {
         payload.owner_id = staffId;
         console.log("Setting owner_id for staff property:", staffId);
       }
-      
+
       console.log("Final payload:", payload);
       console.log("isStaffProperty:", isStaffProperty, "isEditMode:", isEditMode, "staffId:", staffId);
 
@@ -302,10 +302,10 @@ const PropertyForm = () => {
       // Get token for authentication
       const token = localStorage.getItem('auth_token');
       const authHeaders = token ? { Authorization: `Bearer ${token}` } : {};
-      
+
       console.log("Property creation - Token:", token ? "Present" : "Missing");
       console.log("Property creation - Headers:", authHeaders);
-      
+
       let response;
       if (isEditMode) {
         response = await axios.put(`/api/v1/properties/${id}`, payload, { headers: authHeaders });
@@ -348,35 +348,37 @@ const PropertyForm = () => {
   }
 
   return (
-    <div className="p-3 sm:p-4 lg:p-6 bg-[#0A1330] min-h-screen">
+    <div className="p-4 lg:p-6 pb-24 lg:pb-6 bg-[#0A1330] min-h-screen">
       <div className="max-w-4xl mx-auto">
-        {/* Header */}
-        <div className="flex flex-col sm:flex-row sm:items-center gap-4 mb-6">
+        {/* Header Section */}
+        <div className="flex flex-col sm:flex-row sm:items-center gap-6 mb-10 overflow-visible">
           <button
             onClick={() => navigate(user?.role === 'staff' ? "/staff/properties" : "/admin/properties")}
-            className="p-3 bg-[#171D41] rounded-lg hover:bg-[#2A2A3E] transition-colors border border-[#3A3A4E] self-start"
+            className="p-3 bg-[#121B36] rounded-xl border border-[#FFFFFF0D] hover:bg-[#1C244D] transition-all self-start shadow-xl"
           >
-            <FaArrowLeft className="text-white" />
+            <FaArrowLeft className="text-[#14F195]" size={14} />
           </button>
-          <div className="flex-1">
-            <h1 className="text-2xl sm:text-3xl font-bold text-white">
-              {isEditMode ? "Edit Property" : "Create New Property"}
+          <div className="flex-1 flex flex-col gap-1">
+            <h1 className="text-3xl sm:text-4xl font-bold text-white tracking-tight">
+              {isEditMode ? "Modify Property" : "Direct Listing"}
             </h1>
-            <p className="text-[#AEB9E1] mt-1 text-sm sm:text-base">
-              {isEditMode ? "Update property information" : "Add a new property to your system"}
+            <p className="text-[#AEB9E1] text-xs font-bold uppercase tracking-widest opacity-60">
+              {isEditMode ? "Update listing data" : "Register a new establishment"}
             </p>
             {isStaffProperty && (
-              <div className="mt-2 inline-flex items-center px-3 py-1 rounded-full bg-blue-500/20 border border-blue-500/30">
-                <span className="text-blue-400 text-xs font-medium">
-                  Creating property for Staff ID: {staffId}
+              <div className="mt-3 inline-flex items-center px-4 py-1.5 rounded-2xl bg-blue-500/10 border border-blue-500/20">
+                <span className="text-blue-400 text-[10px] font-bold uppercase tracking-wider">
+                  Partner ID: {staffId}
                 </span>
               </div>
             )}
           </div>
         </div>
 
-        {/* Form */}
-        <div className="bg-[#171D41] rounded-lg shadow-lg border border-[#3A3A4E] p-4 sm:p-6">
+        {/* Unified Form Card */}
+        <div className="bg-[#121B36] rounded-[32px] border border-[#FFFFFF0D] shadow-2xl p-6 sm:p-10 relative overflow-hidden">
+          <div className="absolute top-0 right-0 w-64 h-64 bg-gradient-to-br from-[#9945FF] to-[#14F195] opacity-5 blur-3xl -z-10"></div>
+
           <Formik
             enableReinitialize
             initialValues={initialValues}
@@ -384,156 +386,148 @@ const PropertyForm = () => {
             onSubmit={handleSubmit}
           >
             {({ values, isSubmitting, setFieldValue, errors, touched }) => (
-              <Form className="space-y-6">
-                {/* Basic Information */}
-                <div>
-                  <h2 className="text-xl font-semibold mb-4 text-white">Basic Information</h2>
-                  
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-sm font-medium mb-2 text-[#AEB9E1]">Property Name *</label>
+              <Form className="space-y-10">
+
+                {/* Section: Basic Details */}
+                <div className="space-y-6">
+                  <div className="flex items-center gap-3 mb-2">
+                    <span className="w-2 h-6 bg-[#14F195] rounded-full"></span>
+                    <h2 className="text-xl font-bold text-white">Identity Details</h2>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="space-y-2">
+                      <label className="text-[#AEB9E1]/40 text-[10px] font-bold uppercase tracking-widest ml-1">Establishment Name *</label>
                       <Field
                         name="name"
                         type="text"
-                        className="w-full px-4 py-2 bg-[#2A2A3E] border border-[#3A3A4E] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#14F195] text-white placeholder-[#AEB9E1]"
-                        placeholder="Enter property name"
+                        className="w-full h-14 bg-[#171D41] border border-[#FFFFFF0D] rounded-2xl px-5 text-white font-bold focus:ring-2 focus:ring-[#14F195/40] outline-none transition-all placeholder-[#AEB9E1]/30"
+                        placeholder="e.g. Grand Royal Hotel"
                       />
-                      <ErrorMessage name="name" component="div" className="text-red-400 text-sm mt-1" />
+                      <ErrorMessage name="name" component="div" className="text-red-400 text-[10px] font-bold uppercase tracking-wider ml-1" />
                     </div>
 
-                    <div>
-                      <label className="block text-sm font-medium mb-2 text-[#AEB9E1]">Status</label>
+                    <div className="space-y-2">
+                      <label className="text-[#AEB9E1]/40 text-[10px] font-bold uppercase tracking-widest ml-1">Active Status</label>
                       <Field
                         as="select"
                         name="status"
-                        className="w-full px-4 py-2 bg-[#2A2A3E] border border-[#3A3A4E] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#14F195] text-white"
+                        className="w-full h-14 bg-[#171D41] border border-[#FFFFFF0D] rounded-2xl px-5 text-white font-bold focus:ring-2 focus:ring-[#14F195/40] outline-none transition-all cursor-pointer"
                       >
-                        <option value="active">Active</option>
-                        <option value="inactive">Inactive</option>
-                        <option value="maintenance">Maintenance</option>
+                        <option value="active">Operational (Active)</option>
+                        <option value="inactive">Paused (Inactive)</option>
+                        <option value="maintenance">Under Maintenance</option>
                       </Field>
                     </div>
 
-                    <div>
-                      <label className="block text-sm font-medium mb-2 text-[#AEB9E1]">Currency *</label>
+                    <div className="space-y-2">
+                      <label className="text-[#AEB9E1]/40 text-[10px] font-bold uppercase tracking-widest ml-1">Primary Currency *</label>
                       <Field
                         as="select"
                         name="currency"
-                        className="w-full px-4 py-2 bg-[#2A2A3E] border border-[#3A3A4E] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#14F195] text-white"
+                        className="w-full h-14 bg-[#171D41] border border-[#FFFFFF0D] rounded-2xl px-5 text-white font-bold focus:ring-2 focus:ring-[#14F195/40] outline-none transition-all cursor-pointer"
                       >
-                        <option value="USD">USD ($)</option>
-                        <option value="PKR">PKR (Rs)</option>
+                        <option value="USD">USD ($) - International</option>
+                        <option value="PKR">PKR (Rs) - Local</option>
                       </Field>
-                      <ErrorMessage name="currency" component="div" className="text-red-400 text-sm mt-1" />
+                      <ErrorMessage name="currency" component="div" className="text-red-400 text-[10px] font-bold uppercase tracking-wider ml-1" />
                     </div>
 
-                    {/* Payment Type Display - Read-only, inherited from staff */}
                     {propertyPaymentType && (
-                      <div>
-                        <label className="block text-sm font-medium mb-2 text-[#AEB9E1]">
-                          Payment Type <span className="text-xs text-gray-500">(Inherited from Staff)</span>
+                      <div className="space-y-2">
+                        <label className="text-[#AEB9E1]/40 text-[10px] font-bold uppercase tracking-widest ml-1">
+                          Payment Policy <span className="text-[8px] opacity-40">(Inherited)</span>
                         </label>
-                        <div className="w-full px-4 py-2 bg-[#2A2A3E] border border-[#3A3A4E] rounded-lg text-white opacity-75 cursor-not-allowed">
-                          {propertyPaymentType === 'online' ? 'Online Payment Only' :
-                           propertyPaymentType === 'cash' ? 'Cash Payment Only (Payment on Arrival)' :
-                           propertyPaymentType === 'both' ? 'Both (Online & Cash)' : 'Both'}
+                        <div className="w-full h-14 flex items-center bg-[#0A1330] border border-[#FFFFFF05] rounded-2xl px-5 text-white/50 font-bold text-sm italic">
+                          {propertyPaymentType === 'online' ? 'Credit/Debit Only' :
+                            propertyPaymentType === 'cash' ? 'Pay on Arrival Only' :
+                              'Multi-Channel (Both)'}
                         </div>
-                        <p className="text-xs text-gray-500 mt-1">
-                          This property will accept {propertyPaymentType === 'online' ? 'online payments only' :
-                          propertyPaymentType === 'cash' ? 'cash payments on arrival only' :
-                          'both online and cash payments'} based on the staff's payment preferences.
-                        </p>
                       </div>
                     )}
                   </div>
 
-                  <div className="mt-4">
-                    <label className="block text-sm font-medium mb-2 text-[#AEB9E1]">Address *</label>
+                  <div className="space-y-2">
+                    <label className="text-[#AEB9E1]/40 text-[10px] font-bold uppercase tracking-widest ml-1">Geographic Location *</label>
                     <Field
                       name="address"
                       type="text"
-                      className="w-full px-4 py-2 bg-[#2A2A3E] border border-[#3A3A4E] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#14F195] text-white placeholder-[#AEB9E1]"
-                      placeholder="Enter property address"
+                      className="w-full h-14 bg-[#171D41] border border-[#FFFFFF0D] rounded-2xl px-5 text-white font-bold focus:ring-2 focus:ring-[#14F195/40] outline-none transition-all placeholder-[#AEB9E1]/30"
+                      placeholder="Street, City, Country"
                     />
-                    <ErrorMessage name="address" component="div" className="text-red-400 text-sm mt-1" />
+                    <ErrorMessage name="address" component="div" className="text-red-400 text-[10px] font-bold uppercase tracking-wider ml-1" />
                   </div>
 
-                  <div className="mt-4">
-                    <label className="block text-sm font-medium mb-2 text-[#AEB9E1]">Description</label>
+                  <div className="space-y-2">
+                    <label className="text-[#AEB9E1]/40 text-[10px] font-bold uppercase tracking-widest ml-1">Listing Bio</label>
                     <Field
                       as="textarea"
                       name="description"
                       rows="3"
-                      className="w-full px-4 py-2 bg-[#2A2A3E] border border-[#3A3A4E] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#14F195] text-white placeholder-[#AEB9E1] resize-none"
-                      placeholder="Enter property description"
+                      className="w-full bg-[#171D41] border border-[#FFFFFF0D] rounded-[24px] p-5 text-white font-medium focus:ring-2 focus:ring-[#14F195/40] outline-none transition-all placeholder-[#AEB9E1]/30 resize-none min-h-[120px]"
+                      placeholder="Describe the unique features of your property..."
                     />
                   </div>
                 </div>
 
-                {/* Room Types */}
-                <div>
-                  <h2 className="text-xl font-semibold mb-4 text-white">Room Types</h2>
+                {/* Section: Inventory */}
+                <div className="space-y-6">
+                  <div className="flex items-center gap-3 mb-2">
+                    <span className="w-2 h-6 bg-[#9945FF] rounded-full"></span>
+                    <h2 className="text-xl font-bold text-white">Room Inventory</h2>
+                  </div>
+
                   <FieldArray name="roomTypes">
                     {({ push, remove }) => (
-                      <div className="space-y-4">
+                      <div className="space-y-6">
                         {values.roomTypes.map((room, index) => (
-                          <div key={index} className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 p-4 bg-[#2A2A3E] rounded-lg border border-[#3A3A4E]">
-                            <div>
-                              <label className="block text-sm font-medium mb-2 text-[#AEB9E1]">Room Type</label>
-                              <Field
-                                as="select"
-                                name={`roomTypes.${index}.type`}
-                                className="w-full px-4 py-2 bg-[#3A3A4E] border border-[#454A67] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#14F195] text-white"
-                              >
-                                <option value="single">Single</option>
-                                <option value="double">Double</option>
-                              </Field>
-                            </div>
-
-                            <div>
-                              <label className="block text-sm font-medium mb-2 text-[#AEB9E1]">Count</label>
-                              <Field
-                                name={`roomTypes.${index}.count`}
-                                type="number"
-                                min="0"
-                                className="w-full px-4 py-2 bg-[#3A3A4E] border border-[#454A67] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#14F195] text-white"
-                              />
-                              <ErrorMessage
-                                name={`roomTypes.${index}.count`}
-                                component="div"
-                                className="text-red-400 text-sm mt-1"
-                              />
-                            </div>
-
-                            <div>
-                              <label className="block text-sm font-medium mb-2 text-[#AEB9E1]">
-                                Price ({values.currency === "PKR" ? "Rs" : "$"})
-                              </label>
-                              <Field
-                                name={`roomTypes.${index}.price`}
-                                type="number"
-                                min="0"
-                                step="0.01"
-                                className="w-full px-4 py-2 bg-[#3A3A4E] border border-[#454A67] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#14F195] text-white"
-                              />
-                              <ErrorMessage
-                                name={`roomTypes.${index}.price`}
-                                component="div"
-                                className="text-red-400 text-sm mt-1"
-                              />
-                            </div>
-
-                            <div className="flex items-end">
-                              {values.roomTypes.length > 1 && (
-                                <button
-                                  type="button"
-                                  onClick={() => remove(index)}
-                                  className="px-4 py-2 bg-red-500/20 text-red-400 rounded-lg hover:bg-red-500/30 border border-red-500/30 w-full transition-colors"
+                          <div key={index} className="relative group">
+                            <div className="absolute -inset-0.5 bg-gradient-to-r from-[#9945FF] to-[#14F195] rounded-[28px] blur opacity-0 group-hover:opacity-10 transition duration-500"></div>
+                            <div className="relative grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 p-6 bg-[#171D41] rounded-[28px] border border-[#FFFFFF0D]">
+                              <div className="space-y-2">
+                                <label className="text-[#AEB9E1]/40 text-[9px] font-bold uppercase tracking-widest ml-1">Category</label>
+                                <Field
+                                  as="select"
+                                  name={`roomTypes.${index}.type`}
+                                  className="w-full h-12 bg-[#0A1330] border border-[#FFFFFF0D] rounded-xl px-4 text-white font-bold focus:ring-[#14F195] appearance-none cursor-pointer"
                                 >
-                                  <FaTrash className="inline mr-2" />
-                                  Remove
-                                </button>
-                              )}
+                                  <option value="single">Single Room</option>
+                                  <option value="double">Double Room</option>
+                                </Field>
+                              </div>
+
+                              <div className="space-y-2">
+                                <label className="text-[#AEB9E1]/40 text-[9px] font-bold uppercase tracking-widest ml-1">Quantity</label>
+                                <Field
+                                  name={`roomTypes.${index}.count`}
+                                  type="number"
+                                  className="w-full h-12 bg-[#0A1330] border border-[#FFFFFF0D] rounded-xl px-4 text-white font-bold outline-none"
+                                />
+                                <ErrorMessage name={`roomTypes.${index}.count`} component="div" className="text-red-400 text-[10px] font-medium" />
+                              </div>
+
+                              <div className="space-y-2">
+                                <label className="text-[#AEB9E1]/40 text-[9px] font-bold uppercase tracking-widest ml-1">Price ({values.currency})</label>
+                                <Field
+                                  name={`roomTypes.${index}.price`}
+                                  type="number"
+                                  className="w-full h-12 bg-[#0A1330] border border-[#FFFFFF0D] rounded-xl px-4 text-white font-bold outline-none"
+                                />
+                                <ErrorMessage name={`roomTypes.${index}.price`} component="div" className="text-red-400 text-[10px] font-medium" />
+                              </div>
+
+                              <div className="flex items-end">
+                                {values.roomTypes.length > 1 && (
+                                  <button
+                                    type="button"
+                                    onClick={() => remove(index)}
+                                    className="w-full h-12 flex items-center justify-center gap-2 bg-[#FF4B5510] text-[#FF4B55] border border-[#FF4B5520] rounded-xl hover:bg-[#FF4B5520] transition-all font-bold text-xs"
+                                  >
+                                    <FaTrash size={12} />
+                                    <span>REMOVE</span>
+                                  </button>
+                                )}
+                              </div>
                             </div>
                           </div>
                         ))}
@@ -541,113 +535,116 @@ const PropertyForm = () => {
                         <button
                           type="button"
                           onClick={() => push({ type: "single", count: 0, price: 0 })}
-                          className="w-full px-4 py-3 bg-gradient-to-r from-blue-500/20 to-purple-500/20 text-blue-400 rounded-lg hover:from-blue-500/30 hover:to-purple-500/30 border border-blue-500/30 transition-all duration-300"
+                          className="w-full py-4 bg-white/5 border border-dashed border-[#FFFFFF1A] rounded-[24px] text-[#AEB9E1] font-bold hover:bg-white/10 hover:border-[#14F195/40] transition-all flex items-center justify-center gap-2"
                         >
-                          <FaPlus className="inline mr-2" />
-                          Add Room Type
+                          <FaPlus size={12} />
+                          <span>APPEND NEW ROOM CATEGORY</span>
                         </button>
                       </div>
                     )}
                   </FieldArray>
                 </div>
 
-                {/* Contact Information */}
-                <div>
-                  <h2 className="text-xl font-semibold mb-4 text-white">Contact Information</h2>
-                  
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-sm font-medium mb-2 text-[#AEB9E1]">Contact Email *</label>
-                      <Field
-                        name="contactEmail"
-                        type="email"
-                        className="w-full px-4 py-2 bg-[#2A2A3E] border border-[#3A3A4E] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#14F195] text-white placeholder-[#AEB9E1]"
-                        placeholder="contact@property.com"
-                      />
-                      <ErrorMessage name="contactEmail" component="div" className="text-red-400 text-sm mt-1" />
+                {/* Section: Communications & Policy */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+                  <div className="space-y-6">
+                    <div className="flex items-center gap-3 mb-2">
+                      <span className="w-2 h-6 bg-blue-500 rounded-full"></span>
+                      <h2 className="text-xl font-bold text-white">Contact Info</h2>
                     </div>
 
-                    <div>
-                      <label className="block text-sm font-medium mb-2 text-[#AEB9E1]">Contact Phone</label>
-                      <Field
-                        name="contactPhone"
-                        type="tel"
-                        className="w-full px-4 py-2 bg-[#2A2A3E] border border-[#3A3A4E] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#14F195] text-white placeholder-[#AEB9E1]"
-                        placeholder="+1 234 567 8900"
-                      />
+                    <div className="space-y-6">
+                      <div className="space-y-2">
+                        <label className="text-[#AEB9E1]/40 text-[10px] font-bold uppercase tracking-widest ml-1">Support Email *</label>
+                        <Field
+                          name="contactEmail"
+                          type="email"
+                          className="w-full h-14 bg-[#171D41] border border-[#FFFFFF0D] rounded-2xl px-5 text-white font-bold outline-none placeholder-[#AEB9E1]/20"
+                          placeholder="inquiry@hotel.com"
+                        />
+                        <ErrorMessage name="contactEmail" component="div" className="text-red-400 text-[10px] font-bold" />
+                      </div>
+                      <div className="space-y-2">
+                        <label className="text-[#AEB9E1]/40 text-[10px] font-bold uppercase tracking-widest ml-1">Mobile Hotline</label>
+                        <Field
+                          name="contactPhone"
+                          type="tel"
+                          className="w-full h-14 bg-[#171D41] border border-[#FFFFFF0D] rounded-2xl px-5 text-white font-bold outline-none placeholder-[#AEB9E1]/20"
+                          placeholder="+00 000 000 000"
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="space-y-6">
+                    <div className="flex items-center gap-3 mb-2">
+                      <span className="w-2 h-6 bg-[#F7B91C] rounded-full"></span>
+                      <h2 className="text-xl font-bold text-white">Policy Times</h2>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <label className="text-[#AEB9E1]/40 text-[10px] font-bold uppercase tracking-widest text-center block">Check-In</label>
+                        <Field
+                          name="checkInTime"
+                          type="time"
+                          className="w-full h-14 bg-[#171D41] border border-[#FFFFFF0D] rounded-2xl px-5 text-white font-bold outline-none text-center"
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <label className="text-[#AEB9E1]/40 text-[10px] font-bold uppercase tracking-widest text-center block">Check-Out</label>
+                        <Field
+                          name="checkOutTime"
+                          type="time"
+                          className="w-full h-14 bg-[#171D41] border border-[#FFFFFF0D] rounded-2xl px-5 text-white font-bold outline-none text-center"
+                        />
+                      </div>
                     </div>
                   </div>
                 </div>
 
-                {/* Check-in/Check-out Times */}
-                <div>
-                  <h2 className="text-xl font-semibold mb-4 text-white">Check-in/Check-out Times</h2>
-                  
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-sm font-medium mb-2 text-[#AEB9E1]">Check-in Time</label>
-                      <Field
-                        name="checkInTime"
-                        type="time"
-                        className="w-full px-4 py-2 bg-[#2A2A3E] border border-[#3A3A4E] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#14F195] text-white"
-                      />
-                    </div>
-
-                    <div>
-                      <label className="block text-sm font-medium mb-2 text-[#AEB9E1]">Check-out Time</label>
-                      <Field
-                        name="checkOutTime"
-                        type="time"
-                        className="w-full px-4 py-2 bg-[#2A2A3E] border border-[#3A3A4E] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#14F195] text-white"
-                      />
-                    </div>
+                {/* Section: Media Gallery */}
+                <div className="space-y-6">
+                  <div className="flex items-center gap-3 mb-2">
+                    <span className="w-2 h-6 bg-pink-500 rounded-full"></span>
+                    <h2 className="text-xl font-bold text-white">Visual Showcase</h2>
                   </div>
-                </div>
 
-                {/* Property Images */}
-                <div>
-                  <h2 className="text-xl font-semibold mb-4 text-white">Property Images</h2>
-                  <p className="text-sm text-[#AEB9E1] mb-4">Upload up to 2 images of your property (Max 5MB each)</p>
-                  
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     {[0, 1].map((index) => (
-                      <div key={index} className="space-y-2">
-                        <label className="block text-sm font-medium text-[#AEB9E1]">
-                          Image {index + 1}
-                        </label>
-                        
+                      <div key={index} className="space-y-4">
+                        <label className="text-[#AEB9E1]/40 text-[10px] font-bold uppercase tracking-widest block ml-2">Gallery Asset {index + 1}</label>
+
                         {imagePreviews[index] ? (
-                          <div className="relative">
-                            <img
-                              src={imagePreviews[index]}
-                              alt={`Property preview ${index + 1}`}
-                              className="w-full h-48 object-cover rounded-lg border border-[#3A3A4E]"
-                            />
-                            <button
-                              type="button"
-                              onClick={() => handleImageRemove(index, setFieldValue, values)}
-                              className="absolute top-2 right-2 bg-red-500/80 hover:bg-red-500 text-white rounded-full p-2 transition-colors"
-                            >
-                              <FaTrash className="w-4 h-4" />
-                            </button>
+                          <div className="relative group rounded-[28px] overflow-hidden border border-[#FFFFFF0D] shadow-2xl">
+                            <img src={imagePreviews[index]} className="w-full h-64 object-cover" />
+                            <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-all flex items-center justify-center">
+                              <button
+                                type="button"
+                                onClick={() => handleImageRemove(index, setFieldValue, values)}
+                                className="w-12 h-12 bg-red-500 rounded-2xl flex items-center justify-center shadow-2xl active:scale-90 transition-transform"
+                              >
+                                <FaTrash size={16} className="text-white" />
+                              </button>
+                            </div>
                           </div>
                         ) : (
-                          <div className="border-2 border-dashed border-[#3A3A4E] rounded-lg p-6 text-center hover:border-[#14F195] transition-colors">
+                          <div className="h-64 border-2 border-dashed border-[#FFFFFF0D] rounded-[32px] flex items-center justify-center group hover:border-[#14F195/40] transition-colors relative">
                             <input
                               type="file"
                               accept="image/*"
                               onChange={(e) => handleImageChange(index, e, setFieldValue, values)}
-                              className="hidden"
-                              id={`image-upload-${index}`}
+                              className="absolute inset-0 opacity-0 cursor-pointer z-10"
                             />
-                            <label
-                              htmlFor={`image-upload-${index}`}
-                              className="cursor-pointer flex flex-col items-center justify-center"
-                            >
-                              <FaPlus className="w-8 h-8 text-[#AEB9E1] mb-2" />
-                              <span className="text-sm text-[#AEB9E1]">Click to upload image</span>
-                              <span className="text-xs text-[#AEB9E1]/70 mt-1">JPG, PNG, GIF (Max 5MB)</span>
-                            </label>
+                            <div className="flex flex-col items-center gap-4">
+                              <div className="w-16 h-16 rounded-full bg-white/5 flex items-center justify-center group-hover:scale-110 transition-transform">
+                                <FaPlus size={20} className="text-[#AEB9E1]" />
+                              </div>
+                              <div className="text-center">
+                                <p className="text-white font-bold text-sm">Upload Perspective</p>
+                                <p className="text-[#AEB9E1]/40 text-[10px] font-bold uppercase mt-1">High Res JPG / PNG</p>
+                              </div>
+                            </div>
                           </div>
                         )}
                       </div>
@@ -655,23 +652,22 @@ const PropertyForm = () => {
                   </div>
                 </div>
 
-                {/* Submit Buttons */}
-                <div className="flex flex-col sm:flex-row gap-4 pt-6">
+                {/* Global Actions */}
+                <div className="flex flex-col sm:flex-row gap-4 pt-10 border-t border-[#FFFFFF0D]">
                   <button
                     type="submit"
                     disabled={isSubmitting}
-                    onClick={() => console.log("Create Property button clicked!")}
-                    className="flex-1 bg-gradient-to-r from-blue-600 to-purple-600 text-white px-6 py-3 rounded-lg hover:from-blue-700 hover:to-purple-700 transition-all duration-300 disabled:opacity-50 flex items-center justify-center"
+                    className="flex-1 h-16 bg-gradient-to-r from-[#9945FF] to-[#14F195] text-white rounded-[24px] font-bold text-lg tracking-tight shadow-xl shadow-[#14F19522] hover:opacity-95 transition-all active:scale-[0.98] disabled:opacity-50 flex items-center justify-center gap-3"
                   >
-                    <FaSave className="mr-2" />
-                    {isSubmitting ? "Saving..." : isEditMode ? "Update Property" : "Create Property"}
+                    <FaSave size={18} />
+                    {isSubmitting ? "PROCESSING..." : isEditMode ? "SAVE UPDATES" : "DEPLOY LISTING"}
                   </button>
                   <button
                     type="button"
                     onClick={() => navigate(user?.role === 'staff' ? "/staff/properties" : "/admin/properties")}
-                    className="px-6 py-3 bg-[#2A2A3E] text-[#AEB9E1] rounded-lg hover:bg-[#3A3A4E] transition border border-[#3A3A4E]"
+                    className="h-16 px-10 bg-[#0A1330] text-[#AEB9E1] rounded-[24px] font-bold text-sm tracking-widest border border-[#FFFFFF0D] hover:bg-white/5 transition-all"
                   >
-                    Cancel
+                    CANCEL
                   </button>
                 </div>
               </Form>

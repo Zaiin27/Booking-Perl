@@ -9,11 +9,12 @@ const ReusableTable = ({
   selectedRow = null,
   actions = null,
   onView = null,
-  onEdit = null,  
+  onEdit = null,
   onDelete = null,
   onResendViaEmail = null,
   onOpenInChat = null, // New prop for open in chat callback
   onAddProperty = null, // New prop for add property callback
+  onPayCommission = null, // New prop for pay commission callback
   onStatusChange = null, // New prop for status change callback
   tableType = "tickets", // "orders", "tickets", "staff"
   isLoading = false, // New prop for loading state
@@ -51,7 +52,7 @@ const ReusableTable = ({
   const handleMenuClick = (e, rowId, index) => {
     e.stopPropagation();
     e.preventDefault();
-    
+
     // Convert rowId to string for consistent comparison
     const rowIdStr = String(rowId);
     console.log("Menu clicked:", { rowId, rowIdStr, index, currentActiveMenu: activeMenu, tableType });
@@ -202,23 +203,23 @@ const ReusableTable = ({
         },
       ],
     };
-    
+
     // For tickets, return progressive options based on current status
     if (tableType === "tickets" && currentStatus) {
       const availableStatuses = getTicketStatusProgression(currentStatus);
       const allTicketStatuses = statusOptions.tickets;
-      
+
       // If current status has available progressions, show only those options
       if (availableStatuses.length > 0) {
-        return allTicketStatuses.filter(status => 
+        return allTicketStatuses.filter(status =>
           availableStatuses.includes(status.value)
         );
       }
-      
+
       // If no progression available (like FULFILLED or CANCELLED), return empty array
       return [];
     }
-    
+
     return statusOptions[tableType] || statusOptions.orders;
   };
 
@@ -395,12 +396,12 @@ const ReusableTable = ({
 
     // Handle special case for cancelled tickets
     let config = statusConfig[status] || (status ? statusConfig[status.toLowerCase()] : null);
-    
+
     // If status is CANCELLED and we're dealing with tickets, use CANCELLED_TICKET
     if (status === "CANCELLED" && tableType === "tickets" && !config) {
       config = statusConfig.CANCELLED_TICKET;
     }
-    
+
     // Fallback to PENDING if no config found
     if (!config) {
       config = statusConfig.PENDING;
@@ -409,9 +410,8 @@ const ReusableTable = ({
     // For orders and properties, show static badge without dropdown
     if (tableType === "orders" || tableType === "properties") {
       return (
-        <div className={`inline-flex items-center justify-center gap-2 px-3 py-1.5 rounded-lg text-xs font-semibold min-w-[100px] ${
-          config.bg
-        } ${config.text} ${config.border || ""}`}>
+        <div className={`inline-flex items-center justify-center gap-2 px-3 py-1.5 rounded-lg text-xs font-semibold min-w-[100px] ${config.bg
+          } ${config.text} ${config.border || ""}`}>
           {config.label}
         </div>
       );
@@ -423,9 +423,8 @@ const ReusableTable = ({
     // If no status options available (like FULFILLED or CANCELLED), show static badge
     if (statusOptions.length === 0) {
       return (
-        <div className={`inline-flex items-center justify-center gap-2 px-3 py-1 rounded-lg text-[10px] font-medium min-w-[100px] ${
-          config.bg
-        } ${config.text} ${config.border || ""}`}>
+        <div className={`inline-flex items-center justify-center gap-2 px-3 py-1 rounded-lg text-[10px] font-medium min-w-[100px] ${config.bg
+          } ${config.text} ${config.border || ""}`}>
           {config.label}
         </div>
       );
@@ -435,9 +434,8 @@ const ReusableTable = ({
       <div className="relative" data-status-container>
         <button
           onClick={(e) => handleStatusClick(e, row.id)}
-          className={`inline-flex items-center justify-center gap-2 px-3 py-1 rounded-lg text-[10px] font-medium min-w-[100px] cursor-pointer hover:opacity-80 transition-opacity ${
-            config.bg
-          } ${config.text} ${config.border || ""}`}
+          className={`inline-flex items-center justify-center gap-2 px-3 py-1 rounded-lg text-[10px] font-medium min-w-[100px] cursor-pointer hover:opacity-80 transition-opacity ${config.bg
+            } ${config.text} ${config.border || ""}`}
         >
           {config.label}
           <ChevronDown className="w-3 h-3" />
@@ -449,11 +447,10 @@ const ReusableTable = ({
               <button
                 key={option.value}
                 onClick={(e) => handleStatusChange(e, row, option.value)}
-                className={`w-full text-left px-3 py-2 text-[10px] font-medium hover:bg-[#3A3A4E] transition-colors first:rounded-t-lg last:rounded-b-lg ${
-                  status === option.value || (status && status.toLowerCase() === option.value.toLowerCase())
-                    ? `${option.color} ${option.bg}`
-                    : "text-white"
-                }`}
+                className={`w-full text-left px-3 py-2 text-[10px] font-medium hover:bg-[#3A3A4E] transition-colors first:rounded-t-lg last:rounded-b-lg ${status === option.value || (status && status.toLowerCase() === option.value.toLowerCase())
+                  ? `${option.color} ${option.bg}`
+                  : "text-white"
+                  }`}
               >
                 {option.label}
               </button>
@@ -673,7 +670,7 @@ const ReusableTable = ({
               {new Date(value).toLocaleDateString()}
             </div>
             <div className="text-xs text-[#AEB9E1] bg-gray-500/20 px-2 py-1 rounded-full">
-              {new Date(value).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
+              {new Date(value).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
             </div>
           </div>
         );
@@ -715,11 +712,10 @@ const ReusableTable = ({
         return (
           <div className="space-y-1">
             <div className="flex items-center gap-2">
-              <span className={`px-2 py-1 rounded text-sm font-semibold ${
-                isLimitReached
-                  ? "bg-red-500/20 text-red-400"
-                  : "bg-green-500/20 text-green-400"
-              }`}>
+              <span className={`px-2 py-1 rounded text-sm font-semibold ${isLimitReached
+                ? "bg-red-500/20 text-red-400"
+                : "bg-green-500/20 text-green-400"
+                }`}>
                 {value || 0} clicks
               </span>
             </div>
@@ -738,11 +734,10 @@ const ReusableTable = ({
         return (
           <div className="flex flex-col gap-1">
             <span
-              className={`px-2 py-1 rounded text-xs font-semibold ${
-                value && !isExpired
-                  ? "bg-green-500/20 text-green-400"
-                  : "bg-red-500/20 text-red-400"
-              }`}
+              className={`px-2 py-1 rounded text-xs font-semibold ${value && !isExpired
+                ? "bg-green-500/20 text-green-400"
+                : "bg-red-500/20 text-red-400"
+                }`}
             >
               {value && !isExpired ? "Active" : "Inactive"}
             </span>
@@ -798,6 +793,7 @@ const ReusableTable = ({
                 onResendViaEmail={handleResendViaEmail}
                 onOpenInChat={handleOpenInChat}
                 onAddProperty={onAddProperty}
+                onPayCommission={onPayCommission}
                 position={menuPosition}
                 rowData={row}
                 tableType={tableType}
@@ -830,123 +826,388 @@ const ReusableTable = ({
   return (
     <div className="overflow-x-auto overflow-y-visible w-full scrollbar-thin scrollbar-thumb-gray-600 scrollbar-track-gray-800">
       {/* Mobile/Tablet Card View */}
+      {/* Mobile/Tablet Card View - Stunning App Experience */}
       <div className="block lg:hidden">
         {isLoading ? (
-          <div className="flex flex-col items-center justify-center space-y-3 py-12">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#14F195]"></div>
-            <div className="text-[#AEB9E1] text-sm font-medium">Loading...</div>
+          <div className="flex flex-col items-center justify-center space-y-4 py-16">
+            <div className="relative">
+              <div className="w-12 h-12 rounded-full border-t-2 border-r-2 border-[#14F195] animate-spin"></div>
+              <div className="absolute inset-0 flex items-center justify-center">
+                <div className="w-8 h-8 rounded-full border-b-2 border-l-2 border-[#9945FF] animate-spin-slow"></div>
+              </div>
+            </div>
+            <div className="text-[#AEB9E1] text-sm font-medium tracking-wide">Loading data...</div>
           </div>
         ) : data.length > 0 ? (
-          <div className="space-y-4 p-4">
-            {data.map((row, index) => (
-              <div
-                key={row.id || index}
-                className="bg-[#2A2A3E] rounded-lg p-4 border border-[#3A3A4E] hover:bg-[#3A3A4E] transition-colors"
-              >
-                {/* Property Name & Status */}
-                <div className="flex justify-between items-start mb-3">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
-                      <span className="text-white text-sm font-bold">🏨</span>
-                    </div>
-                    <div>
-                      <h3 className="font-semibold text-white text-sm">{row.name}</h3>
-                      <p className="text-[#AEB9E1] text-xs">{row.address}</p>
-                    </div>
-                  </div>
-                  {getStatusBadge(row.status, row)}
-                </div>
+          <div className="space-y-5 p-4">
+            {data.map((row, index) => {
+              const rowId = row._id || row.id;
 
-                {/* Room Info */}
-                <div className="grid grid-cols-2 gap-4 mb-3">
-                  <div className="text-center">
-                    <p className="text-[#AEB9E1] text-xs mb-1">Total Rooms</p>
-                    <span className="bg-blue-500/20 text-blue-400 px-3 py-1.5 rounded-lg text-xs font-semibold border border-blue-500/30">
-                      {row.totalRooms}
-                    </span>
-                  </div>
-                  <div className="text-center">
-                    <p className="text-[#AEB9E1] text-xs mb-1">Available</p>
-                    <span className="bg-green-500/20 text-green-400 px-3 py-1.5 rounded-lg text-xs font-semibold border border-green-500/30">
-                      {row.availableRooms}
-                    </span>
-                  </div>
-                </div>
+              // Staff Card
+              if (tableType === "staff") {
+                return (
+                  <div key={rowId || index} className="relative group">
+                    <div className="absolute -inset-0.5 bg-gradient-to-r from-[#9945FF] to-[#14F195] rounded-2xl blur opacity-10 group-hover:opacity-20 transition duration-500"></div>
+                    <div className="relative bg-[#171D41] rounded-2xl p-5 border border-[#FFFFFF0D] shadow-2xl overflow-hidden">
+                      <div className="flex justify-between items-start mb-4">
+                        <div className="flex items-center gap-4">
+                          <div className="w-12 h-12 rounded-xl bg-[#2A2D53] flex items-center justify-center relative">
+                            <span className="text-xl font-bold text-white">
+                              {row.name?.charAt(0).toUpperCase() || "S"}
+                            </span>
+                            {row.status === "Active" && (
+                              <div className="absolute -bottom-1 -right-1 w-4 h-4 rounded-full bg-[#14F195] border-4 border-[#171D41]"></div>
+                            )}
+                          </div>
+                          <div>
+                            <h3 className="font-semibold text-white text-base leading-tight">{row.name}</h3>
+                            <p className="text-[#AEB9E1] text-xs mt-0.5">{row.email}</p>
+                          </div>
+                        </div>
+                        {getStatusBadge(row.status, row)}
+                      </div>
 
-                {/* Room Types */}
-                {row.roomTypes && Array.isArray(row.roomTypes) && (
-                  <div className="mb-3">
-                    <p className="text-[#AEB9E1] text-xs mb-2">Room Types</p>
-                    <div className="flex flex-wrap gap-2">
-                      {row.roomTypes.map((room, roomIndex) => (
-                        <span key={roomIndex} className="bg-gradient-to-r from-purple-500/20 to-pink-500/20 text-purple-300 px-3 py-1.5 rounded-lg text-xs font-medium border border-purple-500/30">
-                          <span className="capitalize font-semibold">{room.type}</span>
-                          <span className="text-white ml-1">${room.price}</span>
+                      <div className="grid grid-cols-2 gap-3 mb-5">
+                        <div className="bg-[#2A2D53]/50 rounded-xl p-3 border border-[#FFFFFF05]">
+                          <p className="text-[#AEB9E1]/60 text-[10px] uppercase font-bold tracking-wider mb-1">Role</p>
+                          <p className="text-white text-xs font-semibold">{row.role}</p>
+                        </div>
+                        <div className="bg-[#2A2D53]/50 rounded-xl p-3 border border-[#FFFFFF05]">
+                          <p className="text-[#AEB9E1]/60 text-[10px] uppercase font-bold tracking-wider mb-1">Created</p>
+                          <p className="text-white text-xs font-semibold">
+                            {new Date(row.createdAt).toLocaleDateString()}
+                          </p>
+                        </div>
+                      </div>
+
+                      <div className="flex gap-2 pt-4 border-t border-[#FFFFFF0D]">
+                        <button
+                          onClick={(e) => { e.stopPropagation(); onView?.(row); }}
+                          className="flex-1 py-2.5 rounded-xl bg-white/5 hover:bg-white/10 text-white text-xs font-bold transition-all active:scale-95"
+                        >
+                          View
+                        </button>
+                        <button
+                          onClick={(e) => { e.stopPropagation(); onEdit?.(row); }}
+                          className="flex-1 py-2.5 rounded-xl bg-gradient-to-r from-[#9945FF] to-[#14F195] text-white text-xs font-bold shadow-lg shadow-[#14F19522] transition-all active:scale-95"
+                        >
+                          Edit
+                        </button>
+                        <div className="relative" data-actions-container>
+                          <button
+                            onClick={(e) => handleMenuClick(e, rowId, index)}
+                            className="bg-[#2A2D53] p-2.5 rounded-xl text-white hover:bg-[#323664] transition-all"
+                          >
+                            <MoreHorizontal size={18} />
+                          </button>
+                          {activeMenu === String(rowId) && (
+                            <div className="absolute bottom-full right-0 mb-2 z-50">
+                              <ActionsMenu
+                                isOpen={true}
+                                onClose={() => setActiveMenu(null)}
+                                onView={handleView}
+                                onEdit={handleEdit}
+                                onDelete={handleDelete}
+                                onResendViaEmail={handleResendViaEmail}
+                                onOpenInChat={handleOpenInChat}
+                                onAddProperty={onAddProperty}
+                                onPayCommission={onPayCommission}
+                                position="top"
+                                rowData={row}
+                                tableType={tableType}
+                              />
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                );
+              }
+
+              // Booking Card
+              if (tableType === "bookings") {
+                const nights = Math.ceil((new Date(row.checkOutDate) - new Date(row.checkInDate)) / (1000 * 60 * 60 * 24));
+                return (
+                  <div key={rowId || index} className="bg-[#171D41] rounded-2xl p-5 border border-[#FFFFFF0D] shadow-xl relative overflow-hidden">
+                    <div className="flex justify-between items-center mb-4">
+                      <div className="flex flex-col">
+                        <span className="text-[10px] font-bold text-[#14F195] tracking-[0.2em] uppercase mb-1">
+                          Ref: {row.bookingReference?.split('-').pop()}
                         </span>
-                      ))}
+                        <h3 className="font-semibold text-white text-base leading-tight">{row.guestName}</h3>
+                      </div>
+                      {getStatusBadge(row.bookingStatus, row)}
+                    </div>
+
+                    <div className="bg-[#2A2D53]/30 rounded-2xl p-4 mb-4 border border-[#FFFFFF05]">
+                      <div className="flex items-center justify-between mb-3">
+                        <div className="flex flex-col">
+                          <p className="text-[#AEB9E1]/60 text-[10px] uppercase font-bold mb-1">Check In</p>
+                          <p className="text-white text-xs font-semibold">{new Date(row.checkInDate).toLocaleDateString()}</p>
+                        </div>
+                        <div className="h-8 w-px bg-[#FFFFFF0D]"></div>
+                        <div className="flex flex-col text-right">
+                          <p className="text-[#AEB9E1]/60 text-[10px] uppercase font-bold mb-1">Check Out</p>
+                          <p className="text-white text-xs font-semibold">{new Date(row.checkOutDate).toLocaleDateString()}</p>
+                        </div>
+                      </div>
+                      <div className="pt-3 border-t border-[#FFFFFF0D] flex justify-between items-center">
+                        <span className="text-[#AEB9E1] text-[10px] font-medium">{nights} Nights • {row.numberOfGuests} Guests</span>
+                        <span className="text-[#14F195] font-bold text-sm">${row.totalAmount}</span>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center justify-between gap-3">
+                      <div className="flex items-center gap-2">
+                        <div className="w-8 h-8 rounded-full bg-blue-500/20 flex items-center justify-center">
+                          <span className="text-xs">💳</span>
+                        </div>
+                        <span className="text-[#AEB9E1] text-xs capitalize">{row.paymentType} • {row.paymentStatus}</span>
+                      </div>
+                      <button
+                        onClick={() => onView?.(row)}
+                        className="p-2.5 rounded-xl bg-[#2A2D53] text-white hover:bg-[#323664] transition-all"
+                      >
+                        <MoreHorizontal size={18} />
+                      </button>
                     </div>
                   </div>
-                )}
+                );
+              }
 
-                {/* Contact */}
-                <div className="mb-3">
-                  <p className="text-[#AEB9E1] text-xs mb-2 font-medium">Contact Information</p>
-                  <div className="bg-[#3A3A4E]/30 rounded-lg p-3">
-                    <div className="text-xs">
-                      <div className="text-white font-medium mb-1">{row.contactEmail}</div>
-                      {row.contactPhone && (
-                        <div className="text-[#AEB9E1]">{row.contactPhone}</div>
-                      )}
+              // Properties Card
+              if (tableType === "properties") {
+                return (
+                  <div key={rowId || index} className="bg-[#171D41] rounded-2xl overflow-hidden border border-[#FFFFFF0D] shadow-xl group">
+                    <div className="h-48 relative overflow-hidden">
+                      <img
+                        src={row.photos?.[0] || "https://images.unsplash.com/photo-1566073771259-6a8506099945?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"}
+                        alt={row.name}
+                        className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-[#171D41] to-transparent opacity-60"></div>
+                      <div className="absolute top-4 left-4">
+                        {getStatusBadge(row.status, row)}
+                      </div>
+                      <div className="absolute bottom-4 left-4 right-4">
+                        <h3 className="text-white font-semibold text-lg leading-tight truncate">{row.name}</h3>
+                        <p className="text-[#AEB9E1] text-xs flex items-center gap-1 mt-1">
+                          <span className="text-sm">📍</span> {row.address}
+                        </p>
+                      </div>
+                    </div>
+                    <div className="p-4">
+                      <div className="flex items-center justify-between mb-4">
+                        <div className="flex gap-4">
+                          <div className="flex flex-col">
+                            <span className="text-[#AEB9E1]/60 text-[10px] uppercase font-bold">Rooms</span>
+                            <span className="text-white text-xs font-bold">{row.totalRooms} Total</span>
+                          </div>
+                          <div className="flex flex-col">
+                            <span className="text-[#AEB9E1]/60 text-[10px] uppercase font-bold">Avail</span>
+                            <span className="text-[#14F195] text-xs font-bold">{row.availableRooms} Left</span>
+                          </div>
+                        </div>
+                        <div className="text-right">
+                          <span className="text-[#AEB9E1]/60 text-[10px] uppercase font-bold block">Avg. Price</span>
+                          <span className="text-white font-bold text-sm">${row.roomTypes?.[0]?.price || 0}</span>
+                        </div>
+                      </div>
+                      <div className="flex gap-2">
+                        <button onClick={() => onView?.(row)} className="flex-1 py-2.5 rounded-xl bg-[#2A2D53] text-white text-xs font-bold">View Details</button>
+                        <button onClick={() => onEdit?.(row)} className="px-3 rounded-xl bg-white/10 text-white"><span className="text-sm">⚙️</span></button>
+                      </div>
+                    </div>
+                  </div>
+                );
+              }
+
+              // Tickets Card
+              if (tableType === "tickets") {
+                return (
+                  <div key={rowId || index} className="relative group">
+                    <div className="absolute -inset-0.5 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-2xl blur opacity-10 group-hover:opacity-20 transition duration-500"></div>
+                    <div className="relative bg-[#171D41] rounded-2xl p-5 border border-[#FFFFFF0D] shadow-2xl overflow-hidden">
+                      <div className="flex justify-between items-start mb-4">
+                        <div className="flex items-center gap-3">
+                          <div className="w-10 h-10 rounded-xl bg-blue-500/20 flex items-center justify-center text-blue-400">
+                            <span className="text-lg">🎫</span>
+                          </div>
+                          <div>
+                            <h3 className="font-semibold text-white text-sm leading-tight">#{row.id}</h3>
+                            <p className="text-[#AEB9E1] text-[10px] truncate max-w-[120px]">{row.subject}</p>
+                          </div>
+                        </div>
+                        {getStatusBadge(row.status, row)}
+                      </div>
+
+                      <div className="bg-[#2A2D53]/30 rounded-xl p-3 mb-4 border border-[#FFFFFF05]">
+                        <div className="flex justify-between items-center mb-2">
+                          <span className="text-[#AEB9E1]/60 text-[10px] font-bold uppercase">Customer</span>
+                          <span className="text-white text-[10px] font-medium">{row.customerName}</span>
+                        </div>
+                        <div className="flex justify-between items-center">
+                          <span className="text-[#AEB9E1]/60 text-[10px] font-bold uppercase">Last Update</span>
+                          <span className="text-[#AEB9E1] text-[10px]">{row.lastUpdated}</span>
+                        </div>
+                      </div>
+
+                      <div className="flex gap-2">
+                        <button
+                          onClick={(e) => { e.stopPropagation(); onOpenInChat?.(row); }}
+                          className="flex-1 py-2.5 rounded-xl bg-gradient-to-r from-blue-600 to-cyan-600 text-white text-[10px] font-bold shadow-lg shadow-blue-500/20 transition-all active:scale-95 flex items-center justify-center gap-2"
+                        >
+                          <span>💬</span> Open Chat
+                        </button>
+                        <div className="relative" data-actions-container>
+                          <button
+                            onClick={(e) => handleMenuClick(e, rowId, index)}
+                            className="bg-[#2A2D53] p-2.5 rounded-xl text-white hover:bg-[#323664] transition-all h-full"
+                          >
+                            <MoreHorizontal size={16} />
+                          </button>
+                          {activeMenu === String(rowId) && (
+                            <div className="absolute bottom-full right-0 mb-2 z-50">
+                              <ActionsMenu
+                                isOpen={true}
+                                onClose={() => setActiveMenu(null)}
+                                onView={handleView}
+                                onEdit={handleEdit}
+                                onDelete={handleDelete}
+                                onResendViaEmail={handleResendViaEmail}
+                                onOpenInChat={handleOpenInChat}
+                                onAddProperty={onAddProperty}
+                                onPayCommission={onPayCommission}
+                                position="top"
+                                rowData={row}
+                                tableType={tableType}
+                              />
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                );
+              }
+
+              // Orders Card
+              if (tableType === "orders") {
+                return (
+                  <div key={rowId || index} className="bg-[#171D41] rounded-2xl p-5 border border-[#FFFFFF0D] shadow-xl relative overflow-hidden group">
+                    <div className="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity">
+                      <span className="text-4xl text-white">📦</span>
+                    </div>
+                    <div className="flex justify-between items-center mb-4">
+                      <div className="flex flex-col">
+                        <span className="text-[10px] font-bold text-cyan-400 tracking-wider mb-1">ORDER #{row.order_id}</span>
+                        <h3 className="font-semibold text-white text-sm truncate max-w-[150px]">{row.customer_email}</h3>
+                      </div>
+                      {getStatusBadge(row.status, row)}
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-4 mb-4">
+                      <div className="flex flex-col">
+                        <span className="text-[#AEB9E1]/40 text-[10px] font-bold uppercase mb-1">Total Amount</span>
+                        <span className="text-white font-bold text-base">${row.amount?.toFixed(2)}</span>
+                      </div>
+                      <div className="flex flex-col text-right">
+                        <span className="text-[#AEB9E1]/40 text-[10px] font-bold uppercase mb-1">Payment</span>
+                        <span className="text-[#14F195] font-bold text-xs uppercase">{row.payment}</span>
+                      </div>
+                    </div>
+
+                    <div className="flex items-center justify-between pt-4 border-t border-[#FFFFFF0D]">
+                      <span className="text-[#AEB9E1] text-[10px] font-medium">{row.timestamp}</span>
+                      <div className="flex gap-2">
+                        <button onClick={() => onView?.(row)} className="px-4 py-2 rounded-lg bg-white/5 hover:bg-white/10 text-white text-[10px] font-bold transition-all">View</button>
+                        <button onClick={(e) => handleMenuClick(e, rowId, index)} className="p-2 rounded-lg bg-[#2A2D53] text-white"><MoreHorizontal size={14} /></button>
+                      </div>
+                    </div>
+                  </div>
+                );
+              }
+
+              // Contacts Card
+              if (tableType === "contacts") {
+                return (
+                  <div key={rowId || index} className="bg-[#171D41] rounded-2xl p-5 border border-[#FFFFFF0D] shadow-xl hover:bg-[#1C244D] transition-all group">
+                    <div className="flex justify-between items-start mb-4">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-xl bg-orange-500/20 flex items-center justify-center text-orange-400 group-hover:scale-110 transition-transform">
+                          <span className="text-lg">📧</span>
+                        </div>
+                        <div>
+                          <h3 className="font-semibold text-white text-sm">{row.name}</h3>
+                          <p className="text-[#AEB9E1] text-[10px]">{row.email}</p>
+                        </div>
+                      </div>
+                      <span className={`text-[10px] px-2 py-1 rounded-lg font-bold uppercase ${row.status === 'unread' ? 'bg-red-500/20 text-red-400 border border-red-500/30' : 'bg-green-500/20 text-green-400 border border-green-500/30'}`}>
+                        {row.status}
+                      </span>
+                    </div>
+
+                    <div className="bg-[#0A1330]/50 rounded-xl p-3 mb-4">
+                      <p className="text-white text-[11px] font-bold mb-1 truncate">{row.subject}</p>
+                      <p className="text-[#AEB9E1] text-[10px] line-clamp-2 italic leading-relaxed">"{row.message}"</p>
+                    </div>
+
+                    <div className="flex items-center justify-between">
+                      <div className="flex flex-col">
+                        <span className="text-[9px] text-[#AEB9E1]/60 font-bold uppercase">{new Date(row.createdAt).toLocaleDateString()}</span>
+                        <span className="text-[9px] text-[#AEB9E1]/40 uppercase">{new Date(row.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+                      </div>
+                      <button
+                        onClick={() => alert(`Full Message:\n\n${row.message}`)}
+                        className="px-4 py-2 rounded-xl bg-[#2A2D53] text-white text-[10px] font-bold hover:bg-white/10 transition-all flex items-center gap-2"
+                      >
+                        Read Full
+                      </button>
+                    </div>
+                  </div>
+                );
+              }
+
+              // Default Fallback Card
+              return (
+                <div
+                  key={rowId || index}
+                  className="bg-[#171D41] rounded-2xl p-5 border border-[#FFFFFF0D] shadow-xl hover:bg-[#1C244D] transition-colors"
+                >
+                  <div className="flex justify-between items-start mb-4">
+                    <div className="flex items-center gap-4">
+                      <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500/20 to-purple-500/20 flex items-center justify-center text-xl">
+                        {tableType === "orders" ? "📦" : tableType === "tickets" ? "🎫" : "📄"}
+                      </div>
+                      <div>
+                        <h3 className="font-semibold text-white text-sm">{row.name || row.title || row.bookingReference || "N/A"}</h3>
+                        <p className="text-[#AEB9E1] text-[10px] mt-0.5">{row.email || row.guestEmail || row.type || tableType}</p>
+                      </div>
+                    </div>
+                    {getStatusBadge(row.status || row.bookingStatus, row)}
+                  </div>
+
+                  <div className="flex items-center justify-between pt-4 border-t border-[#FFFFFF0D]">
+                    <div className="text-xs text-[#AEB9E1]">
+                      {row.createdAt ? new Date(row.createdAt).toLocaleDateString() : "No date"}
+                    </div>
+                    <div className="flex gap-2">
+                      <button onClick={(e) => { e.stopPropagation(); onView?.(row); }} className="px-4 py-1.5 rounded-lg bg-[#2A2D53] text-white text-[10px] font-bold">View</button>
+                      <button onClick={(e) => handleMenuClick(e, rowId, index)} className="p-1.5 rounded-lg bg-white/5 text-white"><MoreHorizontal size={14} /></button>
                     </div>
                   </div>
                 </div>
-
-                {/* Actions */}
-                <div className="flex gap-2 pt-3 border-t border-[#3A3A4E]">
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      if (onView) onView(row);
-                    }}
-                    className="flex-1 flex items-center justify-center gap-2 bg-blue-500/20 text-blue-400 px-3 py-2 rounded text-xs font-medium hover:bg-blue-500/30 transition"
-                  >
-                    <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                    </svg>
-                    View
-                  </button>
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      if (onEdit) onEdit(row);
-                    }}
-                    className="flex-1 flex items-center justify-center gap-2 bg-yellow-500/20 text-yellow-400 px-3 py-2 rounded text-xs font-medium hover:bg-yellow-500/30 transition"
-                  >
-                    <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                    </svg>
-                    Edit
-                  </button>
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      if (onDelete) onDelete(row);
-                    }}
-                    className="flex-1 flex items-center justify-center gap-2 bg-red-500/20 text-red-400 px-3 py-2 rounded text-xs font-medium hover:bg-red-500/30 transition"
-                  >
-                    <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                    </svg>
-                    Delete
-                  </button>
-                </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         ) : (
-          <div className="text-center py-12">
-            <div className="text-[#AEB9E1] text-sm font-medium">No data found</div>
+          <div className="flex flex-col items-center justify-center py-20 px-4 text-center">
+            <div className="w-20 h-20 bg-[#171D41] rounded-full flex items-center justify-center mb-4 border border-[#FFFFFF0D]">
+              <span className="text-4xl filter grayscale opacity-40">📂</span>
+            </div>
+            <h3 className="text-white font-bold text-lg mb-1">No Records Found</h3>
+            <p className="text-[#AEB9E1] text-sm max-w-xs">We couldn't find any data to display here at the moment.</p>
           </div>
         )}
       </div>
@@ -958,10 +1219,9 @@ const ReusableTable = ({
             {columns.map((column) => (
               <th
                 key={column.key}
-                className={`text-left py-5 px-6 text-sm font-semibold text-white font-inter ${
-                  column.className || ""
-                }`}
-                style={{ 
+                className={`text-left py-5 px-6 text-sm font-semibold text-white font-inter ${column.className || ""
+                  }`}
+                style={{
                   width: `${100 / columns.length}%`,
                   minWidth: column.className ? column.className.replace('min-w-[', '').replace(']', '') : '140px',
                   maxWidth: column.key === 'paymentType' ? '150px' : '300px',
@@ -993,17 +1253,15 @@ const ReusableTable = ({
               <tr
                 key={row.id || index}
                 onClick={() => onRowClick && onRowClick(row)}
-                className={`border-b border-[#EDEDED33] hover:bg-[#0A1330] hover:rounded-lg transition-all duration-200 cursor-pointer my-2 ${
-                  selectedRow === row.id ? "bg-[#0A1330]" : ""
-                }`}
+                className={`border-b border-[#EDEDED33] hover:bg-[#0A1330] hover:rounded-lg transition-all duration-200 cursor-pointer my-2 ${selectedRow === row.id ? "bg-[#0A1330]" : ""
+                  }`}
               >
                 {columns.map((column) => (
                   <td
                     key={column.key}
-                    className={`py-5 px-6 text-sm text-[#AEB9E1] font-medium font-inter text-left ${
-                      column.className || ""
-                    } ${column.key === 'actions' ? 'overflow-visible' : ''}`}
-                    style={{ 
+                    className={`py-5 px-6 text-sm text-[#AEB9E1] font-medium font-inter text-left ${column.className || ""
+                      } ${column.key === 'actions' ? 'overflow-visible' : ''}`}
+                    style={{
                       width: `${100 / columns.length}%`,
                       minWidth: column.className ? column.className.replace('min-w-[', '').replace(']', '') : '140px',
                       maxWidth: column.key === 'actions' ? 'none' : (column.key === 'paymentType' ? '150px' : 'none'),

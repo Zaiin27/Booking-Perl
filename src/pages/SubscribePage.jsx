@@ -6,7 +6,6 @@ import { toast } from "react-hot-toast";
 import {
   FaArrowLeft,
   FaCheckCircle,
-  FaCreditCard,
   FaMobile,
   FaWallet,
   FaLock,
@@ -34,13 +33,13 @@ const SubscribePage = () => {
 
   const checkCurrentSubscription = async () => {
     if (!user) return;
-    
+
     try {
       const token = user?.token || localStorage.getItem("auth_token");
       const response = await axios.get("/api/v1/plans/my-subscription", {
         headers: token ? { Authorization: `Bearer ${token}` } : {},
       });
-      
+
       if (response.data.success && response.data.data.isActive) {
         const currentPlan = response.data.data.plan?.name || response.data.data.subscription?.planName;
         if (currentPlan === planName) {
@@ -84,7 +83,7 @@ const SubscribePage = () => {
       return;
     }
 
-    if (paymentMethod !== "stripe" && !mobileNumber) {
+    if (!mobileNumber) {
       toast.error(`Please enter your ${paymentMethod === "jazzcash" ? "JazzCash" : "EasyPaisa"} mobile number`);
       return;
     }
@@ -94,7 +93,7 @@ const SubscribePage = () => {
     try {
       // Get token from user or localStorage
       const token = user?.token || localStorage.getItem("auth_token");
-      
+
       if (!token) {
         toast.error("Please login to subscribe");
         navigate("/login", { state: { returnTo: `/subscribe/${planName}` } });
@@ -105,7 +104,7 @@ const SubscribePage = () => {
       const response = await axios.post("/api/v1/subscriptions", {
         planName: plan.name,
         duration: plan.duration,
-        paymentMethod: paymentMethod === "stripe" ? "manual" : paymentMethod,
+        paymentMethod: paymentMethod,
       }, {
         headers: {
           Authorization: `Bearer ${token}`
@@ -115,88 +114,76 @@ const SubscribePage = () => {
       if (response.data.success) {
         const subscription = response.data.data;
 
-        if (paymentMethod === "stripe") {
-          // Handle Stripe payment (if implemented)
-          toast.success("Redirecting to payment...");
-          // Navigate to payment page
-          navigate("/order-now", {
-            state: {
-              subscriptionId: subscription._id,
-              amount: plan.price,
-              currency: plan.currency,
-              planName: plan.name,
-            },
+
+        // For JazzCash/EasyPaisa, create payment first
+        try {
+          const paymentEndpoint = paymentMethod === "jazzcash"
+            ? "/api/v1/payments/create-jazzcash-payment"
+            : "/api/v1/payments/create-easypaisa-payment";
+
+          const paymentResponse = await axios.post(paymentEndpoint, {
+            amount: plan.price,
+            currency: plan.currency,
+            subscription_id: subscription._id,
+            mobile_number: mobileNumber,
+            description: `Payment for ${plan.displayName} subscription`,
+          }, {
+            headers: {
+              Authorization: `Bearer ${token}`
+            }
           });
-        } else {
-          // For JazzCash/EasyPaisa, create payment first
-          try {
-            const paymentEndpoint = paymentMethod === "jazzcash" 
-              ? "/api/v1/payments/create-jazzcash-payment"
-              : "/api/v1/payments/create-easypaisa-payment";
-            
-            const paymentResponse = await axios.post(paymentEndpoint, {
-              amount: plan.price,
-              currency: plan.currency,
-              subscription_id: subscription._id,
-              mobile_number: mobileNumber,
-              description: `Payment for ${plan.displayName} subscription`,
+
+          if (paymentResponse.data.success) {
+            const { transaction_id, payment_url } = paymentResponse.data.data;
+
+            // Update subscription with transaction ID
+            await axios.patch(`/api/v1/subscriptions/${subscription._id}`, {
+              transactionId: transaction_id,
             }, {
               headers: {
                 Authorization: `Bearer ${token}`
               }
             });
 
-            if (paymentResponse.data.success) {
-              const { transaction_id, payment_url } = paymentResponse.data.data;
-              
-              // Update subscription with transaction ID
-              await axios.patch(`/api/v1/subscriptions/${subscription._id}`, {
-                transactionId: transaction_id,
-              }, {
-                headers: {
-                  Authorization: `Bearer ${token}`
-                }
-              });
+            toast.success("Payment initiated! Please complete payment on your mobile device.");
 
-              toast.success("Payment initiated! Please complete payment on your mobile device.");
-              
-              // Open payment URL in new tab if available
-              if (payment_url) {
-                window.open(payment_url, '_blank');
-              }
-              
-              // Navigate to payment verification
-              navigate("/payment-verification", {
-                state: {
-                  subscriptionId: subscription._id,
-                  paymentMethod,
-                  transactionId: transaction_id,
-                  amount: plan.price,
-                  currency: plan.currency,
-                  planName: plan.name,
-                },
-              });
-            } else {
-              toast.error("Failed to initiate payment");
+            // Open payment URL in new tab if available
+            if (payment_url) {
+              window.open(payment_url, '_blank');
             }
-          } catch (error) {
-            console.error("Error creating payment:", error);
-            
-            // Handle 401 Unauthorized
-            if (error.response?.status === 401) {
-              toast.error("Session expired. Please login again.");
-              localStorage.removeItem("auth_token");
-              navigate("/login", { state: { returnTo: `/subscribe/${planName}` } });
-              return;
-            }
-            
-            toast.error(error.response?.data?.message || "Failed to create payment");
+
+            // Navigate to payment verification
+            navigate("/payment-verification", {
+              state: {
+                subscriptionId: subscription._id,
+                paymentMethod,
+                transactionId: transaction_id,
+                amount: plan.price,
+                currency: plan.currency,
+                planName: plan.name,
+              },
+            });
+          } else {
+            toast.error("Failed to initiate payment");
           }
+        } catch (error) {
+          console.error("Error creating payment:", error);
+
+          // Handle 401 Unauthorized
+          if (error.response?.status === 401) {
+            toast.error("Session expired. Please login again.");
+            localStorage.removeItem("auth_token");
+            navigate("/login", { state: { returnTo: `/subscribe/${planName}` } });
+            return;
+          }
+
+          toast.error(error.response?.data?.message || "Failed to create payment");
         }
+
       }
     } catch (error) {
       console.error("Error creating subscription:", error);
-      
+
       // Handle 401 Unauthorized
       if (error.response?.status === 401) {
         toast.error("Session expired. Please login again.");
@@ -204,7 +191,7 @@ const SubscribePage = () => {
         navigate("/login", { state: { returnTo: `/subscribe/${planName}` } });
         return;
       }
-      
+
       // Handle already active subscription
       if (error.response?.data?.message?.includes("already have an active subscription")) {
         toast.error("You already have an active subscription!", {
@@ -216,7 +203,7 @@ const SubscribePage = () => {
         }, 2000);
         return;
       }
-      
+
       toast.error(error.response?.data?.message || "Failed to create subscription");
     } finally {
       setProcessing(false);
@@ -263,7 +250,7 @@ const SubscribePage = () => {
           {/* Plan Summary */}
           <div className="bg-white/5 backdrop-blur-md rounded-2xl p-6 border border-white/10">
             <h2 className="text-2xl font-semibold text-white mb-6">Plan Details</h2>
-            
+
             <div className="space-y-4 mb-6">
               <div className="flex justify-between items-center p-4 bg-white/5 rounded-lg">
                 <span className="text-white/70">Plan</span>
@@ -314,11 +301,10 @@ const SubscribePage = () => {
                   {/* JazzCash */}
                   <div
                     onClick={() => setPaymentMethod("jazzcash")}
-                    className={`p-4 rounded-lg border-2 cursor-pointer transition-all ${
-                      paymentMethod === "jazzcash"
-                        ? "border-green-500 bg-green-500/10"
-                        : "border-white/20 hover:border-green-400"
-                    }`}
+                    className={`p-4 rounded-lg border-2 cursor-pointer transition-all ${paymentMethod === "jazzcash"
+                      ? "border-green-500 bg-green-500/10"
+                      : "border-white/20 hover:border-green-400"
+                      }`}
                   >
                     <div className="flex items-center gap-3">
                       <FaMobile className="text-green-400 text-xl" />
@@ -332,11 +318,10 @@ const SubscribePage = () => {
                   {/* EasyPaisa */}
                   <div
                     onClick={() => setPaymentMethod("easypaisa")}
-                    className={`p-4 rounded-lg border-2 cursor-pointer transition-all ${
-                      paymentMethod === "easypaisa"
-                        ? "border-purple-500 bg-purple-500/10"
-                        : "border-white/20 hover:border-purple-400"
-                    }`}
+                    className={`p-4 rounded-lg border-2 cursor-pointer transition-all ${paymentMethod === "easypaisa"
+                      ? "border-purple-500 bg-purple-500/10"
+                      : "border-white/20 hover:border-purple-400"
+                      }`}
                   >
                     <div className="flex items-center gap-3">
                       <FaWallet className="text-purple-400 text-xl" />

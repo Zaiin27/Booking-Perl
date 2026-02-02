@@ -18,7 +18,7 @@ const PropertyDetail = () => {
     try {
       setLoading(true);
       const response = await axios.get(`/api/v1/properties/${id}`);
-      
+
       if (response.data.success) {
         setProperty(response.data.data);
       }
@@ -38,7 +38,7 @@ const PropertyDetail = () => {
 
     try {
       const response = await axios.delete(`/api/v1/properties/${id}`);
-      
+
       if (response.data.success) {
         toast.success("Property deleted successfully");
         navigate("/admin/properties");
@@ -77,167 +77,173 @@ const PropertyDetail = () => {
   }
 
   return (
-    <div className="p-3 sm:p-4 lg:p-6 bg-[#0A1330] min-h-screen">
+    <div className="p-4 lg:p-6 pb-24 lg:pb-6 bg-[#0A1330] min-h-screen">
       <div className="max-w-6xl mx-auto">
-        {/* Header */}
-        <div className="flex flex-col sm:flex-row sm:items-center gap-4 mb-6">
+        {/* Header Section */}
+        <div className="flex flex-col sm:flex-row sm:items-center gap-6 mb-8 mt-2">
           <button
             onClick={() => navigate("/admin/properties")}
-            className="p-3 bg-[#171D41] rounded-lg hover:bg-[#2A2A3E] transition-colors border border-[#3A3A4E] self-start"
+            className="p-3 bg-[#121B36] rounded-xl border border-[#FFFFFF0D] hover:bg-[#1C244D] transition-all self-start shadow-lg"
           >
-            <FaArrowLeft className="text-white" />
+            <FaArrowLeft className="text-[#14F195]" size={14} />
           </button>
-          <div className="flex-1">
-            <h1 className="text-2xl sm:text-3xl font-bold text-white">{property.name}</h1>
-            <p className="text-[#AEB9E1] mt-1 text-sm sm:text-base">Property Details</p>
+
+          <div className="flex-1 flex flex-col gap-1">
+            <h1 className="text-3xl sm:text-4xl font-bold text-white tracking-tight">{property.name}</h1>
+            <p className="text-[#AEB9E1] text-xs font-bold uppercase tracking-widest opacity-60">Property Management</p>
           </div>
-          <div className="flex gap-3">
+
+          <div className="flex gap-3 w-full sm:w-auto">
             <button
               onClick={() => navigate(`/admin/properties/edit/${id}`)}
-              className="flex items-center gap-2 bg-gradient-to-r from-yellow-600 to-orange-600 text-white px-4 py-2 rounded-lg hover:from-yellow-700 hover:to-orange-700 transition"
+              className="flex-1 sm:flex-none flex items-center justify-center gap-2 bg-[#F7B91C20] text-[#F7B91C] border border-[#F7B91C40] px-5 py-3 rounded-2xl font-bold hover:bg-[#F7B91C30] transition-all active:scale-95 text-sm"
             >
-              <FaEdit />
-              <span className="hidden sm:inline">Edit</span>
+              <FaEdit size={14} />
+              <span>Edit</span>
             </button>
             <button
               onClick={handleDelete}
-              className="flex items-center gap-2 bg-gradient-to-r from-red-600 to-pink-600 text-white px-4 py-2 rounded-lg hover:from-red-700 hover:to-pink-700 transition"
+              className="flex-1 sm:flex-none flex items-center justify-center gap-2 bg-[#FF4B5520] text-[#FF4B55] border border-[#FF4B5540] px-5 py-3 rounded-2xl font-bold hover:bg-[#FF4B5530] transition-all active:scale-95 text-sm"
             >
-              <FaTrash />
-              <span className="hidden sm:inline">Delete</span>
+              <FaTrash size={14} />
+              <span>Delete</span>
             </button>
           </div>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Main Content */}
+          {/* Main Content Column */}
           <div className="lg:col-span-2 space-y-6">
-            {/* Basic Information */}
-            <div className="bg-[#171D41] rounded-lg shadow-lg border border-[#3A3A4E] p-4 sm:p-6">
-              <h2 className="text-xl font-semibold mb-4 text-white flex items-center gap-2">
-                <FaHome className="text-blue-400" />
-                Basic Information
-              </h2>
-              
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-[#AEB9E1] mb-2">Property Name</label>
-                  <div className="text-white font-medium">{property.name}</div>
+
+            {/* Core Info Card */}
+            <div className="bg-[#121B36] rounded-[32px] p-6 sm:p-8 border border-[#FFFFFF0D] shadow-2xl relative overflow-hidden">
+              <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-[#9945FF] to-[#14F195] opacity-5 blur-3xl"></div>
+
+              <div className="flex items-center gap-4 mb-8">
+                <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-blue-600 to-cyan-600 flex items-center justify-center shadow-lg">
+                  <FaHome className="w-7 h-7 text-white" />
                 </div>
-                
                 <div>
-                  <label className="block text-sm font-medium text-[#AEB9E1] mb-2">Status</label>
-                  <span className={`inline-flex items-center px-3 py-1.5 rounded-lg text-xs font-semibold ${
-                    property.status === "active" 
-                      ? "bg-green-500/20 text-green-400 border border-green-500/30"
-                      : property.status === "inactive"
-                      ? "bg-red-500/20 text-red-400 border border-red-500/30"
-                      : "bg-yellow-500/20 text-yellow-400 border border-yellow-500/30"
-                  }`}>
-                    {property.status.charAt(0).toUpperCase() + property.status.slice(1)}
-                  </span>
+                  <h2 className="text-xl font-bold text-white leading-tight">Identity</h2>
+                  <p className="text-[#AEB9E1] text-xs font-medium opacity-60">Basic information & status</p>
                 </div>
               </div>
 
-              <div className="mt-4">
-                <label className="block text-sm font-medium text-[#AEB9E1] mb-2 flex items-center gap-2">
-                  <FaMapMarkerAlt className="text-blue-400" />
-                  Address
-                </label>
-                <div className="text-white">{property.address}</div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                <div className="space-y-1">
+                  <label className="text-[#AEB9E1]/40 text-[10px] font-bold uppercase tracking-widest">Listing Name</label>
+                  <div className="text-white font-bold text-xl tracking-tight">{property.name}</div>
+                </div>
+
+                <div className="space-y-1">
+                  <label className="text-[#AEB9E1]/40 text-[10px] font-bold uppercase tracking-widest">Current Status</label>
+                  <div>
+                    <span className={`inline-flex items-center px-4 py-1.5 rounded-xl text-[10px] font-bold uppercase tracking-wider ${property.status === "active"
+                      ? "bg-[#14F19520] text-[#14F195] border border-[#14F19540]"
+                      : property.status === "inactive"
+                        ? "bg-[#FF4B5520] text-[#FF4B55] border border-[#FF4B5540]"
+                        : "bg-[#F7B91C20] text-[#F7B91C] border border-[#F7B91C40]"
+                      }`}>
+                      {property.status}
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              <div className="mt-8 pt-6 border-t border-[#FFFFFF0D]">
+                <label className="text-[#AEB9E1]/40 text-[10px] font-bold uppercase tracking-widest block mb-2">Location Address</label>
+                <div className="flex items-start gap-3 text-white">
+                  <div className="w-8 h-8 rounded-lg bg-blue-500/10 flex items-center justify-center flex-shrink-0">
+                    <FaMapMarkerAlt className="text-blue-400" size={14} />
+                  </div>
+                  <span className="font-medium text-sm leading-relaxed">{property.address}</span>
+                </div>
               </div>
 
               {property.description && (
-                <div className="mt-4">
-                  <label className="block text-sm font-medium text-[#AEB9E1] mb-2">Description</label>
-                  <div className="text-[#AEB9E1] bg-[#2A2A3E] rounded-lg p-3 border border-[#3A3A4E]">
-                    {property.description}
+                <div className="mt-8">
+                  <label className="text-[#AEB9E1]/40 text-[10px] font-bold uppercase tracking-widest block mb-2">Description</label>
+                  <div className="text-[#AEB9E1] bg-[#171D41] rounded-[24px] p-5 border border-[#FFFFFF0D] text-sm leading-relaxed italic">
+                    "{property.description}"
                   </div>
                 </div>
               )}
             </div>
 
-            {/* Room Types */}
-            <div className="bg-[#171D41] rounded-lg shadow-lg border border-[#3A3A4E] p-4 sm:p-6">
-              <h2 className="text-xl font-semibold mb-4 text-white flex items-center gap-2">
-                <FaBed className="text-purple-400" />
-                Room Types & Pricing
-              </h2>
-              
+            {/* Units & Pricing Card */}
+            <div className="bg-[#121B36] rounded-[32px] p-6 sm:p-8 border border-[#FFFFFF0D] shadow-2xl">
+              <div className="flex items-center gap-4 mb-8">
+                <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-purple-600 to-pink-600 flex items-center justify-center shadow-lg">
+                  <FaBed className="w-7 h-7 text-white" />
+                </div>
+                <div>
+                  <h2 className="text-xl font-bold text-white leading-tight">Units & Pricing</h2>
+                  <p className="text-[#AEB9E1] text-xs font-medium opacity-60">Room distribution and nightly rates</p>
+                </div>
+              </div>
+
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 {property.roomTypes.map((room, index) => (
-                  <div key={index} className="bg-[#2A2A3E] rounded-lg p-4 border border-[#3A3A4E]">
-                    <div className="flex justify-between items-start mb-3">
-                      <h3 className="text-lg font-semibold text-white capitalize">{room.type} Room</h3>
-                      <span className="bg-gradient-to-r from-purple-500/20 to-pink-500/20 text-purple-300 px-3 py-1.5 rounded-lg text-sm font-medium border border-purple-500/30">
-                        ${room.price}/night
-                      </span>
-                    </div>
-                    
-                    <div className="grid grid-cols-2 gap-4">
-                      <div>
-                        <label className="block text-xs text-[#AEB9E1] mb-1">Total Count</label>
-                        <span className="bg-blue-500/20 text-blue-400 px-3 py-1.5 rounded-lg text-sm font-semibold border border-blue-500/30">
-                          {room.count}
-                        </span>
+                  <div key={index} className="bg-[#171D41] rounded-[24px] p-5 border border-[#FFFFFF0D] group hover:border-[#FFFFFF1A] transition-all">
+                    <div className="flex justify-between items-start mb-4">
+                      <h3 className="text-base font-bold text-white capitalize">{room.type} Room</h3>
+                      <div className="bg-[#14F19520] text-[#14F195] px-3 py-1.5 rounded-xl text-sm font-bold border border-[#14F19530]">
+                        ${room.price}
                       </div>
-                      <div>
-                        <label className="block text-xs text-[#AEB9E1] mb-1">Available</label>
-                        <span className="bg-green-500/20 text-green-400 px-3 py-1.5 rounded-lg text-sm font-semibold border border-green-500/30">
-                          {room.available || room.count}
-                        </span>
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-3">
+                      <div className="bg-[#0A1330] rounded-xl p-3 border border-[#FFFFFF05]">
+                        <p className="text-[#AEB9E1]/40 text-[9px] font-bold uppercase mb-1 tracking-tight">Total Capacity</p>
+                        <p className="text-white font-bold text-sm">{room.count} Rooms</p>
+                      </div>
+                      <div className="bg-[#0A1330] rounded-xl p-3 border border-[#FFFFFF05]">
+                        <p className="text-[#14F195]/40 text-[9px] font-bold uppercase mb-1 tracking-tight">Available</p>
+                        <p className="text-[#14F195] font-bold text-sm">{room.available || room.count} Rooms</p>
                       </div>
                     </div>
                   </div>
                 ))}
               </div>
 
-              <div className="mt-4 pt-4 border-t border-[#3A3A4E]">
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="text-center">
-                    <label className="block text-sm text-[#AEB9E1] mb-2">Total Rooms</label>
-                    <span className="bg-blue-500/20 text-blue-400 px-4 py-2 rounded-lg text-lg font-bold border border-blue-500/30">
-                      {property.totalRooms}
-                    </span>
-                  </div>
-                  <div className="text-center">
-                    <label className="block text-sm text-[#AEB9E1] mb-2">Available Rooms</label>
-                    <span className="bg-green-500/20 text-green-400 px-4 py-2 rounded-lg text-lg font-bold border border-green-500/30">
-                      {property.availableRooms || property.totalRooms}
-                    </span>
-                  </div>
+              <div className="mt-8 pt-6 border-t border-[#FFFFFF0D] grid grid-cols-2 gap-4">
+                <div className="text-center bg-blue-500/5 p-4 rounded-2xl border border-blue-500/10">
+                  <p className="text-blue-400 text-[10px] font-bold uppercase mb-1">Portfolio Total</p>
+                  <p className="text-white text-2xl font-bold tracking-tighter">{property.totalRooms}</p>
+                  <p className="text-[#AEB9E1] text-[9px] font-medium opacity-40">Total Rooms Registered</p>
+                </div>
+                <div className="text-center bg-green-500/5 p-4 rounded-2xl border border-green-500/10">
+                  <p className="text-green-400 text-[10px] font-bold uppercase mb-1">Ready to Book</p>
+                  <p className="text-white text-2xl font-bold tracking-tighter">{property.availableRooms || property.totalRooms}</p>
+                  <p className="text-[#AEB9E1] text-[9px] font-medium opacity-40">Currently Available</p>
                 </div>
               </div>
             </div>
           </div>
 
-          {/* Sidebar */}
+          {/* Sidebar Column */}
           <div className="lg:col-span-1 space-y-6">
-            {/* Contact Information */}
-            <div className="bg-[#171D41] rounded-lg shadow-lg border border-[#3A3A4E] p-4 sm:p-6">
-              <h2 className="text-xl font-semibold mb-4 text-white flex items-center gap-2">
-                <FaEnvelope className="text-green-400" />
-                Contact Information
-              </h2>
-              
-              <div className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium text-[#AEB9E1] mb-2 flex items-center gap-2">
-                    <FaEnvelope className="text-green-400" />
-                    Email
-                  </label>
-                  <div className="text-white bg-[#2A2A3E] rounded-lg p-3 border border-[#3A3A4E]">
+
+            {/* Contact Details Card */}
+            <div className="bg-[#121B36] rounded-[32px] p-6 sm:p-8 border border-[#FFFFFF0D] shadow-2xl overflow-hidden relative">
+              <div className="absolute top-0 right-0 w-24 h-24 bg-green-500/5 blur-3xl rounded-full"></div>
+              <h3 className="text-lg font-bold text-white mb-6 flex items-center gap-2">
+                <FaEnvelope className="text-[#14F195]" size={16} />
+                Contact Info
+              </h3>
+
+              <div className="space-y-6">
+                <div className="space-y-2">
+                  <label className="text-[#AEB9E1]/40 text-[10px] font-bold uppercase tracking-widest ml-1">Official Email</label>
+                  <div className="text-white bg-[#171D41] rounded-2xl p-4 border border-[#FFFFFF0D] text-sm font-bold truncate">
                     {property.contactEmail}
                   </div>
                 </div>
-                
+
                 {property.contactPhone && (
-                  <div>
-                    <label className="block text-sm font-medium text-[#AEB9E1] mb-2 flex items-center gap-2">
-                      <FaPhone className="text-green-400" />
-                      Phone
-                    </label>
-                    <div className="text-white bg-[#2A2A3E] rounded-lg p-3 border border-[#3A3A4E]">
+                  <div className="space-y-2">
+                    <label className="text-[#AEB9E1]/40 text-[10px] font-bold uppercase tracking-widest ml-1">Direct Phone</label>
+                    <div className="text-white bg-[#171D41] rounded-2xl p-4 border border-[#FFFFFF0D] text-sm font-bold">
                       {property.contactPhone}
                     </div>
                   </div>
@@ -245,37 +251,39 @@ const PropertyDetail = () => {
               </div>
             </div>
 
-            {/* Check-in/Check-out Times */}
-            <div className="bg-[#171D41] rounded-lg shadow-lg border border-[#3A3A4E] p-4 sm:p-6">
-              <h2 className="text-xl font-semibold mb-4 text-white flex items-center gap-2">
-                <FaClock className="text-yellow-400" />
-                Check-in/Check-out Times
-              </h2>
-              
-              <div className="space-y-4">
-                <div>
-                  <label className="block text-sm font-medium text-[#AEB9E1] mb-2">Check-in Time</label>
-                  <div className="text-white bg-[#2A2A3E] rounded-lg p-3 border border-[#3A3A4E] text-center">
+            {/* Policy & Times Card */}
+            <div className="bg-[#121B36] rounded-[32px] p-6 sm:p-8 border border-[#FFFFFF0D] shadow-2xl overflow-hidden relative">
+              <div className="absolute top-0 right-0 w-24 h-24 bg-yellow-500/5 blur-3xl rounded-full"></div>
+              <h3 className="text-lg font-bold text-white mb-6 flex items-center gap-2">
+                <FaClock className="text-[#F7B91C]" size={16} />
+                Timing Policy
+              </h3>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <label className="text-[#AEB9E1]/40 text-[10px] font-bold uppercase tracking-widest text-center block">Check In</label>
+                  <div className="text-white bg-[#171D41] rounded-2xl p-4 border border-[#FFFFFF0D] text-center font-bold text-sm">
                     {property.checkInTime}
                   </div>
                 </div>
-                
-                <div>
-                  <label className="block text-sm font-medium text-[#AEB9E1] mb-2">Check-out Time</label>
-                  <div className="text-white bg-[#2A2A3E] rounded-lg p-3 border border-[#3A3A4E] text-center">
+
+                <div className="space-y-2">
+                  <label className="text-[#AEB9E1]/40 text-[10px] font-bold uppercase tracking-widest text-center block">Check Out</label>
+                  <div className="text-white bg-[#171D41] rounded-2xl p-4 border border-[#FFFFFF0D] text-center font-bold text-sm">
                     {property.checkOutTime}
                   </div>
                 </div>
               </div>
             </div>
 
-            {/* Amenities */}
+            {/* Features Card */}
             {property.amenities && property.amenities.length > 0 && (
-              <div className="bg-[#171D41] rounded-lg shadow-lg border border-[#3A3A4E] p-4 sm:p-6">
-                <h2 className="text-xl font-semibold mb-4 text-white">Amenities</h2>
+              <div className="bg-[#121B36] rounded-[32px] p-6 sm:p-8 border border-[#FFFFFF0D] shadow-2xl relative overflow-hidden">
+                <div className="absolute bottom-0 right-0 w-24 h-24 bg-blue-500/5 blur-3xl rounded-full"></div>
+                <h3 className="text-lg font-bold text-white mb-6">Key Amenities</h3>
                 <div className="flex flex-wrap gap-2">
                   {property.amenities.map((amenity, index) => (
-                    <span key={index} className="bg-gradient-to-r from-blue-500/20 to-purple-500/20 text-blue-300 px-3 py-1.5 rounded-lg text-sm font-medium border border-blue-500/30">
+                    <span key={index} className="bg-[#171D41] text-[#AEB9E1] px-4 py-2 rounded-xl text-xs font-bold border border-[#FFFFFF0D] hover:bg-[#1C244D] transition-all cursor-default">
                       {amenity}
                     </span>
                   ))}

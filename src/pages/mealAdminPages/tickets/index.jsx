@@ -48,10 +48,10 @@ const TicketsPage = () => {
 
   // Debounced search query
   const [debouncedSearchQuery, setDebouncedSearchQuery] = useState(searchQuery);
-  
+
   // Debounced filters
   const [debouncedFilters, setDebouncedFilters] = useState(filters);
-  
+
   // Optimistic updates state
   const [optimisticUpdates, setOptimisticUpdates] = useState({});
 
@@ -60,7 +60,7 @@ const TicketsPage = () => {
     if (searchQuery !== debouncedSearchQuery) {
       setIsFilterLoading(true);
     }
-    
+
     const timer = setTimeout(() => {
       setDebouncedSearchQuery(searchQuery);
       setIsFilterLoading(false);
@@ -74,7 +74,7 @@ const TicketsPage = () => {
     if (JSON.stringify(filters) !== JSON.stringify(debouncedFilters)) {
       setIsFilterLoading(true);
     }
-    
+
     const timer = setTimeout(() => {
       setDebouncedFilters(filters);
       setIsFilterLoading(false);
@@ -120,7 +120,7 @@ const TicketsPage = () => {
 
   // Ticket status update mutation
   const [updateTicketStatus, { isLoading: isUpdatingStatus }] = useUpdateTicketStatusMutation();
-  
+
   // Order status update mutation
   const [updateOrderStatus, { isLoading: isUpdatingOrderStatus }] = useUpdateOrderStatusMutation();
 
@@ -137,7 +137,7 @@ const TicketsPage = () => {
       if (ticket.status === "RESOLVED") {
         frontendStatus = "FULFILLED";
       }
-      
+
       // Apply optimistic update if exists
       const ticketId = ticket.ticket_id;
       console.log("Checking optimistic update for ticket:", ticketId, "current status:", frontendStatus, "optimisticUpdates:", optimisticUpdates);
@@ -147,7 +147,7 @@ const TicketsPage = () => {
       } else {
         console.log("❌ No optimistic update found for ticket:", ticketId);
       }
-      
+
       return {
         id: ticket.ticket_id,
         orderId: ticket.order_id,
@@ -157,8 +157,8 @@ const TicketsPage = () => {
         lastUpdated: ticket.updatedAt ? new Date(ticket.updatedAt).toLocaleDateString() : "N/A",
         status: frontendStatus, // Use mapped frontend status for table display
         statusValue: ticket.status, // Keep original backend status for API calls
-        assignedStaff: ticket.claimed_by ? 
-          (ticket.claimed_by.name || "Admin") : 
+        assignedStaff: ticket.claimed_by ?
+          (ticket.claimed_by.name || "Admin") :
           null,
         createdAt: ticket.createdAt,
         userId: ticket.user_id?.id,
@@ -188,7 +188,7 @@ const TicketsPage = () => {
       },
     }));
     setCurrentPage(1); // Reset to first page when filters change
-    
+
     // Show loading immediately when filter changes
     setIsFilterLoading(true);
   };
@@ -197,7 +197,7 @@ const TicketsPage = () => {
   const handleSearchChange = (value) => {
     setSearchQuery(value);
     setCurrentPage(1); // Reset to first page when search changes
-    
+
     // Show loading immediately when user types
     if (value !== debouncedSearchQuery) {
       setIsFilterLoading(true);
@@ -211,7 +211,7 @@ const TicketsPage = () => {
     console.log("Row data:", row);
     console.log("Extracted ticketId:", ticketId);
     const loadingToast = toastUtils.loading(`Updating ticket ${ticketId} status...`);
-    
+
     // Apply optimistic update immediately
     console.log("Applying optimistic update:", { ticketId, newStatus });
     setOptimisticUpdates(prev => {
@@ -222,23 +222,23 @@ const TicketsPage = () => {
       console.log("Optimistic updates state:", updated);
       return updated;
     });
-    
+
     try {
       // Map frontend status to backend status
       let backendStatus = newStatus;
       if (newStatus === "FULFILLED") {
         backendStatus = "RESOLVED";
       }
-      
+
       // Update ticket status
-      await updateTicketStatus({ 
-        ticketId, 
-        status: backendStatus 
+      await updateTicketStatus({
+        ticketId,
+        status: backendStatus
       }).unwrap();
-      
+
       // Dismiss loading toast first
       toastUtils.dismiss(loadingToast);
-      
+
       // If ticket status is FULFILLED (RESOLVED in backend), also update the order status to PLACED
       if (newStatus === "FULFILLED" && orderId) {
         try {
@@ -246,7 +246,7 @@ const TicketsPage = () => {
             orderId,
             status: "PLACED"
           }).unwrap();
-          
+
           toastUtils.success(`Ticket status updated to Fulfilled and order status updated to Placed successfully!`);
         } catch (orderError) {
           console.error('Failed to update order status:', orderError);
@@ -255,19 +255,19 @@ const TicketsPage = () => {
       } else {
         toastUtils.success(`Status updated successfully!`);
       }
-      
+
       // Remove optimistic update after successful update and sync with server
       setOptimisticUpdates(prev => {
         const updated = { ...prev };
         delete updated[ticketId];
         return updated;
       });
-      
+
       // Sync with server data after a short delay
       setTimeout(() => {
         refetch();
       }, 1000);
-      
+
     } catch (error) {
       // Remove optimistic update on error
       setOptimisticUpdates(prev => {
@@ -275,7 +275,7 @@ const TicketsPage = () => {
         delete updated[ticketId];
         return updated;
       });
-      
+
       toastUtils.dismiss(loadingToast);
       toastUtils.error(`Failed to update status. Please try again.`);
       console.error('Failed to update ticket status:', error);
@@ -290,7 +290,7 @@ const TicketsPage = () => {
   // Handle row selection
   const handleRowClick = (row) => {
     setSelectedRow(selectedRow === row.id ? null : row.id);
-    
+
     // Open chat for this ticket when row is clicked
     handleOpenInChat(row);
   };
@@ -337,7 +337,7 @@ const TicketsPage = () => {
   const handleOpenInChat = (ticket) => {
     console.log("Opening ticket in chat:", ticket);
     console.log("Ticket assignedStaff:", ticket.assignedStaff);
-    
+
     // Create chat context with ticket information
     const chatContext = {
       ticketId: ticket.id,
@@ -364,15 +364,15 @@ const TicketsPage = () => {
         lastUpdated: ticket.lastUpdated
       }
     };
-    
+
     console.log("Chat context created:", chatContext);
-    
+
     // Navigate to chat page with ticket context
-    navigate('/admin/tickets/chat', { 
-      state: { 
+    navigate('/admin/tickets/chat', {
+      state: {
         selectedChat: chatContext,
-        showChatWindow: true 
-      } 
+        showChatWindow: true
+      }
     });
   };
 
@@ -471,9 +471,8 @@ const TicketsPage = () => {
   }));
 
   // CSV filename with current date
-  const csvFilename = `tickets_export_${
-    new Date().toISOString().split("T")[0]
-  }.csv`;
+  const csvFilename = `tickets_export_${new Date().toISOString().split("T")[0]
+    }.csv`;
 
   // Show loading state
   if (isLoading) {
@@ -511,7 +510,7 @@ const TicketsPage = () => {
             icon={IoMdCheckmarkCircleOutline}
           />
         </div>
-        
+
         <div className="flex flex-col bg-[#171D41] rounded-t-lg p-6">
           {/* Header and Filters Section */}
           <div className="flex items-center justify-between mb-6">
@@ -548,75 +547,83 @@ const TicketsPage = () => {
   }
 
   return (
-    <div className="p-6">
-      {/* Stat Cards Section */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
-        <StatCard title="Total Tickets" value={(stats.total || 0).toString()} icon={TicketsIcon} />
-        <StatCard
-          title="Open Tickets"
-          value={(stats.open || 0).toString()}
-          icon={MdOutlineChatBubbleOutline}
-        />
-        <StatCard
-          title="Fulfilled"
-          value={(stats.fulfilled || 0).toString()}
-          icon={IoMdCheckmarkCircleOutline}
-        />
-      </div>
-      <div className="flex flex-col bg-[#171D41] rounded-t-lg p-6">
-        {/* Header and Filters Section */}
-        <div className="flex items-center justify-between mb-6">
-          <h1 className="text-2xl font-bold text-white">Tickets</h1>
+    <div className="p-4 lg:p-6 pb-24 lg:pb-6 bg-[#0A1330] min-h-screen">
+      <div className="max-w-7xl mx-auto">
+        {/* Header Section */}
+        <div className="flex flex-col gap-1 mb-8">
+          <h1 className="text-2xl sm:text-3xl font-black text-white px-1 mt-2">Support Tickets</h1>
+          <p className="text-[#AEB9E1] px-1 text-sm opacity-60">Manage and resolve customer support inquiries.</p>
+        </div>
 
-          {/* Search and Filters Section */}
-          <div className="flex-1 ml-8">
+        {/* Stat Cards Section */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
+          <StatCard
+            title="Total Tickets"
+            value={(stats.total || 0).toString()}
+            icon={TicketsIcon}
+            gradient="from-blue-500 to-cyan-500"
+          />
+          <StatCard
+            title="Open Tickets"
+            value={(stats.open || 0).toString()}
+            icon={MdOutlineChatBubbleOutline}
+            gradient="from-orange-500 to-red-500"
+          />
+          <StatCard
+            title="Fulfilled"
+            value={(stats.fulfilled || 0).toString()}
+            icon={IoMdCheckmarkCircleOutline}
+            gradient="from-green-500 to-[#14F195]"
+          />
+        </div>
+
+        {/* Main Content Card */}
+        <div className="bg-[#121B36] rounded-[32px] border border-[#FFFFFF0D] shadow-2xl overflow-hidden relative">
+          <LoadingOverlay
+            isLoading={isLoading || isFilterLoading}
+            message={isFilterLoading ? "Searching..." : "Loading tickets..."}
+          />
+
+          {/* Filters Area */}
+          <div className="p-6 pb-2">
             <ReusableFilter
               filters={Object.values(filters)}
               onFilterChange={handleFilterChange}
-              searchPlaceholder="Ticket ID, Order ID..."
+              searchPlaceholder="Search ticket or order ID..."
               onSearchChange={handleSearchChange}
               searchValue={searchQuery}
             />
           </div>
-        </div>
 
-        {/* Tickets Table */}
-        <div className="bg-[#171D41] rounded-lg border border-[#EDEDED33] p-4 relative">
-          <LoadingOverlay 
-            isLoading={isLoading || isFilterLoading}
-            message={
-              isFilterLoading 
-                ? (searchQuery !== debouncedSearchQuery ? "Searching..." : "Applying filters...") 
-                : "Loading tickets..."
-            }
-          />
-          
-          <ReusableTable
-            columns={columns}
-            data={currentData}
-            onRowClick={handleRowClick}
-            selectedRow={selectedRow}
-            actions={true}
-            onView={handleViewTicket}
-            onEdit={handleEditTicket}
-            onDelete={handleDeleteTicket}
-            onOpenInChat={handleOpenInChat}
-            onStatusChange={handleTicketStatusUpdate}
-            tableType="tickets"
-          />
-        </div>
-      </div>
+          {/* Table Area */}
+          <div className="p-0 sm:p-4">
+            <ReusableTable
+              columns={columns}
+              data={currentData}
+              onRowClick={handleRowClick}
+              selectedRow={selectedRow}
+              actions={true}
+              onView={handleViewTicket}
+              onEdit={handleEditTicket}
+              onDelete={handleDeleteTicket}
+              onOpenInChat={handleOpenInChat}
+              onStatusChange={handleTicketStatusUpdate}
+              tableType="tickets"
+            />
+          </div>
 
-      {/* Pagination */}
-      <div className="bg-[#171D41] rounded-b-lg px-3 pb-3">
-        <ReusablePagination
-          currentPage={currentPage}
-          totalPages={totalPages}
-          onPageChange={handlePageChange}
-          totalItems={totalItems}
-          itemsPerPage={itemsPerPage}
-          showPageInfo={true}
-        />
+          {/* Pagination */}
+          <div className="px-3 pb-3">
+            <ReusablePagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              onPageChange={handlePageChange}
+              totalItems={totalItems}
+              itemsPerPage={itemsPerPage}
+              showPageInfo={true}
+            />
+          </div>
+        </div>
       </div>
 
       {/* Hidden CSV Export Link */}
@@ -653,9 +660,8 @@ const TicketsPage = () => {
           deleteConfirmState.ticket?.subject ||
           "This ticket will be permanently deleted from the system"
         }
-        itemDate={`Created ${
-          deleteConfirmState.ticket?.lastUpdated || "Unknown"
-        }`}
+        itemDate={`Created ${deleteConfirmState.ticket?.lastUpdated || "Unknown"
+          }`}
         confirmButtonText="Delete Ticket"
         type="delete"
       />
