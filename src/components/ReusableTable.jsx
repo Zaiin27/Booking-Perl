@@ -386,12 +386,6 @@ const ReusableTable = ({
         label: "Pending",
         border: "border border-[#3B82F6]",
       },
-      closed: {
-        bg: "bg-[#6B728033]",
-        text: "text-[#6B7280]",
-        label: "Closed",
-        border: "border border-[#6B7280]",
-      },
     };
 
     // Handle special case for cancelled tickets
