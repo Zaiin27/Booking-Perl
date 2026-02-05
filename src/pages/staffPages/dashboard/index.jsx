@@ -108,12 +108,7 @@ const StaffDashboard = () => {
     <div className="p-4 sm:p-6 bg-[#0A1330] min-h-screen">
       {/* Header */}
       <div className="mb-6">
-        <div className="flex items-center gap-3 mb-2">
-          <div className="w-10 h-10 rounded-lg bg-gradient-to-r from-[#9945FF] to-[#14F195] flex items-center justify-center">
-            <Home className="w-5 h-5 text-white" />
-          </div>
-          <h1 className="text-2xl sm:text-3xl font-bold text-white">My Dashboard</h1>
-        </div>
+
         <p className="text-[#AEB9E1] text-sm sm:text-base">
           Welcome back! Here's what's happening with your property today.
         </p>

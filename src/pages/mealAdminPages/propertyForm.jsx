@@ -418,18 +418,18 @@ const PropertyForm = () => {
 
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                       <div className="space-y-2">
-                        <label className="text-[#AEB9E1]/40 text-[10px] font-bold uppercase tracking-widest ml-1">Establishment Name *</label>
+                        <label className="text-white text-[10px] font-bold uppercase tracking-widest ml-1">Establishment Name *</label>
                         <Field
                           name="name"
                           type="text"
-                          className="w-full h-14 bg-[#171D41] border border-[#FFFFFF0D] rounded-2xl px-5 text-white font-bold focus:ring-2 focus:ring-[#14F195/40] outline-none transition-all placeholder-[#AEB9E1]/30"
+                          className="w-full h-14 bg-[#171D41] border border-[#FFFFFF0D] rounded-2xl px-5 text-white font-bold focus:ring-2 focus:ring-[#14F195/40] outline-none transition-all placeholder-white/60"
                           placeholder="e.g. Grand Royal Hotel"
                         />
                         <ErrorMessage name="name" component="div" className="text-red-400 text-[10px] font-bold uppercase tracking-wider ml-1" />
                       </div>
 
                       <div className="space-y-2">
-                        <label className="text-[#AEB9E1]/40 text-[10px] font-bold uppercase tracking-widest ml-1">Active Status</label>
+                        <label className="text-white text-[10px] font-bold uppercase tracking-widest ml-1">Active Status</label>
                         <Field
                           as="select"
                           name="status"
@@ -442,7 +442,7 @@ const PropertyForm = () => {
                       </div>
 
                       <div className="space-y-2">
-                        <label className="text-[#AEB9E1]/40 text-[10px] font-bold uppercase tracking-widest ml-1">Primary Currency *</label>
+                        <label className="text-white text-[10px] font-bold uppercase tracking-widest ml-1">Primary Currency *</label>
                         <Field
                           as="select"
                           name="currency"
@@ -456,7 +456,7 @@ const PropertyForm = () => {
 
                       {propertyPaymentType && (
                         <div className="space-y-2">
-                          <label className="text-[#AEB9E1]/40 text-[10px] font-bold uppercase tracking-widest ml-1">
+                          <label className="text-white text-[10px] font-bold uppercase tracking-widest ml-1">
                             Payment Policy <span className="text-[8px] opacity-40">(Inherited)</span>
                           </label>
                           <div className="w-full h-14 flex items-center bg-[#0A1330] border border-[#FFFFFF05] rounded-2xl px-5 text-white/50 font-bold text-sm italic">
@@ -469,23 +469,23 @@ const PropertyForm = () => {
                     </div>
 
                     <div className="space-y-2">
-                      <label className="text-[#AEB9E1]/40 text-[10px] font-bold uppercase tracking-widest ml-1">Geographic Location *</label>
+                      <label className="text-white text-[10px] font-bold uppercase tracking-widest ml-1">Geographic Location *</label>
                       <Field
                         name="address"
                         type="text"
-                        className="w-full h-14 bg-[#171D41] border border-[#FFFFFF0D] rounded-2xl px-5 text-white font-bold focus:ring-2 focus:ring-[#14F195/40] outline-none transition-all placeholder-[#AEB9E1]/30"
+                        className="w-full h-14 bg-[#171D41] border border-[#FFFFFF0D] rounded-2xl px-5 text-white font-bold focus:ring-2 focus:ring-[#14F195/40] outline-none transition-all placeholder-white/60"
                         placeholder="Street, City, Country"
                       />
                       <ErrorMessage name="address" component="div" className="text-red-400 text-[10px] font-bold uppercase tracking-wider ml-1" />
                     </div>
 
                     <div className="space-y-2">
-                      <label className="text-[#AEB9E1]/40 text-[10px] font-bold uppercase tracking-widest ml-1">Listing Bio</label>
+                      <label className="text-white text-[10px] font-bold uppercase tracking-widest ml-1">Listing Bio</label>
                       <Field
                         as="textarea"
                         name="description"
                         rows="3"
-                        className="w-full bg-[#171D41] border border-[#FFFFFF0D] rounded-[24px] p-5 text-white font-medium focus:ring-2 focus:ring-[#14F195/40] outline-none transition-all placeholder-[#AEB9E1]/30 resize-none min-h-[120px]"
+                        className="w-full bg-[#171D41] border border-[#FFFFFF0D] rounded-[24px] p-5 text-white font-medium focus:ring-2 focus:ring-[#14F195/40] outline-none transition-all placeholder-white/60 resize-none min-h-[120px]"
                         placeholder="Describe the unique features of your property..."
                       />
                     </div>
@@ -506,7 +506,7 @@ const PropertyForm = () => {
                               <div className="absolute -inset-0.5 bg-gradient-to-r from-[#9945FF] to-[#14F195] rounded-[28px] blur opacity-0 group-hover:opacity-10 transition duration-500"></div>
                               <div className="relative grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 p-6 bg-[#171D41] rounded-[28px] border border-[#FFFFFF0D]">
                                 <div className="space-y-2">
-                                  <label className="text-[#AEB9E1]/40 text-[9px] font-bold uppercase tracking-widest ml-1">Category</label>
+                                  <label className="text-white text-[9px] font-bold uppercase tracking-widest ml-1">Category</label>
                                   <Field
                                     as="select"
                                     name={`roomTypes.${index}.type`}
@@ -518,7 +518,7 @@ const PropertyForm = () => {
                                 </div>
 
                                 <div className="space-y-2">
-                                  <label className="text-[#AEB9E1]/40 text-[9px] font-bold uppercase tracking-widest ml-1">Quantity</label>
+                                  <label className="text-white text-[9px] font-bold uppercase tracking-widest ml-1">Quantity</label>
                                   <Field
                                     name={`roomTypes.${index}.count`}
                                     type="number"
@@ -528,7 +528,7 @@ const PropertyForm = () => {
                                 </div>
 
                                 <div className="space-y-2">
-                                  <label className="text-[#AEB9E1]/40 text-[9px] font-bold uppercase tracking-widest ml-1">Price ({values.currency})</label>
+                                  <label className="text-white text-[9px] font-bold uppercase tracking-widest ml-1">Price ({values.currency})</label>
                                   <Field
                                     name={`roomTypes.${index}.price`}
                                     type="number"
@@ -576,21 +576,21 @@ const PropertyForm = () => {
 
                       <div className="space-y-6">
                         <div className="space-y-2">
-                          <label className="text-[#AEB9E1]/40 text-[10px] font-bold uppercase tracking-widest ml-1">Support Email *</label>
+                          <label className="text-white text-[10px] font-bold uppercase tracking-widest ml-1">Support Email *</label>
                           <Field
                             name="contactEmail"
                             type="email"
-                            className="w-full h-14 bg-[#171D41] border border-[#FFFFFF0D] rounded-2xl px-5 text-white font-bold outline-none placeholder-[#AEB9E1]/20"
+                            className="w-full h-14 bg-[#171D41] border border-[#FFFFFF0D] rounded-2xl px-5 text-white font-bold outline-none placeholder-white/60"
                             placeholder="inquiry@hotel.com"
                           />
                           <ErrorMessage name="contactEmail" component="div" className="text-red-400 text-[10px] font-bold" />
                         </div>
                         <div className="space-y-2">
-                          <label className="text-[#AEB9E1]/40 text-[10px] font-bold uppercase tracking-widest ml-1">Mobile Hotline</label>
+                          <label className="text-white text-[10px] font-bold uppercase tracking-widest ml-1">Mobile Hotline</label>
                           <Field
                             name="contactPhone"
                             type="tel"
-                            className="w-full h-14 bg-[#171D41] border border-[#FFFFFF0D] rounded-2xl px-5 text-white font-bold outline-none placeholder-[#AEB9E1]/20"
+                            className="w-full h-14 bg-[#171D41] border border-[#FFFFFF0D] rounded-2xl px-5 text-white font-bold outline-none placeholder-white/60"
                             placeholder="+00 000 000 000"
                           />
                         </div>
@@ -605,7 +605,7 @@ const PropertyForm = () => {
 
                       <div className="grid grid-cols-2 gap-4">
                         <div className="space-y-2">
-                          <label className="text-[#AEB9E1]/40 text-[10px] font-bold uppercase tracking-widest text-center block">Check-In</label>
+                          <label className="text-white text-[10px] font-bold uppercase tracking-widest text-center block">Check-In</label>
                           <Field
                             name="checkInTime"
                             type="time"
@@ -613,7 +613,7 @@ const PropertyForm = () => {
                           />
                         </div>
                         <div className="space-y-2">
-                          <label className="text-[#AEB9E1]/40 text-[10px] font-bold uppercase tracking-widest text-center block">Check-Out</label>
+                          <label className="text-white text-[10px] font-bold uppercase tracking-widest text-center block">Check-Out</label>
                           <Field
                             name="checkOutTime"
                             type="time"
@@ -634,7 +634,7 @@ const PropertyForm = () => {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                       {[0, 1].map((index) => (
                         <div key={index} className="space-y-4">
-                          <label className="text-[#AEB9E1]/40 text-[10px] font-bold uppercase tracking-widest block ml-2">Gallery Asset {index + 1}</label>
+                          <label className="text-white text-[10px] font-bold uppercase tracking-widest block ml-2">Gallery Asset {index + 1}</label>
 
                           {imagePreviews[index] ? (
                             <div className="relative group rounded-[28px] overflow-hidden border border-[#FFFFFF0D] shadow-2xl">
@@ -663,7 +663,7 @@ const PropertyForm = () => {
                                 </div>
                                 <div className="text-center">
                                   <p className="text-white font-bold text-sm">Upload Perspective</p>
-                                  <p className="text-[#AEB9E1]/40 text-[10px] font-bold uppercase mt-1">High Res JPG / PNG</p>
+                                  <p className="text-white/40 text-[10px] font-bold uppercase mt-1">High Res JPG / PNG</p>
                                 </div>
                               </div>
                             </div>

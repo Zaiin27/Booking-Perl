@@ -222,10 +222,7 @@ const PropertiesPage = () => {
       <div className="max-w-8xl mx-auto">
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
-          <div className="flex flex-col gap-1">
-            <h1 className="text-2xl sm:text-3xl font-bold text-white px-1 mt-2">Properties</h1>
-            <p className="text-[#AEB9E1] px-1 text-sm opacity-60">Manage and track your active hotel listings.</p>
-          </div>
+
           <button
             onClick={() => navigate(user?.role === 'staff' ? "/staff/properties/create" : "/admin/properties/create")}
             disabled={!canAddProperty}

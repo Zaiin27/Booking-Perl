@@ -200,11 +200,7 @@ const BookingsPage = () => {
   return (
     <div className="p-4 lg:p-6 pb-24 lg:pb-6 bg-[#0A1330] min-h-screen">
       <div className="max-w-7xl mx-auto">
-        {/* Header */}
-        <div className="flex flex-col gap-1 mb-8">
-          <h1 className="text-2xl sm:text-3xl font-bold text-white px-1 mt-2">Bookings</h1>
-          <p className="text-[#AEB9E1] px-1 text-sm sm:text-base opacity-60">Monitor and manage all hotel reservations.</p>
-        </div>
+
 
         {/* Content Card */}
         <div className="bg-[#121B36] rounded-[32px] border border-[#FFFFFF0D] shadow-2xl overflow-hidden">
