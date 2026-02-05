@@ -7,6 +7,20 @@ import axios from "../../utils/axios";
 import { toast } from "react-hot-toast";
 import { FaPlus, FaTrash, FaSave, FaArrowLeft } from "react-icons/fa";
 
+const FormErrorReporter = ({ errors, submitCount }) => {
+  useEffect(() => {
+    if (submitCount > 0 && Object.keys(errors).length > 0) {
+      const firstError = Object.values(errors)[0];
+      const errorMsg = typeof firstError === 'string'
+        ? firstError
+        : "Please check all required fields and room quantities/prices.";
+      toast.error(`Form Error: ${errorMsg}`);
+      console.log("Validation Errors:", errors);
+    }
+  }, [submitCount]);
+  return null;
+};
+
 const PropertyForm = () => {
   const navigate = useNavigate();
   const { id, staffId } = useParams();
@@ -111,8 +125,8 @@ const PropertyForm = () => {
       .required("Contact email is required"),
 
     contactPhone: Yup.string()
-      .matches(/^[\+]?[1-9][\d]{0,15}$/, "Please enter a valid phone number")
-      .max(15, "Phone number must be less than 15 digits"),
+      .matches(/^[\+]?[0-9\s\-]{7,20}$/, "Please enter a valid phone number")
+      .max(20, "Phone number must be less than 20 characters"),
 
     checkInTime: Yup.string()
       .matches(/^([0-1]?[0-9]|2[0-3]):[0-5][0-9]$/, "Please enter valid time format (HH:MM)")
@@ -148,8 +162,7 @@ const PropertyForm = () => {
             .max(1000, "Room count cannot exceed 1000")
             .required("Room count is required"),
           price: Yup.number()
-            .positive("Price must be greater than 0")
-            .min(1, "Minimum price is $1")
+            .min(0, "Price cannot be negative")
             .max(10000, "Maximum price is $10,000")
             .required("Price is required"),
         })
@@ -284,8 +297,14 @@ const PropertyForm = () => {
 
       const payload = {
         ...values,
-        roomTypes: values.roomTypes.filter(room => room.count > 0),
+        roomTypes: values.roomTypes.filter(room => room.count > 0 && room.price > 0),
       };
+
+      if (payload.roomTypes.length === 0) {
+        toast.error("Please add at least one room category with quantity and price greater than 0");
+        setSubmitting(false);
+        return;
+      }
 
       // Add owner_id if creating property for specific staff
       if (isStaffProperty && !isEditMode) {
@@ -385,292 +404,295 @@ const PropertyForm = () => {
             validationSchema={validationSchema}
             onSubmit={handleSubmit}
           >
-            {({ values, isSubmitting, setFieldValue, errors, touched }) => (
-              <Form className="space-y-10">
+            {({ values, isSubmitting, setFieldValue, errors, touched, submitCount }) => (
+              <>
+                <FormErrorReporter errors={errors} submitCount={submitCount} />
+                <Form className="space-y-10">
 
-                {/* Section: Basic Details */}
-                <div className="space-y-6">
-                  <div className="flex items-center gap-3 mb-2">
-                    <span className="w-2 h-6 bg-[#14F195] rounded-full"></span>
-                    <h2 className="text-xl font-bold text-white">Identity Details</h2>
-                  </div>
-
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div className="space-y-2">
-                      <label className="text-[#AEB9E1]/40 text-[10px] font-bold uppercase tracking-widest ml-1">Establishment Name *</label>
-                      <Field
-                        name="name"
-                        type="text"
-                        className="w-full h-14 bg-[#171D41] border border-[#FFFFFF0D] rounded-2xl px-5 text-white font-bold focus:ring-2 focus:ring-[#14F195/40] outline-none transition-all placeholder-[#AEB9E1]/30"
-                        placeholder="e.g. Grand Royal Hotel"
-                      />
-                      <ErrorMessage name="name" component="div" className="text-red-400 text-[10px] font-bold uppercase tracking-wider ml-1" />
-                    </div>
-
-                    <div className="space-y-2">
-                      <label className="text-[#AEB9E1]/40 text-[10px] font-bold uppercase tracking-widest ml-1">Active Status</label>
-                      <Field
-                        as="select"
-                        name="status"
-                        className="w-full h-14 bg-[#171D41] border border-[#FFFFFF0D] rounded-2xl px-5 text-white font-bold focus:ring-2 focus:ring-[#14F195/40] outline-none transition-all cursor-pointer"
-                      >
-                        <option value="active">Operational (Active)</option>
-                        <option value="inactive">Paused (Inactive)</option>
-                        <option value="maintenance">Under Maintenance</option>
-                      </Field>
-                    </div>
-
-                    <div className="space-y-2">
-                      <label className="text-[#AEB9E1]/40 text-[10px] font-bold uppercase tracking-widest ml-1">Primary Currency *</label>
-                      <Field
-                        as="select"
-                        name="currency"
-                        className="w-full h-14 bg-[#171D41] border border-[#FFFFFF0D] rounded-2xl px-5 text-white font-bold focus:ring-2 focus:ring-[#14F195/40] outline-none transition-all cursor-pointer"
-                      >
-                        <option value="USD">USD ($) - International</option>
-                        <option value="PKR">PKR (Rs) - Local</option>
-                      </Field>
-                      <ErrorMessage name="currency" component="div" className="text-red-400 text-[10px] font-bold uppercase tracking-wider ml-1" />
-                    </div>
-
-                    {propertyPaymentType && (
-                      <div className="space-y-2">
-                        <label className="text-[#AEB9E1]/40 text-[10px] font-bold uppercase tracking-widest ml-1">
-                          Payment Policy <span className="text-[8px] opacity-40">(Inherited)</span>
-                        </label>
-                        <div className="w-full h-14 flex items-center bg-[#0A1330] border border-[#FFFFFF05] rounded-2xl px-5 text-white/50 font-bold text-sm italic">
-                          {propertyPaymentType === 'online' ? 'Credit/Debit Only' :
-                            propertyPaymentType === 'cash' ? 'Pay on Arrival Only' :
-                              'Multi-Channel (Both)'}
-                        </div>
-                      </div>
-                    )}
-                  </div>
-
-                  <div className="space-y-2">
-                    <label className="text-[#AEB9E1]/40 text-[10px] font-bold uppercase tracking-widest ml-1">Geographic Location *</label>
-                    <Field
-                      name="address"
-                      type="text"
-                      className="w-full h-14 bg-[#171D41] border border-[#FFFFFF0D] rounded-2xl px-5 text-white font-bold focus:ring-2 focus:ring-[#14F195/40] outline-none transition-all placeholder-[#AEB9E1]/30"
-                      placeholder="Street, City, Country"
-                    />
-                    <ErrorMessage name="address" component="div" className="text-red-400 text-[10px] font-bold uppercase tracking-wider ml-1" />
-                  </div>
-
-                  <div className="space-y-2">
-                    <label className="text-[#AEB9E1]/40 text-[10px] font-bold uppercase tracking-widest ml-1">Listing Bio</label>
-                    <Field
-                      as="textarea"
-                      name="description"
-                      rows="3"
-                      className="w-full bg-[#171D41] border border-[#FFFFFF0D] rounded-[24px] p-5 text-white font-medium focus:ring-2 focus:ring-[#14F195/40] outline-none transition-all placeholder-[#AEB9E1]/30 resize-none min-h-[120px]"
-                      placeholder="Describe the unique features of your property..."
-                    />
-                  </div>
-                </div>
-
-                {/* Section: Inventory */}
-                <div className="space-y-6">
-                  <div className="flex items-center gap-3 mb-2">
-                    <span className="w-2 h-6 bg-[#9945FF] rounded-full"></span>
-                    <h2 className="text-xl font-bold text-white">Room Inventory</h2>
-                  </div>
-
-                  <FieldArray name="roomTypes">
-                    {({ push, remove }) => (
-                      <div className="space-y-6">
-                        {values.roomTypes.map((room, index) => (
-                          <div key={index} className="relative group">
-                            <div className="absolute -inset-0.5 bg-gradient-to-r from-[#9945FF] to-[#14F195] rounded-[28px] blur opacity-0 group-hover:opacity-10 transition duration-500"></div>
-                            <div className="relative grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 p-6 bg-[#171D41] rounded-[28px] border border-[#FFFFFF0D]">
-                              <div className="space-y-2">
-                                <label className="text-[#AEB9E1]/40 text-[9px] font-bold uppercase tracking-widest ml-1">Category</label>
-                                <Field
-                                  as="select"
-                                  name={`roomTypes.${index}.type`}
-                                  className="w-full h-12 bg-[#0A1330] border border-[#FFFFFF0D] rounded-xl px-4 text-white font-bold focus:ring-[#14F195] appearance-none cursor-pointer"
-                                >
-                                  <option value="single">Single Room</option>
-                                  <option value="double">Double Room</option>
-                                </Field>
-                              </div>
-
-                              <div className="space-y-2">
-                                <label className="text-[#AEB9E1]/40 text-[9px] font-bold uppercase tracking-widest ml-1">Quantity</label>
-                                <Field
-                                  name={`roomTypes.${index}.count`}
-                                  type="number"
-                                  className="w-full h-12 bg-[#0A1330] border border-[#FFFFFF0D] rounded-xl px-4 text-white font-bold outline-none"
-                                />
-                                <ErrorMessage name={`roomTypes.${index}.count`} component="div" className="text-red-400 text-[10px] font-medium" />
-                              </div>
-
-                              <div className="space-y-2">
-                                <label className="text-[#AEB9E1]/40 text-[9px] font-bold uppercase tracking-widest ml-1">Price ({values.currency})</label>
-                                <Field
-                                  name={`roomTypes.${index}.price`}
-                                  type="number"
-                                  className="w-full h-12 bg-[#0A1330] border border-[#FFFFFF0D] rounded-xl px-4 text-white font-bold outline-none"
-                                />
-                                <ErrorMessage name={`roomTypes.${index}.price`} component="div" className="text-red-400 text-[10px] font-medium" />
-                              </div>
-
-                              <div className="flex items-end">
-                                {values.roomTypes.length > 1 && (
-                                  <button
-                                    type="button"
-                                    onClick={() => remove(index)}
-                                    className="w-full h-12 flex items-center justify-center gap-2 bg-[#FF4B5510] text-[#FF4B55] border border-[#FF4B5520] rounded-xl hover:bg-[#FF4B5520] transition-all font-bold text-xs"
-                                  >
-                                    <FaTrash size={12} />
-                                    <span>REMOVE</span>
-                                  </button>
-                                )}
-                              </div>
-                            </div>
-                          </div>
-                        ))}
-
-                        <button
-                          type="button"
-                          onClick={() => push({ type: "single", count: 0, price: 0 })}
-                          className="w-full py-4 bg-white/5 border border-dashed border-[#FFFFFF1A] rounded-[24px] text-[#AEB9E1] font-bold hover:bg-white/10 hover:border-[#14F195/40] transition-all flex items-center justify-center gap-2"
-                        >
-                          <FaPlus size={12} />
-                          <span>APPEND NEW ROOM CATEGORY</span>
-                        </button>
-                      </div>
-                    )}
-                  </FieldArray>
-                </div>
-
-                {/* Section: Communications & Policy */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+                  {/* Section: Basic Details */}
                   <div className="space-y-6">
                     <div className="flex items-center gap-3 mb-2">
-                      <span className="w-2 h-6 bg-blue-500 rounded-full"></span>
-                      <h2 className="text-xl font-bold text-white">Contact Info</h2>
+                      <span className="w-2 h-6 bg-[#14F195] rounded-full"></span>
+                      <h2 className="text-xl font-bold text-white">Identity Details</h2>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      <div className="space-y-2">
+                        <label className="text-[#AEB9E1]/40 text-[10px] font-bold uppercase tracking-widest ml-1">Establishment Name *</label>
+                        <Field
+                          name="name"
+                          type="text"
+                          className="w-full h-14 bg-[#171D41] border border-[#FFFFFF0D] rounded-2xl px-5 text-white font-bold focus:ring-2 focus:ring-[#14F195/40] outline-none transition-all placeholder-[#AEB9E1]/30"
+                          placeholder="e.g. Grand Royal Hotel"
+                        />
+                        <ErrorMessage name="name" component="div" className="text-red-400 text-[10px] font-bold uppercase tracking-wider ml-1" />
+                      </div>
+
+                      <div className="space-y-2">
+                        <label className="text-[#AEB9E1]/40 text-[10px] font-bold uppercase tracking-widest ml-1">Active Status</label>
+                        <Field
+                          as="select"
+                          name="status"
+                          className="w-full h-14 bg-[#171D41] border border-[#FFFFFF0D] rounded-2xl px-5 text-white font-bold focus:ring-2 focus:ring-[#14F195/40] outline-none transition-all cursor-pointer"
+                        >
+                          <option value="active">Operational (Active)</option>
+                          <option value="inactive">Paused (Inactive)</option>
+                          <option value="maintenance">Under Maintenance</option>
+                        </Field>
+                      </div>
+
+                      <div className="space-y-2">
+                        <label className="text-[#AEB9E1]/40 text-[10px] font-bold uppercase tracking-widest ml-1">Primary Currency *</label>
+                        <Field
+                          as="select"
+                          name="currency"
+                          className="w-full h-14 bg-[#171D41] border border-[#FFFFFF0D] rounded-2xl px-5 text-white font-bold focus:ring-2 focus:ring-[#14F195/40] outline-none transition-all cursor-pointer"
+                        >
+                          <option value="USD">USD ($) - International</option>
+                          <option value="PKR">PKR (Rs) - Local</option>
+                        </Field>
+                        <ErrorMessage name="currency" component="div" className="text-red-400 text-[10px] font-bold uppercase tracking-wider ml-1" />
+                      </div>
+
+                      {propertyPaymentType && (
+                        <div className="space-y-2">
+                          <label className="text-[#AEB9E1]/40 text-[10px] font-bold uppercase tracking-widest ml-1">
+                            Payment Policy <span className="text-[8px] opacity-40">(Inherited)</span>
+                          </label>
+                          <div className="w-full h-14 flex items-center bg-[#0A1330] border border-[#FFFFFF05] rounded-2xl px-5 text-white/50 font-bold text-sm italic">
+                            {propertyPaymentType === 'online' ? 'Credit/Debit Only' :
+                              propertyPaymentType === 'cash' ? 'Pay on Arrival Only' :
+                                'Multi-Channel (Both)'}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+
+                    <div className="space-y-2">
+                      <label className="text-[#AEB9E1]/40 text-[10px] font-bold uppercase tracking-widest ml-1">Geographic Location *</label>
+                      <Field
+                        name="address"
+                        type="text"
+                        className="w-full h-14 bg-[#171D41] border border-[#FFFFFF0D] rounded-2xl px-5 text-white font-bold focus:ring-2 focus:ring-[#14F195/40] outline-none transition-all placeholder-[#AEB9E1]/30"
+                        placeholder="Street, City, Country"
+                      />
+                      <ErrorMessage name="address" component="div" className="text-red-400 text-[10px] font-bold uppercase tracking-wider ml-1" />
+                    </div>
+
+                    <div className="space-y-2">
+                      <label className="text-[#AEB9E1]/40 text-[10px] font-bold uppercase tracking-widest ml-1">Listing Bio</label>
+                      <Field
+                        as="textarea"
+                        name="description"
+                        rows="3"
+                        className="w-full bg-[#171D41] border border-[#FFFFFF0D] rounded-[24px] p-5 text-white font-medium focus:ring-2 focus:ring-[#14F195/40] outline-none transition-all placeholder-[#AEB9E1]/30 resize-none min-h-[120px]"
+                        placeholder="Describe the unique features of your property..."
+                      />
+                    </div>
+                  </div>
+
+                  {/* Section: Inventory */}
+                  <div className="space-y-6">
+                    <div className="flex items-center gap-3 mb-2">
+                      <span className="w-2 h-6 bg-[#9945FF] rounded-full"></span>
+                      <h2 className="text-xl font-bold text-white">Room Inventory</h2>
+                    </div>
+
+                    <FieldArray name="roomTypes">
+                      {({ push, remove }) => (
+                        <div className="space-y-6">
+                          {values.roomTypes.map((room, index) => (
+                            <div key={index} className="relative group">
+                              <div className="absolute -inset-0.5 bg-gradient-to-r from-[#9945FF] to-[#14F195] rounded-[28px] blur opacity-0 group-hover:opacity-10 transition duration-500"></div>
+                              <div className="relative grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 p-6 bg-[#171D41] rounded-[28px] border border-[#FFFFFF0D]">
+                                <div className="space-y-2">
+                                  <label className="text-[#AEB9E1]/40 text-[9px] font-bold uppercase tracking-widest ml-1">Category</label>
+                                  <Field
+                                    as="select"
+                                    name={`roomTypes.${index}.type`}
+                                    className="w-full h-12 bg-[#0A1330] border border-[#FFFFFF0D] rounded-xl px-4 text-white font-bold focus:ring-[#14F195] appearance-none cursor-pointer"
+                                  >
+                                    <option value="single">Single Room</option>
+                                    <option value="double">Double Room</option>
+                                  </Field>
+                                </div>
+
+                                <div className="space-y-2">
+                                  <label className="text-[#AEB9E1]/40 text-[9px] font-bold uppercase tracking-widest ml-1">Quantity</label>
+                                  <Field
+                                    name={`roomTypes.${index}.count`}
+                                    type="number"
+                                    className="w-full h-12 bg-[#0A1330] border border-[#FFFFFF0D] rounded-xl px-4 text-white font-bold outline-none"
+                                  />
+                                  <ErrorMessage name={`roomTypes.${index}.count`} component="div" className="text-red-400 text-[10px] font-medium" />
+                                </div>
+
+                                <div className="space-y-2">
+                                  <label className="text-[#AEB9E1]/40 text-[9px] font-bold uppercase tracking-widest ml-1">Price ({values.currency})</label>
+                                  <Field
+                                    name={`roomTypes.${index}.price`}
+                                    type="number"
+                                    className="w-full h-12 bg-[#0A1330] border border-[#FFFFFF0D] rounded-xl px-4 text-white font-bold outline-none"
+                                  />
+                                  <ErrorMessage name={`roomTypes.${index}.price`} component="div" className="text-red-400 text-[10px] font-medium" />
+                                </div>
+
+                                <div className="flex items-end">
+                                  {values.roomTypes.length > 1 && (
+                                    <button
+                                      type="button"
+                                      onClick={() => remove(index)}
+                                      className="w-full h-12 flex items-center justify-center gap-2 bg-[#FF4B5510] text-[#FF4B55] border border-[#FF4B5520] rounded-xl hover:bg-[#FF4B5520] transition-all font-bold text-xs"
+                                    >
+                                      <FaTrash size={12} />
+                                      <span>REMOVE</span>
+                                    </button>
+                                  )}
+                                </div>
+                              </div>
+                            </div>
+                          ))}
+
+                          <button
+                            type="button"
+                            onClick={() => push({ type: "single", count: 0, price: 0 })}
+                            className="w-full py-4 bg-white/5 border border-dashed border-[#FFFFFF1A] rounded-[24px] text-[#AEB9E1] font-bold hover:bg-white/10 hover:border-[#14F195/40] transition-all flex items-center justify-center gap-2"
+                          >
+                            <FaPlus size={12} />
+                            <span>APPEND NEW ROOM CATEGORY</span>
+                          </button>
+                        </div>
+                      )}
+                    </FieldArray>
+                  </div>
+
+                  {/* Section: Communications & Policy */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+                    <div className="space-y-6">
+                      <div className="flex items-center gap-3 mb-2">
+                        <span className="w-2 h-6 bg-blue-500 rounded-full"></span>
+                        <h2 className="text-xl font-bold text-white">Contact Info</h2>
+                      </div>
+
+                      <div className="space-y-6">
+                        <div className="space-y-2">
+                          <label className="text-[#AEB9E1]/40 text-[10px] font-bold uppercase tracking-widest ml-1">Support Email *</label>
+                          <Field
+                            name="contactEmail"
+                            type="email"
+                            className="w-full h-14 bg-[#171D41] border border-[#FFFFFF0D] rounded-2xl px-5 text-white font-bold outline-none placeholder-[#AEB9E1]/20"
+                            placeholder="inquiry@hotel.com"
+                          />
+                          <ErrorMessage name="contactEmail" component="div" className="text-red-400 text-[10px] font-bold" />
+                        </div>
+                        <div className="space-y-2">
+                          <label className="text-[#AEB9E1]/40 text-[10px] font-bold uppercase tracking-widest ml-1">Mobile Hotline</label>
+                          <Field
+                            name="contactPhone"
+                            type="tel"
+                            className="w-full h-14 bg-[#171D41] border border-[#FFFFFF0D] rounded-2xl px-5 text-white font-bold outline-none placeholder-[#AEB9E1]/20"
+                            placeholder="+00 000 000 000"
+                          />
+                        </div>
+                      </div>
                     </div>
 
                     <div className="space-y-6">
-                      <div className="space-y-2">
-                        <label className="text-[#AEB9E1]/40 text-[10px] font-bold uppercase tracking-widest ml-1">Support Email *</label>
-                        <Field
-                          name="contactEmail"
-                          type="email"
-                          className="w-full h-14 bg-[#171D41] border border-[#FFFFFF0D] rounded-2xl px-5 text-white font-bold outline-none placeholder-[#AEB9E1]/20"
-                          placeholder="inquiry@hotel.com"
-                        />
-                        <ErrorMessage name="contactEmail" component="div" className="text-red-400 text-[10px] font-bold" />
+                      <div className="flex items-center gap-3 mb-2">
+                        <span className="w-2 h-6 bg-[#F7B91C] rounded-full"></span>
+                        <h2 className="text-xl font-bold text-white">Policy Times</h2>
                       </div>
-                      <div className="space-y-2">
-                        <label className="text-[#AEB9E1]/40 text-[10px] font-bold uppercase tracking-widest ml-1">Mobile Hotline</label>
-                        <Field
-                          name="contactPhone"
-                          type="tel"
-                          className="w-full h-14 bg-[#171D41] border border-[#FFFFFF0D] rounded-2xl px-5 text-white font-bold outline-none placeholder-[#AEB9E1]/20"
-                          placeholder="+00 000 000 000"
-                        />
+
+                      <div className="grid grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                          <label className="text-[#AEB9E1]/40 text-[10px] font-bold uppercase tracking-widest text-center block">Check-In</label>
+                          <Field
+                            name="checkInTime"
+                            type="time"
+                            className="w-full h-14 bg-[#171D41] border border-[#FFFFFF0D] rounded-2xl px-5 text-white font-bold outline-none text-center"
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <label className="text-[#AEB9E1]/40 text-[10px] font-bold uppercase tracking-widest text-center block">Check-Out</label>
+                          <Field
+                            name="checkOutTime"
+                            type="time"
+                            className="w-full h-14 bg-[#171D41] border border-[#FFFFFF0D] rounded-2xl px-5 text-white font-bold outline-none text-center"
+                          />
+                        </div>
                       </div>
                     </div>
                   </div>
 
+                  {/* Section: Media Gallery */}
                   <div className="space-y-6">
                     <div className="flex items-center gap-3 mb-2">
-                      <span className="w-2 h-6 bg-[#F7B91C] rounded-full"></span>
-                      <h2 className="text-xl font-bold text-white">Policy Times</h2>
+                      <span className="w-2 h-6 bg-pink-500 rounded-full"></span>
+                      <h2 className="text-xl font-bold text-white">Visual Showcase</h2>
                     </div>
 
-                    <div className="grid grid-cols-2 gap-4">
-                      <div className="space-y-2">
-                        <label className="text-[#AEB9E1]/40 text-[10px] font-bold uppercase tracking-widest text-center block">Check-In</label>
-                        <Field
-                          name="checkInTime"
-                          type="time"
-                          className="w-full h-14 bg-[#171D41] border border-[#FFFFFF0D] rounded-2xl px-5 text-white font-bold outline-none text-center"
-                        />
-                      </div>
-                      <div className="space-y-2">
-                        <label className="text-[#AEB9E1]/40 text-[10px] font-bold uppercase tracking-widest text-center block">Check-Out</label>
-                        <Field
-                          name="checkOutTime"
-                          type="time"
-                          className="w-full h-14 bg-[#171D41] border border-[#FFFFFF0D] rounded-2xl px-5 text-white font-bold outline-none text-center"
-                        />
-                      </div>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                      {[0, 1].map((index) => (
+                        <div key={index} className="space-y-4">
+                          <label className="text-[#AEB9E1]/40 text-[10px] font-bold uppercase tracking-widest block ml-2">Gallery Asset {index + 1}</label>
+
+                          {imagePreviews[index] ? (
+                            <div className="relative group rounded-[28px] overflow-hidden border border-[#FFFFFF0D] shadow-2xl">
+                              <img src={imagePreviews[index]} className="w-full h-64 object-cover" />
+                              <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-all flex items-center justify-center">
+                                <button
+                                  type="button"
+                                  onClick={() => handleImageRemove(index, setFieldValue, values)}
+                                  className="w-12 h-12 bg-red-500 rounded-2xl flex items-center justify-center shadow-2xl active:scale-90 transition-transform"
+                                >
+                                  <FaTrash size={16} className="text-white" />
+                                </button>
+                              </div>
+                            </div>
+                          ) : (
+                            <div className="h-64 border-2 border-dashed border-[#FFFFFF0D] rounded-[32px] flex items-center justify-center group hover:border-[#14F195/40] transition-colors relative">
+                              <input
+                                type="file"
+                                accept="image/*"
+                                onChange={(e) => handleImageChange(index, e, setFieldValue, values)}
+                                className="absolute inset-0 opacity-0 cursor-pointer z-10"
+                              />
+                              <div className="flex flex-col items-center gap-4">
+                                <div className="w-16 h-16 rounded-full bg-white/5 flex items-center justify-center group-hover:scale-110 transition-transform">
+                                  <FaPlus size={20} className="text-[#AEB9E1]" />
+                                </div>
+                                <div className="text-center">
+                                  <p className="text-white font-bold text-sm">Upload Perspective</p>
+                                  <p className="text-[#AEB9E1]/40 text-[10px] font-bold uppercase mt-1">High Res JPG / PNG</p>
+                                </div>
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      ))}
                     </div>
                   </div>
-                </div>
 
-                {/* Section: Media Gallery */}
-                <div className="space-y-6">
-                  <div className="flex items-center gap-3 mb-2">
-                    <span className="w-2 h-6 bg-pink-500 rounded-full"></span>
-                    <h2 className="text-xl font-bold text-white">Visual Showcase</h2>
+                  {/* Global Actions */}
+                  <div className="flex flex-col sm:flex-row gap-4 pt-10 border-t border-[#FFFFFF0D]">
+                    <button
+                      type="submit"
+                      disabled={isSubmitting}
+                      className="flex-[2] h-18 bg-gradient-to-r py-3 from-[#9945FF] to-[#14F195] text-white rounded-[20px] font-black text-xs tracking-[0.15em] shadow-xl shadow-[#14F19511] hover:opacity-95 transition-all active:scale-[0.98] disabled:opacity-50 flex items-center justify-center gap-3"
+                    >
+                      <FaSave size={18} />
+                      {isSubmitting ? "PROCESSING..." : isEditMode ? "SAVE UPDATES" : "DEPLOY LISTING"}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => navigate(user?.role === 'staff' ? "/staff/properties" : "/admin/properties")}
+                      className="flex-1 h-14 px-8 py-3 bg-[#171D41] text-[#AEB9E1] rounded-[20px] font-bold text-[10px] tracking-[0.15em] border border-[#FFFFFF0D] hover:bg-white/5 transition-all"
+                    >
+                      CANCEL
+                    </button>
                   </div>
-
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    {[0, 1].map((index) => (
-                      <div key={index} className="space-y-4">
-                        <label className="text-[#AEB9E1]/40 text-[10px] font-bold uppercase tracking-widest block ml-2">Gallery Asset {index + 1}</label>
-
-                        {imagePreviews[index] ? (
-                          <div className="relative group rounded-[28px] overflow-hidden border border-[#FFFFFF0D] shadow-2xl">
-                            <img src={imagePreviews[index]} className="w-full h-64 object-cover" />
-                            <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-all flex items-center justify-center">
-                              <button
-                                type="button"
-                                onClick={() => handleImageRemove(index, setFieldValue, values)}
-                                className="w-12 h-12 bg-red-500 rounded-2xl flex items-center justify-center shadow-2xl active:scale-90 transition-transform"
-                              >
-                                <FaTrash size={16} className="text-white" />
-                              </button>
-                            </div>
-                          </div>
-                        ) : (
-                          <div className="h-64 border-2 border-dashed border-[#FFFFFF0D] rounded-[32px] flex items-center justify-center group hover:border-[#14F195/40] transition-colors relative">
-                            <input
-                              type="file"
-                              accept="image/*"
-                              onChange={(e) => handleImageChange(index, e, setFieldValue, values)}
-                              className="absolute inset-0 opacity-0 cursor-pointer z-10"
-                            />
-                            <div className="flex flex-col items-center gap-4">
-                              <div className="w-16 h-16 rounded-full bg-white/5 flex items-center justify-center group-hover:scale-110 transition-transform">
-                                <FaPlus size={20} className="text-[#AEB9E1]" />
-                              </div>
-                              <div className="text-center">
-                                <p className="text-white font-bold text-sm">Upload Perspective</p>
-                                <p className="text-[#AEB9E1]/40 text-[10px] font-bold uppercase mt-1">High Res JPG / PNG</p>
-                              </div>
-                            </div>
-                          </div>
-                        )}
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Global Actions */}
-                <div className="flex flex-col sm:flex-row gap-4 pt-10 border-t border-[#FFFFFF0D]">
-                  <button
-                    type="submit"
-                    disabled={isSubmitting}
-                    className="flex-1 h-16 bg-gradient-to-r from-[#9945FF] to-[#14F195] text-white rounded-[24px] font-bold text-lg tracking-tight shadow-xl shadow-[#14F19522] hover:opacity-95 transition-all active:scale-[0.98] disabled:opacity-50 flex items-center justify-center gap-3"
-                  >
-                    <FaSave size={18} />
-                    {isSubmitting ? "PROCESSING..." : isEditMode ? "SAVE UPDATES" : "DEPLOY LISTING"}
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => navigate(user?.role === 'staff' ? "/staff/properties" : "/admin/properties")}
-                    className="h-16 px-10 bg-[#0A1330] text-[#AEB9E1] rounded-[24px] font-bold text-sm tracking-widest border border-[#FFFFFF0D] hover:bg-white/5 transition-all"
-                  >
-                    CANCEL
-                  </button>
-                </div>
-              </Form>
+                </Form>
+              </>
             )}
           </Formik>
         </div>
