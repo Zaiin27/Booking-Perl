@@ -38,10 +38,12 @@ const UserProfileCard = () => {
   };
 
   const goToDashboard = () => {
-    if (user?.role === 'staff' || user?.role === 'driver') {
-      navigate('/staff');
-    } else if (user?.role === 'admin' || user?.role === 'superadmin') {
-      navigate('/admin');
+    if (user?.role === "staff" || user?.role === "driver") {
+      navigate("/staff");
+    } else if (user?.role === "admin" || user?.role === "superadmin") {
+      navigate("/admin");
+    } else if (user?.role === "subadmin") {
+      navigate("/subadmin/dashboard");
     } else {
       handleRefresh();
     }
@@ -81,15 +83,19 @@ const UserProfileCard = () => {
                 }}
               >
                 <div className="w-full h-full rounded-full bg-[#454A67] flex items-center justify-center">
-                  {/* Show logo for staff/driver users, "U" for regular users */}
-                  {user?.role === 'staff' || user?.role === 'driver' ? (
+                  {/* Show logo for staff/driver/subadmin users, "U" for regular users */}
+                  {user?.role === "staff" ||
+                    user?.role === "driver" ||
+                    user?.role === "subadmin" ? (
                     <img
                       src="/logo.svg"
                       alt="Meal Logo"
                       className="w-8 h-8 sm:w-10 sm:h-10 object-contain"
                     />
                   ) : (
-                    <span className="text-white text-lg sm:text-xl font-bold">U</span>
+                    <span className="text-white text-lg sm:text-xl font-bold">
+                      U
+                    </span>
                   )}
                 </div>
               </div>
@@ -137,7 +143,11 @@ const UserProfileCard = () => {
                 }}
               ></div>
               <div className="w-3 h-3 sm:w-4 sm:h-4 rounded-full flex items-center justify-center relative z-10">
-                {user?.role === 'staff' || user?.role === 'driver' || user?.role === 'admin' || user?.role === 'superadmin' ? (
+                {user?.role === "staff" ||
+                  user?.role === "driver" ||
+                  user?.role === "subadmin" ||
+                  user?.role === "admin" ||
+                  user?.role === "superadmin" ? (
                   <svg
                     className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-[#9945FF]"
                     fill="none"
@@ -145,12 +155,24 @@ const UserProfileCard = () => {
                     viewBox="0 0 24 24"
                   >
                     <defs>
-                      <linearGradient id="dashboard-gradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                      <linearGradient
+                        id="dashboard-gradient"
+                        x1="0%"
+                        y1="0%"
+                        x2="100%"
+                        y2="0%"
+                      >
                         <stop offset="0%" stopColor="#9945FF" />
                         <stop offset="100%" stopColor="#14F195" />
                       </linearGradient>
                     </defs>
-                    <path stroke="url(#dashboard-gradient)" strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
+                    <path
+                      stroke="url(#dashboard-gradient)"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"
+                    />
                   </svg>
                 ) : (
                   <svg
@@ -177,9 +199,15 @@ const UserProfileCard = () => {
                 )}
               </div>
               <span className="text-xs sm:text-sm font-inter font-medium relative z-10 text-[#6B7280]">
-                {user?.role === 'staff' || user?.role === 'driver' || user?.role === 'admin' || user?.role === 'superadmin'
-                  ? 'Go to Dashboard'
-                  : (isLoading ? 'Refreshing...' : 'Refresh Profile')}
+                {user?.role === "staff" ||
+                  user?.role === "driver" ||
+                  user?.role === "subadmin" ||
+                  user?.role === "admin" ||
+                  user?.role === "superadmin"
+                  ? "Go to Dashboard"
+                  : isLoading
+                    ? "Refreshing..."
+                    : "Refresh Profile"}
               </span>
             </button>
 

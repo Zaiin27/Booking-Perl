@@ -103,13 +103,14 @@ const AdminDashboard = () => {
   // Format currency
   const formatCurrency = (amount) => {
     if (!amount && amount !== 0) return "N/A";
+    const numericAmount = parseFloat(amount) || 0;
 
     // Support for PKR/Rs (Pakistani Rupees)
-    if (currency === "PKR" || currency === "Rs" || currency === "RS" || currency === "pkr") {
+    if (currency?.toUpperCase() === "PKR" || currency?.toUpperCase() === "RS") {
       const formattedAmount = new Intl.NumberFormat("en-PK", {
         minimumFractionDigits: 2,
         maximumFractionDigits: 2,
-      }).format(amount);
+      }).format(numericAmount);
       return `Rs ${formattedAmount}`;
     }
 
@@ -119,7 +120,7 @@ const AdminDashboard = () => {
       currency: "USD",
       minimumFractionDigits: 2,
       maximumFractionDigits: 2,
-    }).format(amount);
+    }).format(numericAmount);
   };
 
   return (

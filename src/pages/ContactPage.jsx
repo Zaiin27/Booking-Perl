@@ -87,17 +87,17 @@ const ContactPage = () => {
   const contactOptions = [
     {
       title: "Call Us",
-      info: "+92 300 1234567",
+      info: "+92 3454313851",
       subInfo: "24/7 dedicated support line",
       icon: <FiPhone className="text-2xl" />,
-      link: "tel:+923001234567"
+      link: "tel:+923454313851"
     },
     {
       title: "Email Us",
-      info: "support@bookingpearl.com",
+      info: "Info@bookingpearl.com",
       subInfo: "Response within 2 hours",
       icon: <FiMail className="text-2xl" />,
-      link: "mailto:support@bookingpearl.com"
+      link: "mailto:Info@bookingpearl.com"
     },
     {
       title: "Our Location",
@@ -284,7 +284,7 @@ const ContactPage = () => {
                       disabled={isLoading}
                       className="w-full bg-booking-blue hover:bg-booking-blue-dark text-white font-bold py-5 rounded-2xl shadow-xl shadow-booking-blue/20 transition-all duration-300 hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50"
                     >
-                      {isLoading ? "PROCESSING..." : "SEND PREMIUM MESSAGE"}
+                      {isLoading ? "PROCESSING..." : "SEND MESSAGE"}
                     </button>
                   </form>
                 </div>

@@ -59,24 +59,24 @@ const BookingSearchSection = () => {
   };
 
   return (
-    <div className="w-full py-3 sm:py-4 md:py-6">
+    <div className="w-full py-1.5 sm:py-4 md:py-6">
       <div className="max-w-6xl mx-auto w-full">
-        <div className="bg-white rounded-xl sm:rounded-2xl border-2 border-primary shadow-2xl p-2 sm:p-3 md:p-4">
-          <div className="flex flex-col lg:flex-row gap-2 sm:gap-3 lg:gap-0 items-stretch">
+        <div className="bg-white rounded-xl sm:rounded-2xl border-2 border-primary shadow-2xl p-1.5 sm:p-3 md:p-4">
+          <div className="flex flex-col lg:flex-row gap-1.5 sm:gap-3 lg:gap-0 items-stretch">
             {/* Destination */}
-            <div className="flex-1 flex items-center gap-2 sm:gap-3 px-3 sm:px-4 py-2.5 sm:py-3 border-r-0 lg:border-r border-gray-200 rounded-lg lg:rounded-none">
+            <div className="flex-1 flex items-center gap-2 sm:gap-3 px-3 sm:px-4 py-1.5 sm:py-3 border-r-0 lg:border-r border-gray-200 rounded-lg lg:rounded-none">
               <FaBed className="text-gray-500 text-base sm:text-lg flex-shrink-0" />
               <input
                 type="text"
                 placeholder="Where are you going?"
                 value={searchData.destination}
                 onChange={(e) => setSearchData({ ...searchData, destination: e.target.value })}
-                className="w-full outline-none text-gray-700 placeholder-gray-400 text-sm sm:text-base font-medium bg-transparent focus:text-blue-600 transition-colors"
+                className="w-full outline-none text-gray-700 placeholder-gray-400 text-xs sm:text-base font-medium bg-transparent focus:text-blue-600 transition-colors"
               />
             </div>
 
             {/* Dates */}
-            <div className="flex-1 flex items-center gap-2 sm:gap-3 px-3 sm:px-4 py-2.5 sm:py-3 border-r-0 lg:border-r border-gray-200 rounded-lg lg:rounded-none">
+            <div className="flex-1 flex items-center gap-2 sm:gap-3 px-3 sm:px-4 py-1.5 sm:py-3 border-r-0 lg:border-r border-gray-200 rounded-lg lg:rounded-none">
               <FaCalendarAlt className="text-gray-500 text-base sm:text-lg flex-shrink-0 hidden sm:block" />
               <div className="flex-1 flex items-center gap-1.5 sm:gap-2">
                 <input
@@ -98,14 +98,14 @@ const BookingSearchSection = () => {
             </div>
 
             {/* Guests & Rooms */}
-            <div className="flex-1 flex items-center gap-2 sm:gap-3 px-3 sm:px-4 py-2.5 sm:py-3 border-r-0 lg:border-r border-gray-200 rounded-lg lg:rounded-none relative" ref={dropdownRef}>
+            <div className="flex-1 flex items-center gap-2 sm:gap-3 px-3 sm:px-4 py-1.5 sm:py-3 border-r-0 lg:border-r border-gray-200 rounded-lg lg:rounded-none relative" ref={dropdownRef}>
               <FaUsers className="text-gray-500 text-base sm:text-lg flex-shrink-0" />
               <button
                 onClick={() => setShowGuestDropdown(!showGuestDropdown)}
                 className="flex-1 flex items-center justify-between text-gray-700 text-xs sm:text-sm md:text-base font-medium hover:text-blue-600 transition-colors min-w-0"
               >
                 <span className="truncate">{getGuestText()}</span>
-                <FaChevronDown className={`text-gray-400 text-xs flex-shrink-0 ml-1 transition-transform ${showGuestDropdown ? 'rotate-180' : ''}`} />
+                <FaChevronDown className={`text-gray-400 text-[10px] sm:text-xs flex-shrink-0 ml-1 transition-transform ${showGuestDropdown ? 'rotate-180' : ''}`} />
               </button>
 
               {/* Guest Dropdown */}
@@ -216,9 +216,9 @@ const BookingSearchSection = () => {
             {/* Search Button */}
             <button
               onClick={handleSearch}
-              className="bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white px-4 sm:px-5 md:px-7 lg:px-9 py-2.5 sm:py-3 rounded-lg font-semibold text-sm sm:text-base flex items-center justify-center gap-2 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105 active:scale-100 w-full sm:w-auto"
+              className="bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white px-4 sm:px-5 md:px-7 lg:px-9 py-2 sm:py-3 rounded-lg font-semibold text-sm sm:text-base flex items-center justify-center gap-2 transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105 active:scale-100 w-full sm:w-auto"
             >
-              <FaSearch className="text-sm sm:text-base" />
+              <FaSearch className="text-xs sm:text-base" />
               <span>Search</span>
             </button>
           </div>

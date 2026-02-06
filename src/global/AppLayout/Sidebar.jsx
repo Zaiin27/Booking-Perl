@@ -102,6 +102,14 @@ function Sidebar({ isMobileSidebarOpen, toggleSidebar, setActivePage }) {
           { path: "/company-owner/profile", name: "Profile", icon: StaffIcon },
         ],
       },
+      subadmin: {
+        main: [
+          { path: "/subadmin/dashboard", name: "Dashboard", icon: DashboardIcon },
+          { path: "/subadmin/staff", name: "Staff", icon: StaffIcon },
+          { path: "/subadmin/bookings", name: "Bookings", icon: FaCalendarCheck },
+        ],
+        bottom: [],
+      },
       user: {
         main: [
           {

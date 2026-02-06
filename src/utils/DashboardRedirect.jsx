@@ -12,10 +12,12 @@ const DashboardRedirect = () => {
     currentRole === "admin"
       ? "admin"
       : currentRole === "company-owner"
-      ? "company-owner"
-      : currentRole === "driver"
-      ? "staff"
-      : null;
+        ? "company-owner"
+        : currentRole === "subadmin"
+          ? "subadmin"
+          : currentRole === "driver"
+            ? "staff"
+            : null;
 
   useEffect(() => {
     if (isLoggedIn && roleName) {

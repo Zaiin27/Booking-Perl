@@ -54,6 +54,9 @@ import AdminContactMessages from "./pages/mealAdminPages/AdminContactMessages";
 // Dashboard imports
 import AdminDashboard from "./pages/mealAdminPages/dashboard";
 import StaffDashboard from "./pages/staffPages/dashboard";
+import SubadminDashboard from "./pages/subadminPages/dashboard";
+import SubadminStaff from "./pages/subadminPages/staff";
+import SubadminBookings from "./pages/subadminPages/bookings";
 import NotFound from "./pages/NotFound";
 
 const AppRouter = () => {
@@ -194,6 +197,22 @@ const AppRouter = () => {
           <Route path="staff" element={<StaffPage />} />
           <Route path="settings" element={<AdminSettings />} />
         </Route>
+
+        {/* Subadmin Dashboard Routes - Using AppLayout with Role Protection */}
+        <Route
+          path="/subadmin"
+          element={
+            <RoleProtectedRoute allowedRoles={["subadmin"]}>
+              <AppLayout />
+            </RoleProtectedRoute>
+          }
+        >
+          <Route index element={<SubadminDashboard />} />
+          <Route path="dashboard" element={<SubadminDashboard />} />
+          <Route path="staff" element={<SubadminStaff />} />
+          <Route path="bookings" element={<SubadminBookings />} />
+        </Route>
+
         {/* User Dashboard Routes - Removed - Users go to /profile instead */}
 
         {/* Company Owner Dashboard Routes - Using AppLayout with Role Protection */}

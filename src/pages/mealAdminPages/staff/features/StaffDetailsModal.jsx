@@ -35,6 +35,7 @@ const StaffDetailsModal = ({
   const availableRoles = [
     { value: "admin", label: "Admin" },
     { value: "staff", label: "Staff" },
+    { value: "subadmin", label: "Sub Admin" },
     { value: "user", label: "User" },
   ];
 
@@ -54,7 +55,7 @@ const StaffDetailsModal = ({
   useEffect(() => {
     if (staff) {
       const staffData = staff.data || staff;
-      
+
       setFormData({
         name: staffData.name || staffData.email?.split('@')[0] || "",
         email: staffData.email || "",
@@ -98,7 +99,7 @@ const StaffDetailsModal = ({
         return;
       }
     }
-    
+
     setFormData((prev) => ({
       ...prev,
       [field]: value,
@@ -109,19 +110,19 @@ const StaffDetailsModal = ({
     console.log("=== SAVE BUTTON CLICKED ===");
     console.log("Form data:", formData);
     console.log("Staff data:", staff);
-    
+
     // Email validation
     const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
     if (!emailRegex.test(formData.email)) {
       toastUtils.error("Please enter a valid email address");
       return;
     }
-    
+
     // Don't allow save if already saving
     if (isSaving) {
       return;
     }
-    
+
     // Validate password fields if new password is provided
     if (formData.newPassword && formData.newPassword.trim() !== "") {
       if (formData.newPassword.length < 6) {
@@ -161,8 +162,8 @@ const StaffDetailsModal = ({
   // Show loading state
   if (isLoading) {
     return (
-      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-        <div className="bg-[#171D41] rounded-2xl w-full max-w-2xl max-h-[90vh] overflow-hidden flex flex-col">
+      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[100] p-4">
+        <div className="bg-[#171D41] rounded-2xl w-[95%] max-w-2xl max-h-[85vh] overflow-hidden flex flex-col">
           <div className="p-6 flex-shrink-0">
             <h2 className="text-lg font-medium text-white mb-2">
               Edit Staff Member Details
@@ -184,8 +185,8 @@ const StaffDetailsModal = ({
   // Show error state
   if (error) {
     return (
-      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-        <div className="bg-[#171D41] rounded-2xl w-full max-w-2xl max-h-[90vh] overflow-hidden flex flex-col">
+      <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[100] p-4">
+        <div className="bg-[#171D41] rounded-2xl w-[95%] max-w-2xl max-h-[85vh] overflow-hidden flex flex-col">
           <div className="p-6 flex-shrink-0">
             <h2 className="text-lg font-medium text-white mb-2">
               Edit Staff Member Details
@@ -215,19 +216,27 @@ const StaffDetailsModal = ({
   if (!staff) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-[#171D41] rounded-2xl w-full max-w-2xl max-h-[90vh] overflow-hidden flex flex-col">
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[100] p-4">
+      <div className="bg-[#171D41] rounded-2xl w-[95%] max-w-2xl max-h-[85vh] overflow-hidden flex flex-col">
         {/* Header */}
-        <div className="p-6 flex-shrink-0">
-          <h2 className="text-lg font-medium text-white mb-2">
-            Edit Staff Member Details
-          </h2>
-          <p className="text-sm text-[#AEB9E1]">
-            Update staff member details and permissions
-          </p>
+        <div className="p-6 flex-shrink-0 flex items-start justify-between relative">
+          <div>
+            <h2 className="text-lg font-medium text-white mb-2">
+              Edit Staff Member Details
+            </h2>
+            <p className="text-sm text-[#AEB9E1]">
+              Update staff member details and permissions
+            </p>
+          </div>
+          <button
+            onClick={onClose}
+            className="text-[#AEB9E1] hover:text-white transition-colors p-1"
+          >
+            <X className="w-6 h-6" />
+          </button>
         </div>
 
-        <div className="p-6 space-y-6 overflow-y-auto flex-1">
+        <div className="p-6 space-y-6 overflow-y-auto flex-1 admin-table-scrollbar">
           {/* Staff Details Section */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* Staff Name Field */}
@@ -283,11 +292,10 @@ const StaffDetailsModal = ({
                           handleInputChange("role", option.value);
                           setIsRoleDropdownOpen(false);
                         }}
-                        className={`w-full text-left px-4 py-2 text-sm hover:bg-[#3A3A4E] transition-colors rounded-lg ${
-                          formData.role === option.value
-                            ? "text-[#14F195] bg-[#14F19520]"
-                            : "text-white"
-                        }`}
+                        className={`w-full text-left px-4 py-2 text-sm hover:bg-[#3A3A4E] transition-colors rounded-lg ${formData.role === option.value
+                          ? "text-[#14F195] bg-[#14F19520]"
+                          : "text-white"
+                          }`}
                       >
                         {option.label}
                       </button>
@@ -321,11 +329,10 @@ const StaffDetailsModal = ({
                           handleInputChange("status", option.value);
                           setIsStatusDropdownOpen(false);
                         }}
-                        className={`w-full text-left px-4 py-2 text-sm hover:bg-[#3A3A4E] transition-colors rounded-lg ${
-                          formData.status === option.value
-                            ? "text-[#14F195] bg-[#14F19520]"
-                            : "text-white"
-                        }`}
+                        className={`w-full text-left px-4 py-2 text-sm hover:bg-[#3A3A4E] transition-colors rounded-lg ${formData.status === option.value
+                          ? "text-[#14F195] bg-[#14F19520]"
+                          : "text-white"
+                          }`}
                       >
                         {option.label}
                       </button>
@@ -360,11 +367,10 @@ const StaffDetailsModal = ({
                             handleInputChange("paymentType", option.value);
                             setIsPaymentTypeDropdownOpen(false);
                           }}
-                          className={`w-full text-left px-4 py-2 text-sm hover:bg-[#3A3A4E] transition-colors rounded-lg ${
-                            formData.paymentType === option.value
-                              ? "text-[#14F195] bg-[#14F19520]"
-                              : "text-white"
-                          }`}
+                          className={`w-full text-left px-4 py-2 text-sm hover:bg-[#3A3A4E] transition-colors rounded-lg ${formData.paymentType === option.value
+                            ? "text-[#14F195] bg-[#14F19520]"
+                            : "text-white"
+                            }`}
                         >
                           {option.label}
                         </button>
@@ -460,11 +466,10 @@ const StaffDetailsModal = ({
             <button
               onClick={handleSave}
               disabled={isSaving}
-              className={`px-6 py-2 font-medium font-inter rounded-full transition-all duration-200 ${
-                isSaving 
-                  ? 'bg-gray-500 text-gray-300 cursor-not-allowed' 
-                  : 'bg-gradient-to-r from-[#9945FF] to-[#14F195] text-white hover:shadow-lg'
-              }`}
+              className={`px-6 py-2 font-medium font-inter rounded-full transition-all duration-200 ${isSaving
+                ? 'bg-gray-500 text-gray-300 cursor-not-allowed'
+                : 'bg-gradient-to-r from-[#9945FF] to-[#14F195] text-white hover:shadow-lg'
+                }`}
             >
               {isSaving ? 'Saving...' : 'Save Changes'}
             </button>
@@ -479,9 +484,8 @@ const StaffDetailsModal = ({
         onConfirm={confirmDelete}
         title="Are you sure?"
         itemName={staff?.name || "Staff Member"}
-        itemDescription={`${staff?.role || "Staff"} - ${
-          staff?.email || "No email"
-        }`}
+        itemDescription={`${staff?.role || "Staff"} - ${staff?.email || "No email"
+          }`}
         itemDate={`Status: ${staff?.status || "Unknown"}`}
         confirmButtonText="Delete Staff"
         type="delete"

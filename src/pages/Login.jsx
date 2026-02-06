@@ -85,11 +85,13 @@ const Login = () => {
           user?.role === "admin"
             ? "admin"
             : user?.role === "company-owner"
-            ? "company-owner"
-            : user?.role === "driver"
-            ? "staff"
-            : "user"; // Default to user role
-        
+              ? "company-owner"
+              : user?.role === "subadmin"
+                ? "subadmin"
+                : user?.role === "driver"
+                  ? "staff"
+                  : "user"; // Default to user role
+
         // Determine navigation path
         let navigationPath;
         if (returnUrl) {
@@ -97,20 +99,20 @@ const Login = () => {
           navigationPath = returnUrl;
         } else {
           // Default navigation based on role
-          navigationPath = 
-            user?.role === "admin" || user?.role === "company-owner" || user?.role === "driver"
+          navigationPath =
+            user?.role === "admin" || user?.role === "company-owner" || user?.role === "subadmin" || user?.role === "driver"
               ? `/${roleName}/dashboard`
               : "/profile"; // Navigate to profile for regular users
         }
-        
+
         console.log(
-          "Login successful, navigating to:", 
+          "Login successful, navigating to:",
           navigationPath
         );
 
         // Show success toast
         toastUtils.success(`Welcome back, ${user?.name || user?.email}!`);
-        
+
         // Navigate after a small delay to ensure Redux state is updated
         setTimeout(() => {
           navigate(navigationPath);
@@ -118,8 +120,8 @@ const Login = () => {
       } else if (res.type === "auth/login/rejected") {
         console.error("Login rejected:", res.payload);
         // Extract message from payload if it's an object
-        const errorMessage = typeof res.payload === 'object' && res.payload?.message 
-          ? res.payload.message 
+        const errorMessage = typeof res.payload === 'object' && res.payload?.message
+          ? res.payload.message
           : res.payload || "Login failed. Please check your credentials.";
         setError(errorMessage);
       } else {
@@ -148,7 +150,7 @@ const Login = () => {
       {/* <div className="absolute inset-0 bg-black/40"></div> */}
       {/* Logo and Title */}
       <div className="flex flex-col items-center justify-center gap-6 mb-16 z-10">
-       
+
         <div>
           <span className="text-white text-4xl md:text-[50px] !font-bold font-inter">
             Log In to{" "}
@@ -303,11 +305,10 @@ const Login = () => {
                 <div className="flex items-center">
                   <button
                     type="button"
-                    className={`relative w-6 h-6 flex-shrink-0 flex items-center justify-center rounded-md transition-colors ${
-                      watch("rememberMe")
+                    className={`relative w-6 h-6 flex-shrink-0 flex items-center justify-center rounded-md transition-colors ${watch("rememberMe")
                         ? "bg-primary border-0"
                         : "bg-white border border-gray-300 hover:border-primary"
-                    }`}
+                      }`}
                     onClick={() => {
                       const currentValue = watch("rememberMe");
                       setValue("rememberMe", !currentValue);
@@ -348,7 +349,7 @@ const Login = () => {
           </div>
         </div>
       </div>
-   
+
     </div>
   );
 };

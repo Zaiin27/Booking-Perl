@@ -31,6 +31,7 @@ const StaffPage = () => {
   const availableRoles = [
     { value: "admin", label: "Admin" },
     { value: "staff", label: "Staff" },
+    { value: "subadmin", label: "Sub Admin" },
     { value: "user", label: "User" },
     // Add new roles here in the future - they will automatically be sorted alphabetically
   ];
@@ -201,7 +202,7 @@ const StaffPage = () => {
         _id: user.id,
         name: displayName,
         email: user.email,
-        role: user.role.charAt(0).toUpperCase() + user.role.slice(1),
+        role: user.role === "subadmin" ? "Sub Admin" : user.role.charAt(0).toUpperCase() + user.role.slice(1),
         status: user.isActive ? 'Active' : 'Inactive',
         isVerified: user.isVerified,
         createdAt: user.createdAt

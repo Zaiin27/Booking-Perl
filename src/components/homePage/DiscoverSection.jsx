@@ -1,6 +1,10 @@
 import React from "react";
+import { useNavigate } from "react-router-dom";
+
 
 const DiscoverSection = () => {
+  const navigate = useNavigate();
+
   const categories = [
     {
       id: 1,
@@ -40,30 +44,31 @@ const DiscoverSection = () => {
         </div>
 
         {/* Categories Grid */}
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 sm:gap-4 md:gap-6">
+        <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-5 gap-3 sm:gap-4 md:gap-6">
           {categories.map((category) => (
             <div
               key={category.id}
-              className="group relative bg-white rounded-xl sm:rounded-2xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 sm:hover:-translate-y-2 cursor-pointer"
+              onClick={() => navigate("/properties")}
+              className={`group relative bg-white rounded-xl sm:rounded-2xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1 sm:hover:-translate-y-2 cursor-pointer ${category.name === "Pool" ? "hidden md:block" : ""}`}
             >
-               <div className="relative h-32 sm:h-40 md:h-56 lg:h-64 overflow-hidden">
-                 <img
-                   src={category.image}
-                   alt={category.name}
-                   className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
-                   loading="lazy"
-                 />
-                 <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent"></div>
-               </div>
-               
-               {/* Category Label */}
-               <div className="absolute bottom-2 sm:bottom-3 md:bottom-4 left-2 sm:left-3 md:left-4 right-2 sm:right-3 md:right-4">
-                 <div className="rounded-lg px-2 sm:px-3 md:px-4 py-1 sm:py-1.5 md:py-2 text-center">
-                   <span className="text-white font-semibold text-xs sm:text-sm md:text-base drop-shadow-lg">
-                     {category.name}
-                   </span>
-                 </div>
-               </div>
+              <div className="relative h-32 sm:h-40 md:h-56 lg:h-64 overflow-hidden">
+                <img
+                  src={category.image}
+                  alt={category.name}
+                  className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+                  loading="lazy"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent"></div>
+              </div>
+
+              {/* Category Label */}
+              <div className="absolute bottom-2 sm:bottom-3 md:bottom-4 left-2 sm:left-3 md:left-4 right-2 sm:right-3 md:right-4">
+                <div className="rounded-lg px-2 sm:px-3 md:px-4 py-1 sm:py-1.5 md:py-2 text-center">
+                  <span className="text-white font-semibold text-xs sm:text-sm md:text-base drop-shadow-lg">
+                    {category.name}
+                  </span>
+                </div>
+              </div>
             </div>
           ))}
         </div>

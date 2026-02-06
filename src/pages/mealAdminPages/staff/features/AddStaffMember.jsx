@@ -19,6 +19,7 @@ const AddStaffMember = ({ isOpen, onClose, onAddStaff, isLoading = false }) => {
   const availableRoles = [
     { value: "admin", label: "Admin" },
     { value: "staff", label: "Staff" },
+    { value: "subadmin", label: "Sub Admin" },
     { value: "user", label: "User" },
   ];
 
@@ -61,14 +62,14 @@ const AddStaffMember = ({ isOpen, onClose, onAddStaff, isLoading = false }) => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    
+
     // Email validation
     const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
     if (!emailRegex.test(formData.email)) {
       toastUtils.error("Please enter a valid email address");
       return;
     }
-    
+
     if (formData.name && formData.email && formData.role && formData.password && formData.paymentType && !isLoading) {
       onAddStaff(formData);
     }
@@ -82,19 +83,27 @@ const AddStaffMember = ({ isOpen, onClose, onAddStaff, isLoading = false }) => {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-[#171D41] rounded-2xl w-full max-w-xl max-h-[90vh] overflow-hidden flex flex-col">
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[100] p-4">
+      <div className="bg-[#171D41] rounded-2xl w-[95%] max-w-xl max-h-[85vh] overflow-hidden flex flex-col">
         {/* Header */}
-        <div className="p-6  flex-shrink-0">
-          <h2 className="text-lg font-medium text-white mb-2">Add New Staff</h2>
-          <p className="text-sm text-[#AEB9E1]">
-            Create a new staff record. Fill in all required fields to add new
-            staff member
-          </p>
+        <div className="p-6 flex-shrink-0 flex items-start justify-between relative">
+          <div>
+            <h2 className="text-lg font-medium text-white mb-2">Add New Staff</h2>
+            <p className="text-sm text-[#AEB9E1]">
+              Create a new staff record. Fill in all required fields to add new
+              staff member
+            </p>
+          </div>
+          <button
+            onClick={handleClose}
+            className="text-[#AEB9E1] hover:text-white transition-colors p-1"
+          >
+            <X className="w-6 h-6" />
+          </button>
         </div>
 
         {/* Form Content */}
-        <form onSubmit={handleSubmit} className="p-6 space-y-6 flex-1">
+        <form onSubmit={handleSubmit} className="p-6 space-y-6 flex-1 overflow-y-auto admin-table-scrollbar">
           {/* Form Fields */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* Staff Name Field */}
@@ -152,11 +161,10 @@ const AddStaffMember = ({ isOpen, onClose, onAddStaff, isLoading = false }) => {
                           handleInputChange("role", option.value);
                           setIsRoleDropdownOpen(false);
                         }}
-                        className={`w-full text-left px-3 py-2 text-[10px] font-medium hover:bg-[#3A3A4E] transition-colors first:rounded-t-lg last:rounded-b-lg ${
-                          formData.role === option.value
-                            ? "text-[#14F195] bg-[#14F19533]"
-                            : "text-white"
-                        }`}
+                        className={`w-full text-left px-3 py-2 text-[10px] font-medium hover:bg-[#3A3A4E] transition-colors first:rounded-t-lg last:rounded-b-lg ${formData.role === option.value
+                          ? "text-[#14F195] bg-[#14F19533]"
+                          : "text-white"
+                          }`}
                       >
                         {option.label}
                       </button>
@@ -181,44 +189,46 @@ const AddStaffMember = ({ isOpen, onClose, onAddStaff, isLoading = false }) => {
               />
             </div>
 
-            {/* Payment Type Field */}
-            <div>
-              <label className="block text-xs font-inter text-[#FFFFFF]/70 mb-2">
-                Payment Type
-              </label>
-              <div className="relative" ref={paymentTypeDropdownRef}>
-                <button
-                  type="button"
-                  className="w-full bg-[#121B36] border-none rounded-lg px-3 py-3 text-white text-sm font-inter flex items-center justify-between focus:outline-none focus:border-[#14F195] transition-colors"
-                  onClick={() => setIsPaymentTypeDropdownOpen(!isPaymentTypeDropdownOpen)}
-                >
-                  {paymentTypeOptions.find(opt => opt.value === formData.paymentType)?.label || "Select Payment Type"}
-                  <ChevronDown className="w-4 h-4 text-[#AEB9E1]" />
-                </button>
+            {/* Payment Type Field - Only for staff role */}
+            {formData.role === "staff" && (
+              <div>
+                <label className="block text-xs font-inter text-[#FFFFFF]/70 mb-2">
+                  Payment Type
+                </label>
+                <div className="relative" ref={paymentTypeDropdownRef}>
+                  <button
+                    type="button"
+                    className="w-full bg-[#121B36] border-none rounded-lg px-3 py-3 text-white text-sm font-inter flex items-center justify-between focus:outline-none focus:border-[#14F195] transition-colors"
+                    onClick={() => setIsPaymentTypeDropdownOpen(!isPaymentTypeDropdownOpen)}
+                  >
+                    {paymentTypeOptions.find(opt => opt.value === formData.paymentType)?.label || "Select Payment Type"}
+                    <ChevronDown className="w-4 h-4 text-[#AEB9E1]" />
+                  </button>
 
-                {isPaymentTypeDropdownOpen && (
-                  <div className="absolute top-full left-0 mt-1 bg-[#171D41] border border-[#3A3A4E] rounded-lg shadow-xl z-20 w-full min-w-[180px]">
-                    {paymentTypeOptions.map((option) => (
-                      <button
-                        key={option.value}
-                        type="button"
-                        onClick={() => {
-                          handleInputChange("paymentType", option.value);
-                          setIsPaymentTypeDropdownOpen(false);
-                        }}
-                        className={`w-full text-left px-3 py-2 text-[10px] font-medium hover:bg-[#3A3A4E] transition-colors first:rounded-t-lg last:rounded-b-lg ${
-                          formData.paymentType === option.value
+                  {isPaymentTypeDropdownOpen && (
+                    <div className="absolute top-full left-0 mt-1 bg-[#171D41] border border-[#3A3A4E] rounded-lg shadow-xl z-20 w-full min-w-[180px]">
+                      {paymentTypeOptions.map((option) => (
+                        <button
+                          key={option.value}
+                          type="button"
+                          onClick={() => {
+                            handleInputChange("paymentType", option.value);
+                            setIsPaymentTypeDropdownOpen(false);
+                          }}
+                          className={`w-full text-left px-3 py-2 text-[10px] font-medium hover:bg-[#3A3A4E] transition-colors first:rounded-t-lg last:rounded-b-lg ${formData.paymentType === option.value
                             ? "text-[#14F195] bg-[#14F19533]"
                             : "text-white"
-                        }`}
-                      >
-                        {option.label}
-                      </button>
-                    ))}
-                  </div>
-                )}
+                            }`}
+                        >
+                          {option.label}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
               </div>
-            </div>
+            )}
+
           </div>
         </form>
 
@@ -241,11 +251,10 @@ const AddStaffMember = ({ isOpen, onClose, onAddStaff, isLoading = false }) => {
             type="submit"
             onClick={handleSubmit}
             disabled={isLoading}
-            className={`px-6 py-2 font-inter font-medium rounded-full transition-all duration-200 ${
-              isLoading 
-                ? 'bg-gray-500 text-gray-300 cursor-not-allowed' 
-                : 'bg-gradient-to-r from-[#9945FF] to-[#14F195] text-white hover:shadow-lg'
-            }`}
+            className={`px-6 py-2 font-inter font-medium rounded-full transition-all duration-200 ${isLoading
+              ? 'bg-gray-500 text-gray-300 cursor-not-allowed'
+              : 'bg-gradient-to-r from-[#9945FF] to-[#14F195] text-white hover:shadow-lg'
+              }`}
           >
             {isLoading ? 'Adding...' : 'Add Staff'}
           </button>

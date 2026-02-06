@@ -426,16 +426,23 @@ const ReusableTable = ({
 
     return (
       <div className="relative" data-status-container>
-        <button
-          onClick={(e) => handleStatusClick(e, row.id)}
-          className={`inline-flex items-center justify-center gap-2 px-3 py-1 rounded-lg text-[10px] font-medium min-w-[100px] cursor-pointer hover:opacity-80 transition-opacity ${config.bg
-            } ${config.text} ${config.border || ""}`}
-        >
-          {config.label}
-          <ChevronDown className="w-3 h-3" />
-        </button>
+        {onStatusChange ? (
+          <button
+            onClick={(e) => handleStatusClick(e, row.id)}
+            className={`inline-flex items-center justify-center gap-2 px-3 py-1 rounded-lg text-[10px] font-medium min-w-[100px] cursor-pointer hover:opacity-80 transition-opacity ${config.bg
+              } ${config.text} ${config.border || ""}`}
+          >
+            {config.label}
+            <ChevronDown className="w-3 h-3" />
+          </button>
+        ) : (
+          <div className={`inline-flex items-center justify-center gap-2 px-3 py-1 rounded-lg text-[10px] font-medium min-w-[100px] ${config.bg
+            } ${config.text} ${config.border || ""}`}>
+            {config.label}
+          </div>
+        )}
 
-        {activeStatusDropdown === row.id && (
+        {onStatusChange && activeStatusDropdown === row.id && (
           <div className="absolute top-full left-0 mt-1 bg-[#171D41] border border-[#3A3A4E] rounded-lg shadow-xl z-20 min-w-[120px]">
             {statusOptions.map((option) => (
               <button
@@ -455,8 +462,12 @@ const ReusableTable = ({
     );
   };
 
-  const formatCurrency = (amount) => {
-    return `$${parseFloat(amount).toFixed(2)}`;
+  const formatCurrency = (amount, currencyCode = "USD") => {
+    const numericAmount = parseFloat(amount) || 0;
+    if (currencyCode?.toUpperCase() === "PKR" || currencyCode?.toUpperCase() === "RS") {
+      return `Rs ${numericAmount.toLocaleString('en-PK', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+    }
+    return `$${numericAmount.toFixed(2)}`;
   };
 
   const formatDiscount = (discount) => {
@@ -468,7 +479,7 @@ const ReusableTable = ({
       case "status":
         return getStatusBadge(value, row);
       case "amount":
-        return formatCurrency(value);
+        return formatCurrency(value, row.currency);
       case "discount":
         return formatDiscount(value);
       case "name":
@@ -611,7 +622,7 @@ const ReusableTable = ({
         return (
           <div className="text-center space-y-1">
             <div className="font-bold text-lg text-green-400">
-              ${Number(value).toFixed(2)}
+              {formatCurrency(value, row.currency)}
             </div>
             <div className="text-xs text-[#AEB9E1] bg-green-500/20 px-2 py-1 rounded-full">
               {row.currency || "USD"}

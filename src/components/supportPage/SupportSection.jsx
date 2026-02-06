@@ -32,15 +32,15 @@ const SupportSection = () => {
       title: "General Support",
       description: "Our team is available 24/7 for any booking queries.",
       icon: <FiMail className="text-2xl" />,
-      action: "help@premiumhotels.com",
-      link: "mailto:help@premiumhotels.com"
+      action: "Info@bookingpearl.com",
+      link: "mailto:Info@bookingpearl.com"
     },
     {
       title: "Phone Support",
       description: "Call us directly for immediate assistance.",
       icon: <BsClock className="text-2xl" />,
-      action: "+1 (800) PREMIUM",
-      link: "tel:+18007736486"
+      action: "+92 3454313851",
+      link: "tel:+923454313851"
     },
     {
       title: "Global Offices",
@@ -161,7 +161,7 @@ const SupportSection = () => {
                   </div>
 
                   <button className="w-full bg-booking-blue hover:bg-booking-blue-dark text-white font-bold py-5 rounded-xl shadow-xl shadow-booking-blue/20 transition-all duration-300 hover:scale-[1.02] active:scale-[0.98]">
-                    Send Premium Inquiry
+                    Send Message
                   </button>
                 </form>
               </div>

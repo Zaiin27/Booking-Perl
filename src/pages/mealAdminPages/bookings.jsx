@@ -223,6 +223,7 @@ const BookingsPage = () => {
               isLoading={loading}
               tableType="bookings"
               onView={user?.role === 'admin' ? (row) => navigate(`/admin/bookings/${row._id}`) : null}
+              onStatusChange={user?.role === 'admin' ? handleUpdateBookingStatus : null}
             />
           </div>
 

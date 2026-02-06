@@ -75,7 +75,7 @@ const ActionsMenu = ({
       case "bookings":
         return ["view"]; // Only show View for bookings
       case "staff":
-        return ["edit", "delete", "addProperty", "payCommission"];
+        return ["edit", "delete", "addProperty"];
       case "properties":
         // For properties, only show actions that have handlers
         const actions = ["view"];

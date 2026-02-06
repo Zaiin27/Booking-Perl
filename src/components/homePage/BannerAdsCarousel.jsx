@@ -9,8 +9,34 @@ const BannerAdsCarousel = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [autoPlay, setAutoPlay] = useState(true);
 
-  // Default static banner image
-  const defaultBannerImage = "https://images.unsplash.com/photo-1566073771259-6a8506099945?w=1920&h=1080&fit=crop";
+  // Default static fallback images
+  const fallbackImages = [
+    {
+      _id: "fallback-1",
+      image: "https://images.unsplash.com/photo-1542314831-068cd1dbfeeb?q=80&w=2070&auto=format&fit=crop",
+      title: "Luxury Premium Stays",
+      description: "Experience the ultimate comfort in our handpicked luxury hotels worldwide.",
+      ctaText: "Discover More",
+
+    },
+    {
+      _id: "fallback-2",
+      image: "https://images.unsplash.com/photo-1571896349842-33c89424de2d?q=80&w=2080&auto=format&fit=crop",
+      title: "Exclusive Resort Escapes",
+      description: "Find your peace in breathtaking resorts designed for relaxation and joy.",
+      ctaText: "Explore Resorts",
+
+    },
+    {
+      _id: "fallback-3",
+      image: "https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?q=80&w=2070&auto=format&fit=crop",
+      title: "Nature & Serenity",
+      description: "Connect with nature in our unique properties nestled in beautiful landscapes.",
+      ctaText: "View Nature Stays",
+    }
+  ];
+
+  const defaultBannerImage = fallbackImages[0].image;
 
   useEffect(() => {
     fetchBannerAds();
@@ -48,7 +74,7 @@ const BannerAdsCarousel = () => {
   const handleBookNow = async (ad) => {
     const propertyId = ad.property_id?._id || ad.property_id;
     const adId = ad._id || ad.id;
-    
+
     if (!propertyId) {
       console.error("Property ID not found for ad:", ad);
       return;
@@ -69,25 +95,20 @@ const BannerAdsCarousel = () => {
     navigate(`/properties/${propertyId}`);
   };
 
-  // Show static banner when no API data
-  if (bannerAds.length === 0) {
-    return (
-      <div className="relative w-full h-[400px] sm:h-[450px] md:h-[550px] lg:h-[70vh] xl:h-[85vh] overflow-hidden">
-        <div className="absolute inset-0 w-full h-full">
-          <img
-            src={defaultBannerImage}
-            alt="Booking Pearl"
-            className="w-full h-full object-cover"
-            loading="eager"
-          />
-          {/* Dark Overlay for better text readability */}
-          <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/30 to-black/20"></div>
-        </div>
-      </div>
-    );
-  }
+  // Determine which ads to display
+  const displayAds = bannerAds.length > 0 ? bannerAds : fallbackImages;
+  const currentAd = displayAds[currentIndex];
 
-  const currentAd = bannerAds[currentIndex];
+  // Adjust interval logic to use displayAds
+  useEffect(() => {
+    if (autoPlay && displayAds.length > 1) {
+      const interval = setInterval(() => {
+        setCurrentIndex((prev) => (prev + 1) % displayAds.length);
+      }, 5000);
+
+      return () => clearInterval(interval);
+    }
+  }, [autoPlay, displayAds.length]);
 
   return (
     <div className="relative w-full h-[400px] sm:h-[450px] md:h-[550px] lg:h-[70vh] xl:h-[85vh] overflow-hidden">
@@ -98,7 +119,7 @@ const BannerAdsCarousel = () => {
           transform: `translateX(-${currentIndex * 100}%)`,
         }}
       >
-        {bannerAds.map((ad, index) => (
+        {displayAds.map((ad, index) => (
           <div
             key={ad._id || index}
             className="min-w-full h-full relative flex-shrink-0"
@@ -174,17 +195,16 @@ const BannerAdsCarousel = () => {
       </div>
 
       {/* Dots Indicator */}
-      {bannerAds.length > 1 && (
+      {displayAds.length > 1 && (
         <div className="absolute bottom-4 sm:bottom-6 left-1/2 -translate-x-1/2 flex gap-2 z-20">
-          {bannerAds.map((_, index) => (
+          {displayAds.map((_, index) => (
             <button
               key={index}
               onClick={() => handleDotClick(index)}
-              className={`h-2 sm:h-3 rounded-full transition-all duration-300 ${
-                index === currentIndex
-                  ? "bg-primary w-6 sm:w-8"
-                  : "bg-white/40 hover:bg-white/60 w-2 sm:w-3"
-              }`}
+              className={`h-2 sm:h-3 rounded-full transition-all duration-300 ${index === currentIndex
+                ? "bg-primary w-6 sm:w-8"
+                : "bg-white/40 hover:bg-white/60 w-2 sm:w-3"
+                }`}
               aria-label={`Go to slide ${index + 1}`}
             />
           ))}

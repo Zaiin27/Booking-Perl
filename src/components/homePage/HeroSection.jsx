@@ -115,7 +115,7 @@ const HeroSection = () => {
             <div className="w-full max-w-lg">
               <div className="bg-white/10 backdrop-blur-md rounded-2xl p-6 border border-white/20 shadow-2xl">
                 <h3 className="text-white text-xl font-bold mb-6">Find Your Perfect Stay</h3>
-                
+
                 <div className="space-y-4">
                   {/* Location */}
                   <div className="relative">
@@ -124,7 +124,7 @@ const HeroSection = () => {
                       type="text"
                       placeholder="Where are you going?"
                       value={searchData.location}
-                      onChange={(e) => setSearchData({...searchData, location: e.target.value})}
+                      onChange={(e) => setSearchData({ ...searchData, location: e.target.value })}
                       className="w-full pl-12 pr-4 py-4 bg-white/10 border border-white/20 rounded-xl text-white placeholder-white/60 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent"
                     />
                   </div>
@@ -136,7 +136,7 @@ const HeroSection = () => {
                       <input
                         type="date"
                         value={searchData.checkIn}
-                        onChange={(e) => setSearchData({...searchData, checkIn: e.target.value})}
+                        onChange={(e) => setSearchData({ ...searchData, checkIn: e.target.value })}
                         className="w-full pl-10 pr-3 py-4 bg-white/10 border border-white/20 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-blue-400"
                       />
                       <label className="absolute -top-2 left-3 bg-slate-900 px-2 text-xs text-white/80">Check-in</label>
@@ -146,7 +146,7 @@ const HeroSection = () => {
                       <input
                         type="date"
                         value={searchData.checkOut}
-                        onChange={(e) => setSearchData({...searchData, checkOut: e.target.value})}
+                        onChange={(e) => setSearchData({ ...searchData, checkOut: e.target.value })}
                         className="w-full pl-10 pr-3 py-4 bg-white/10 border border-white/20 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-blue-400"
                       />
                       <label className="absolute -top-2 left-3 bg-slate-900 px-2 text-xs text-white/80">Check-out</label>
@@ -159,10 +159,10 @@ const HeroSection = () => {
                       <FaUsers className="absolute left-3 top-1/2 transform -translate-y-1/2 text-white/60 w-4 h-4" />
                       <select
                         value={searchData.guests}
-                        onChange={(e) => setSearchData({...searchData, guests: parseInt(e.target.value)})}
+                        onChange={(e) => setSearchData({ ...searchData, guests: parseInt(e.target.value) })}
                         className="w-full pl-10 pr-3 py-4 bg-white/10 border border-white/20 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-blue-400"
                       >
-                        {[1,2,3,4,5,6].map(num => (
+                        {[1, 2, 3, 4, 5, 6].map(num => (
                           <option key={num} value={num} className="bg-slate-800">{num} {num === 1 ? 'Guest' : 'Guests'}</option>
                         ))}
                       </select>
@@ -171,10 +171,10 @@ const HeroSection = () => {
                       <IoLocationOutline className="absolute left-3 top-1/2 transform -translate-y-1/2 text-white/60 w-4 h-4" />
                       <select
                         value={searchData.rooms}
-                        onChange={(e) => setSearchData({...searchData, rooms: parseInt(e.target.value)})}
+                        onChange={(e) => setSearchData({ ...searchData, rooms: parseInt(e.target.value) })}
                         className="w-full pl-10 pr-3 py-4 bg-white/10 border border-white/20 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-blue-400"
                       >
-                        {[1,2,3,4,5].map(num => (
+                        {[1, 2, 3, 4, 5].map(num => (
                           <option key={num} value={num} className="bg-slate-800">{num} {num === 1 ? 'Room' : 'Rooms'}</option>
                         ))}
                       </select>
