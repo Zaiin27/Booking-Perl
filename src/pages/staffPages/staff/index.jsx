@@ -41,7 +41,6 @@ const StaffPage = () => {
         { value: "All Roles", label: "All Roles" },
         { value: "staff", label: "Staff" },
         { value: "admin", label: "Admin" },
-        { value: "user", label: "User" },
       ],
     },
   });

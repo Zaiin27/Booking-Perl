@@ -36,7 +36,6 @@ const StaffDetailsModal = ({
     { value: "admin", label: "Admin" },
     { value: "staff", label: "Staff" },
     { value: "subadmin", label: "Sub Admin" },
-    { value: "user", label: "User" },
   ];
 
   const roleOptions = availableRoles.sort((a, b) => a.label.localeCompare(b.label));

@@ -452,7 +452,7 @@ const BookingFormPage = () => {
           validationSchema={validationSchema}
           onSubmit={handleSubmit}
         >
-          {({ values, isSubmitting, setFieldValue }) => {
+          {({ values, isSubmitting, setFieldValue, isValid, errors }) => {
             const total = calculateTotal(values);
             if (total !== calculatedAmount) {
               setCalculatedAmount(total);
@@ -752,6 +752,13 @@ const BookingFormPage = () => {
                           <button
                             type="submit"
                             disabled={isSubmitting || calculatedAmount === 0}
+                            onClick={() => {
+                              if (!isValid || Object.keys(errors).length > 0) {
+                                toast.error("Please fill all required fields correctly.");
+                                window.scrollTo({ top: 0, behavior: "smooth" });
+                                console.log("Validation errors:", errors);
+                              }
+                            }}
                             className="w-full relative group/btn overflow-hidden rounded-[2rem]"
                           >
                             <div className="absolute inset-0 bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 transition-all duration-300 group-hover/btn:scale-105"></div>

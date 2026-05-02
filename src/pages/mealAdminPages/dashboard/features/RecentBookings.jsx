@@ -28,8 +28,8 @@ const RecentBookings = ({ isAdmin }) => {
         };
 
         // Add staff_id for staff members
-        if (!isAdmin && user?.id) {
-          params.staff_id = user.id;
+        if (!isAdmin && (user?.id || user?._id)) {
+          params.staff_id = user.id || user._id;
         }
 
         const response = await axios.get("/api/v1/bookings/admin", { params });

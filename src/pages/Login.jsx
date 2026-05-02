@@ -88,21 +88,18 @@ const Login = () => {
               ? "company-owner"
               : user?.role === "subadmin"
                 ? "subadmin"
-                : user?.role === "driver"
-                  ? "staff"
-                  : "user"; // Default to user role
+                : "staff";
 
-        // Determine navigation path
         let navigationPath;
         if (returnUrl) {
-          // If user came from a specific page, redirect them back
           navigationPath = returnUrl;
         } else {
-          // Default navigation based on role
           navigationPath =
             user?.role === "admin" || user?.role === "company-owner" || user?.role === "subadmin" || user?.role === "driver"
               ? `/${roleName}/dashboard`
-              : "/profile"; // Navigate to profile for regular users
+              : user?.role === "staff"
+                ? "/profile"
+                : "/"; // Navigate to home for others
         }
 
         console.log(
@@ -306,8 +303,8 @@ const Login = () => {
                   <button
                     type="button"
                     className={`relative w-6 h-6 flex-shrink-0 flex items-center justify-center rounded-md transition-colors ${watch("rememberMe")
-                        ? "bg-primary border-0"
-                        : "bg-white border border-gray-300 hover:border-primary"
+                      ? "bg-primary border-0"
+                      : "bg-white border border-gray-300 hover:border-primary"
                       }`}
                     onClick={() => {
                       const currentValue = watch("rememberMe");

@@ -32,7 +32,6 @@ const StaffPage = () => {
     { value: "admin", label: "Admin" },
     { value: "staff", label: "Staff" },
     { value: "subadmin", label: "Sub Admin" },
-    { value: "user", label: "User" },
     // Add new roles here in the future - they will automatically be sorted alphabetically
   ];
 

@@ -464,10 +464,17 @@ const ReusableTable = ({
 
   const formatCurrency = (amount, currencyCode = "USD") => {
     const numericAmount = parseFloat(amount) || 0;
-    if (currencyCode?.toUpperCase() === "PKR" || currencyCode?.toUpperCase() === "RS") {
-      return `Rs ${numericAmount.toLocaleString('en-PK', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+    const code = currencyCode?.toUpperCase();
+    
+    if (code === "PKR" || code === "RS") {
+      // For PKR, don't show decimals if it's a whole number
+      const formatted = numericAmount % 1 === 0 
+        ? numericAmount.toLocaleString('en-PK') 
+        : numericAmount.toLocaleString('en-PK', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      return `Rs ${formatted}`;
     }
-    return `$${numericAmount.toFixed(2)}`;
+    
+    return `$${numericAmount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
   };
 
   const formatDiscount = (discount) => {
@@ -520,7 +527,7 @@ const ReusableTable = ({
               {value.map((room, index) => (
                 <span key={index} className="bg-gradient-to-r from-purple-500/20 to-pink-500/20 text-purple-300 px-3 py-1.5 rounded-lg text-xs font-medium border border-purple-500/30">
                   <span className="capitalize font-semibold">{room.type}</span>
-                  <span className="text-white ml-1">${room.price}</span>
+                  <span className="text-white ml-1">{formatCurrency(room.price, row.currency)}</span>
                 </span>
               ))}
             </div>
@@ -538,8 +545,8 @@ const ReusableTable = ({
         );
       case "owner_id":
         // Handle both string ID and populated user object
-        const staffId = typeof value === 'object' && value?._id ? value._id : value;
-        const staffName = typeof value === 'object' && value?.name ? value.name : null;
+        const staffId = typeof value === 'object' ? (value?.id || value?._id || value) : value;
+        const staffName = typeof value === 'object' ? (value?.name || null) : null;
         return (
           <div className="text-center">
             <span className="bg-orange-500/20 text-orange-400 px-3 py-1.5 rounded-lg text-xs font-semibold border border-orange-500/30">
@@ -851,9 +858,9 @@ const ReusableTable = ({
               // Staff Card
               if (tableType === "staff") {
                 return (
-                  <div key={rowId || index} className="relative group">
+                  <div key={rowId || index} className={`relative group ${activeMenu === String(rowId) ? "z-[100]" : "z-0"}`}>
                     <div className="absolute -inset-0.5 bg-gradient-to-r from-[#9945FF] to-[#14F195] rounded-2xl blur opacity-10 group-hover:opacity-20 transition duration-500"></div>
-                    <div className="relative bg-[#171D41] rounded-2xl p-5 border border-[#FFFFFF0D] shadow-2xl overflow-hidden">
+                    <div className={`relative bg-[#171D41] rounded-2xl p-5 border border-[#FFFFFF0D] shadow-2xl ${activeMenu === String(rowId) ? "overflow-visible" : "overflow-hidden"}`}>
                       <div className="flex justify-between items-start mb-4">
                         <div className="flex items-center gap-4">
                           <div className="w-12 h-12 rounded-xl bg-[#2A2D53] flex items-center justify-center relative">
@@ -934,7 +941,7 @@ const ReusableTable = ({
               if (tableType === "bookings") {
                 const nights = Math.ceil((new Date(row.checkOutDate) - new Date(row.checkInDate)) / (1000 * 60 * 60 * 24));
                 return (
-                  <div key={rowId || index} className="bg-[#171D41] rounded-2xl p-5 border border-[#FFFFFF0D] shadow-xl relative overflow-hidden">
+                  <div key={rowId || index} className={`bg-[#171D41] rounded-2xl p-5 border border-[#FFFFFF0D] shadow-xl relative ${activeMenu === String(rowId) ? "z-[100] overflow-visible" : "z-0 overflow-hidden"}`}>
                     <div className="flex justify-between items-center mb-4">
                       <div className="flex flex-col">
                         <span className="text-[10px] font-bold text-[#14F195] tracking-[0.2em] uppercase mb-1">
@@ -984,7 +991,7 @@ const ReusableTable = ({
               // Properties Card
               if (tableType === "properties") {
                 return (
-                  <div key={rowId || index} className="bg-[#171D41] rounded-2xl overflow-hidden border border-[#FFFFFF0D] shadow-xl group">
+                  <div key={rowId || index} className={`bg-[#171D41] rounded-2xl border border-[#FFFFFF0D] shadow-xl group relative ${activeMenu === String(rowId) ? "z-[100] overflow-visible" : "z-0 overflow-hidden"}`}>
                     <div className="h-48 relative overflow-hidden">
                       <img
                         src={row.photos?.[0] || "https://images.unsplash.com/photo-1566073771259-6a8506099945?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"}
@@ -1031,9 +1038,9 @@ const ReusableTable = ({
               // Tickets Card
               if (tableType === "tickets") {
                 return (
-                  <div key={rowId || index} className="relative group">
+                  <div key={rowId || index} className={`relative group ${activeMenu === String(rowId) ? "z-[100]" : "z-0"}`}>
                     <div className="absolute -inset-0.5 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-2xl blur opacity-10 group-hover:opacity-20 transition duration-500"></div>
-                    <div className="relative bg-[#171D41] rounded-2xl p-5 border border-[#FFFFFF0D] shadow-2xl overflow-hidden">
+                    <div className={`relative bg-[#171D41] rounded-2xl p-5 border border-[#FFFFFF0D] shadow-2xl ${activeMenu === String(rowId) ? "overflow-visible" : "overflow-hidden"}`}>
                       <div className="flex justify-between items-start mb-4">
                         <div className="flex items-center gap-3">
                           <div className="w-10 h-10 rounded-xl bg-blue-500/20 flex items-center justify-center text-blue-400">
@@ -1100,7 +1107,7 @@ const ReusableTable = ({
               // Orders Card
               if (tableType === "orders") {
                 return (
-                  <div key={rowId || index} className="bg-[#171D41] rounded-2xl p-5 border border-[#FFFFFF0D] shadow-xl relative overflow-hidden group">
+                  <div key={rowId || index} className={`bg-[#171D41] rounded-2xl p-5 border border-[#FFFFFF0D] shadow-xl relative group ${activeMenu === String(rowId) ? "z-[100] overflow-visible" : "z-0 overflow-hidden"}`}>
                     <div className="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity">
                       <span className="text-4xl text-white">📦</span>
                     </div>
@@ -1137,7 +1144,7 @@ const ReusableTable = ({
               // Contacts Card
               if (tableType === "contacts") {
                 return (
-                  <div key={rowId || index} className="bg-[#171D41] rounded-2xl p-5 border border-[#FFFFFF0D] shadow-xl hover:bg-[#1C244D] transition-all group">
+                  <div key={rowId || index} className={`bg-[#171D41] rounded-2xl p-5 border border-[#FFFFFF0D] shadow-xl hover:bg-[#1C244D] transition-all group relative ${activeMenu === String(rowId) ? "z-[100]" : "z-0"}`}>
                     <div className="flex justify-between items-start mb-4">
                       <div className="flex items-center gap-3">
                         <div className="w-10 h-10 rounded-xl bg-orange-500/20 flex items-center justify-center text-orange-400 group-hover:scale-110 transition-transform">
@@ -1178,7 +1185,7 @@ const ReusableTable = ({
               return (
                 <div
                   key={rowId || index}
-                  className="bg-[#171D41] rounded-2xl p-5 border border-[#FFFFFF0D] shadow-xl hover:bg-[#1C244D] transition-colors"
+                  className={`bg-[#171D41] rounded-2xl p-5 border border-[#FFFFFF0D] shadow-xl hover:bg-[#1C244D] transition-colors relative ${activeMenu === String(rowId) ? "z-[100]" : "z-0"}`}
                 >
                   <div className="flex justify-between items-start mb-4">
                     <div className="flex items-center gap-4">
@@ -1258,8 +1265,7 @@ const ReusableTable = ({
               <tr
                 key={row.id || index}
                 onClick={() => onRowClick && onRowClick(row)}
-                className={`border-b border-[#EDEDED33] hover:bg-[#0A1330] hover:rounded-lg transition-all duration-200 cursor-pointer my-2 ${selectedRow === row.id ? "bg-[#0A1330]" : ""
-                  }`}
+                className={`border-b border-[#EDEDED33] hover:bg-[#0A1330] hover:rounded-lg transition-all duration-200 cursor-pointer my-2 relative ${selectedRow === row.id ? "bg-[#0A1330]" : ""} ${activeMenu === String(row.id || row._id) ? "z-[100]" : "z-0"}`}
               >
                 {columns.map((column) => (
                   <td

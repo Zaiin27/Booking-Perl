@@ -82,7 +82,7 @@ const PropertiesPage = () => {
 
       // Add staff filtering if user is staff
       if (user?.role === 'staff') {
-        params.owner_id = user.id;
+        params.owner_id = user.id || user._id;
       }
 
       const response = await axios.get("/api/v1/properties", { params });
@@ -257,8 +257,8 @@ const PropertiesPage = () => {
               isLoading={loading}
               tableType="properties"
               onView={(row) => navigate(user?.role === 'staff' ? `/staff/properties/${row._id}` : `/admin/properties/${row._id}`)}
-              onEdit={user?.role === 'admin' ? (row) => navigate(`/admin/properties/edit/${row._id}`) : undefined}
-              onDelete={user?.role === 'admin' ? (row) => handleDelete(row._id) : undefined}
+              onEdit={(row) => navigate(user?.role === 'staff' ? `/staff/properties/edit/${row._id}` : `/admin/properties/edit/${row._id}`)}
+              onDelete={(row) => handleDelete(row._id)}
             />
           </div>
 

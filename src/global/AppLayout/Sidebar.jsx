@@ -110,32 +110,6 @@ function Sidebar({ isMobileSidebarOpen, toggleSidebar, setActivePage }) {
         ],
         bottom: [],
       },
-      user: {
-        main: [
-          {
-            path: "/user/orders",
-            name: "My Orders",
-            icon: OrdersIcon,
-          },
-          {
-            path: "/booking-history",
-            name: "My Bookings",
-            icon: FaCalendarCheck,
-          },
-          {
-            path: "/user/tickets",
-            name: "Support",
-            icon: TicketsIcon,
-          },
-        ],
-        bottom: [
-          {
-            path: "/user/profile",
-            name: "Profile",
-            icon: StaffIcon,
-          },
-        ],
-      },
     };
 
     return menu[role] || {};
@@ -157,10 +131,10 @@ function Sidebar({ isMobileSidebarOpen, toggleSidebar, setActivePage }) {
 
   const menuItems = getRoleBasedMenuItems(roleName);
 
-  // Fallback for testing - if no role is detected, show user menu
+  // Fallback for testing - if no role is detected, show staff menu
   const finalMenuItems = menuItems?.main
     ? menuItems
-    : getRoleBasedMenuItems("user");
+    : getRoleBasedMenuItems("staff");
   // Utility function to render NavLink items
   const handleLogout = async () => {
     try {
@@ -348,9 +322,9 @@ function Sidebar({ isMobileSidebarOpen, toggleSidebar, setActivePage }) {
                       ? "Admin"
                       : currentRole === "staff"
                         ? "Staff"
-                        : currentRole === "user"
-                          ? "User"
-                          : "User")}
+                        : currentRole === "staff"
+                          ? "Staff"
+                          : "Staff")}
                 </div>
               </div>
               <button className="text-[#EDEDED] hover:text-[#EDEDED80]">

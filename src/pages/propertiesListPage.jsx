@@ -151,13 +151,7 @@ const PropertiesListPage = () => {
     navigate(`/properties/${propertyId}`);
   };
 
-  if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-[#0F0F23] via-[#1A1A2E] to-[#16213E]">
-        <div className="text-xl text-white">Loading properties...</div>
-      </div>
-    );
-  }
+
   return (
     <div className="min-h-screen bg-[#F8FAFC]">
       {/* Cinematic Hero Section */}
@@ -234,7 +228,33 @@ const PropertiesListPage = () => {
           </div>
         </div>
 
-        {properties.length === 0 ? (
+        {loading ? (
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
+            {[1, 2, 3, 4].map((n) => (
+              <div key={n} className="bg-white rounded-[2.5rem] overflow-hidden border border-slate-100 shadow-sm flex flex-col md:flex-row animate-pulse">
+                <div className="w-full md:w-[40%] h-72 md:h-auto bg-slate-200"></div>
+                <div className="flex-1 p-6 md:p-8 flex flex-col justify-between space-y-4">
+                  <div className="space-y-4">
+                    <div className="h-4 bg-slate-200 rounded w-1/4"></div>
+                    <div className="h-8 bg-slate-200 rounded w-3/4"></div>
+                    <div className="space-y-2 mt-4">
+                      <div className="h-4 bg-slate-200 rounded w-full"></div>
+                      <div className="h-4 bg-slate-200 rounded w-5/6"></div>
+                    </div>
+                    <div className="flex gap-2 mt-4">
+                      <div className="h-6 bg-slate-200 rounded w-16"></div>
+                      <div className="h-6 bg-slate-200 rounded w-16"></div>
+                    </div>
+                  </div>
+                  <div className="pt-6 border-t border-slate-50 flex items-center justify-between">
+                    <div className="h-10 bg-slate-200 rounded w-24"></div>
+                    <div className="h-12 w-12 bg-slate-200 rounded-[1.2rem]"></div>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        ) : properties.length === 0 ? (
           <div className="text-center py-24 bg-white rounded-[3rem] border-2 border-dashed border-slate-100 animate-slide-up">
             <div className="w-24 h-24 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-6 text-4xl">🏝️</div>
             <h3 className="text-2xl font-black text-slate-800 mb-2">No properties matched your search</h3>

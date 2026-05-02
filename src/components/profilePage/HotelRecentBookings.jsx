@@ -18,7 +18,7 @@ const HotelRecentBookings = () => {
             };
 
             if (user?.role === 'staff') {
-                params.staff_id = user.id;
+                params.staff_id = user.id || user._id;
             }
 
             const response = await axios.get("/api/v1/bookings/admin", { params });

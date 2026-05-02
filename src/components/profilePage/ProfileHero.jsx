@@ -1,7 +1,9 @@
 import React from "react";
 import { useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
 
 const ProfileHero = () => {
+  const navigate = useNavigate();
   const { user } = useSelector((state) => state.auth);
   
   // Get user name, fallback to email if name not available
@@ -34,7 +36,7 @@ const ProfileHero = () => {
           </linearGradient>
         </defs>
       </svg>
-      <div className="">
+      <div className="text-center">
         <span className="text-white text-3xl md:text-[50px] !font-bold font-inter">
           Welcome back{" "}
         </span>
@@ -42,6 +44,15 @@ const ProfileHero = () => {
           {userName}!
         </span>
       </div>
+
+      {user?.role === 'staff' && (
+        <button
+          onClick={() => navigate("/staff/dashboard")}
+          className="mt-6 px-8 py-3 bg-gradient-to-r from-[#9945FF] to-[#14F195] text-white font-bold rounded-full hover:scale-105 transition-all duration-300 shadow-lg shadow-[#14F19522]"
+        >
+          Go to Dashboard
+        </button>
+      )}
     </div>
   );
 };
